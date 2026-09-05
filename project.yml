@@ -29,7 +29,12 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: "Expenses"
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
-        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: YES
+        AD_HOC_CODE_SIGNING_ALLOWED: YES
+        DEVELOPMENT_TEAM: ""
 
   MessageFilterExtension:
     type: app-extension
@@ -49,4 +54,9 @@ targets:
         PRODUCT_NAME: MessageFilterExtension
         SWIFT_VERSION: "5.9"
         GENERATE_INFOPLIST_FILE: NO
-        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: YES
+        AD_HOC_CODE_SIGNING_ALLOWED: YES
+        DEVELOPMENT_TEAM: ""

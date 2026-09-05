@@ -28,7 +28,7 @@ public struct ExpenseTrackerApp: App {
 
     public init() {
         let context = ModelContext(sharedModelContainer)
-        seedInitialDataIfNeeded(context: context)
+        Self.seedInitialDataIfNeeded(context: context)
         Self.syncAutoParsedFromExtension(context: context)
     }
 
