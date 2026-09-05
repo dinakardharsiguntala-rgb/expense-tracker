@@ -1,0 +1,28 @@
+name: expense_tracker
+description: "Privacy-first On-Device Expense Tracker for iPhone and Android with Bank SMS Reader"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  fl_chart: ^0.68.0
+  intl: ^0.19.0
+  flutter_local_notifications: ^17.2.2
+  share_plus: ^10.0.0
+  csv: ^6.0.0
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

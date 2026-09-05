@@ -3,22 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iOS Expense Tracker - Interactive Preview</title>
+  <title>Dual-Platform Expense Tracker - iPhone & Android Simulator</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
-    /* Smooth transitions and custom scrollbar */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 4px; }
     .tab-active { color: #007AFF !important; }
+    .android-tab-active { color: #1E88E5 !important; }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-notification {
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 antialiased font-sans">
+<body class="bg-slate-950 text-slate-100 flex flex-col items-center justify-center min-h-screen p-4 antialiased font-sans">
 
-  <!-- Outer Device Container -->
-  <div class="relative w-full max-w-[420px] bg-slate-900 border-4 border-slate-700 rounded-[48px] shadow-2xl overflow-hidden flex flex-col h-[840px]">
+  <!-- Top Platform Switcher Bar -->
+  <div class="flex items-center space-x-3 mb-4 bg-slate-900/90 border border-slate-700/80 p-1.5 rounded-2xl shadow-xl">
+    <button id="btnSwitchIos" onclick="switchPlatform('ios')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-md transition">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.38c.62-.75 1.04-1.8 0.92-2.85-.9.04-2 .6-2.65 1.35-.58.66-1.09 1.73-.95 2.76 1.01.08 2.06-.51 2.68-1.26z"/></svg>
+      <span>iPhone 15 Pro (iOS)</span>
+    </button>
+    <button id="btnSwitchAndroid" onclick="switchPlatform('android')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.411 13.8566 8.1 12 8.1s-3.5902.311-5.1368.8497L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9974 3.4592C2.6889 11.1867.3432 14.6589 0 18.742h24c-.3432-4.0831-2.6889-7.5553-6.1185-9.4206"/></svg>
+      <span>Android Phone</span>
+    </button>
+  </div>
+
+  <!-- Outer Mobile Device Frame -->
+  <div id="deviceFrame" class="relative w-full max-w-[420px] bg-slate-900 border-4 border-slate-700 rounded-[48px] shadow-2xl overflow-hidden flex flex-col h-[840px] transition-all duration-300">
     
-    <!-- iPhone Dynamic Island / Speaker Notch -->
-    <div class="absolute top-0 left-0 right-0 h-10 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-between px-7 pt-2 select-none">
+    <!-- iPhone Dynamic Island / Notch -->
+    <div id="iosNotch" class="absolute top-0 left-0 right-0 h-10 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-between px-7 pt-2 select-none">
       <span id="clock" class="text-xs font-semibold text-slate-200">9:41</span>
       <div class="w-24 h-5 bg-black rounded-full flex items-center justify-center space-x-2">
         <div class="w-2.5 h-2.5 bg-slate-800 rounded-full"></div>
@@ -30,7 +49,36 @@
       </div>
     </div>
 
-    <!-- Main Screen Content Area (Scrollable) -->
+    <!-- Android Punch-Hole & Status Bar -->
+    <div id="androidStatusBar" class="hidden absolute top-0 left-0 right-0 h-9 bg-slate-900/95 backdrop-blur-md z-50 flex items-center justify-between px-5 pt-1 select-none">
+      <span id="androidClock" class="text-xs font-bold text-slate-200">9:41</span>
+      <!-- Centered Punch Hole Camera -->
+      <div class="w-3.5 h-3.5 bg-black rounded-full border border-slate-800"></div>
+      <div class="flex items-center space-x-2 text-xs text-slate-300">
+        <span class="text-[10px] font-bold text-emerald-400">5G</span>
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.63 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+
+    <!-- Android Heads-Up Notification Banner (Simulated Incoming SMS) -->
+    <div id="androidNotificationBanner" class="hidden absolute top-11 left-3 right-3 bg-slate-800/95 border border-blue-500/40 p-3 rounded-2xl shadow-2xl z-50 animate-notification cursor-pointer" onclick="openTransactionDetail(0)">
+      <div class="flex items-start space-x-2.5">
+        <div class="p-2 bg-blue-600 rounded-xl text-white">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-baseline">
+            <span class="text-xs font-bold text-blue-400">Bank SMS Receiver • Just Now</span>
+            <span class="text-[10px] text-slate-400">Auto-Logged</span>
+          </div>
+          <p id="notifBody" class="text-xs text-slate-200 font-semibold mt-0.5 truncate">Auto-Expense Logged: ₹450 at STARBUCKS</p>
+          <p class="text-[10px] text-slate-400">Saved to local SQLite database</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Screen Content Area -->
     <div id="screenContainer" class="flex-1 overflow-y-auto pt-12 pb-20 px-4 space-y-4">
       
       <!-- ================= TAB 1: DASHBOARD ================= -->
@@ -40,12 +88,23 @@
           <div>
             <div class="flex items-center space-x-1.5">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-[10px] font-bold tracking-wider text-emerald-400 uppercase">On-Device SwiftData</span>
+              <span id="platformDbBadge" class="text-[10px] font-bold tracking-wider text-emerald-400 uppercase">100% On-Device SQLite</span>
             </div>
-            <h1 class="text-2xl font-black tracking-tight text-white">Expense Vault</h1>
+            <h1 class="text-2xl font-black tracking-tight text-white">Expense Tracker</h1>
           </div>
           <button onclick="switchTab('sms')" class="flex items-center space-x-1 px-3 py-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-semibold hover:bg-blue-600 hover:text-white transition">
-            <span>✨ Bank SMS</span>
+            <span>⚡ Bank SMS</span>
+          </button>
+        </div>
+
+        <!-- Android Simulation Live Banner -->
+        <div id="androidQuickSim" class="hidden bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 p-3 rounded-2xl flex items-center justify-between">
+          <div class="text-xs">
+            <div class="font-bold text-blue-300">Android SMS Auto-Receiver</div>
+            <div class="text-[10px] text-slate-400">Test real-time background SMS detection</div>
+          </div>
+          <button onclick="simulateIncomingBankSMS()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
+            Simulate SMS
           </button>
         </div>
 
@@ -53,11 +112,11 @@
         <div class="grid grid-cols-2 gap-2.5">
           <button onclick="switchTab('sms')" class="flex items-center justify-center space-x-2 py-3 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold text-xs shadow-lg shadow-blue-500/20 active:scale-95 transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-            <span>Parse Bank SMS</span>
+            <span id="quickSmsBtnLabel">Read Bank SMS</span>
           </button>
-          <button onclick="switchTab('sms')" class="flex items-center justify-center space-x-2 py-3 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-2xl font-bold text-xs border border-slate-700 active:scale-95 transition">
+          <button onclick="showAddManualModal()" class="flex items-center justify-center space-x-2 py-3 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-2xl font-bold text-xs border border-slate-700 active:scale-95 transition">
             <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            <span>Try Samples</span>
+            <span>Add Expense</span>
           </button>
         </div>
 
@@ -65,15 +124,15 @@
         <div class="grid grid-cols-3 gap-2">
           <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl">
             <div class="text-[11px] text-slate-400 font-medium">Spent</div>
-            <div id="statTotalSpent" class="text-base font-bold text-red-400 mt-1 truncate">$0.00</div>
+            <div id="statTotalSpent" class="text-base font-bold text-red-400 mt-1 truncate">₹0.00</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl">
             <div class="text-[11px] text-slate-400 font-medium">Income</div>
-            <div id="statTotalIncome" class="text-base font-bold text-emerald-400 mt-1 truncate">$0.00</div>
+            <div id="statTotalIncome" class="text-base font-bold text-emerald-400 mt-1 truncate">₹0.00</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl">
             <div class="text-[11px] text-slate-400 font-medium">Net Left</div>
-            <div id="statNetSavings" class="text-base font-bold text-blue-400 mt-1 truncate">$0.00</div>
+            <div id="statNetSavings" class="text-base font-bold text-blue-400 mt-1 truncate">₹0.00</div>
           </div>
         </div>
 
@@ -94,7 +153,7 @@
                 <circle id="donutSegment3" cx="18" cy="18" r="15.915" fill="none" stroke="#6C5CE7" stroke-width="3.8" stroke-dasharray="25 75" stroke-dashoffset="-75"></circle>
               </svg>
               <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span id="donutCenterAmount" class="text-sm font-extrabold text-white">$1,944</span>
+                <span id="donutCenterAmount" class="text-sm font-extrabold text-white">₹1,944</span>
                 <span class="text-[9px] text-slate-400">Total Spent</span>
               </div>
             </div>
@@ -108,7 +167,7 @@
         <div class="bg-slate-800/80 border border-slate-700/60 p-3.5 rounded-2xl space-y-2">
           <div class="flex justify-between items-center text-xs">
             <span class="font-semibold text-slate-300">Monthly Budget</span>
-            <span id="budgetProgressLabel" class="text-slate-400">$1,944 / $2,500</span>
+            <span id="budgetProgressLabel" class="text-slate-400">₹1,944 / ₹2,500</span>
           </div>
           <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
             <div id="budgetProgressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: 77%"></div>
@@ -129,12 +188,12 @@
       <div id="tabTransactions" class="space-y-3 hidden">
         <div class="pt-2">
           <h1 class="text-2xl font-black text-white">Transactions</h1>
-          <p class="text-xs text-slate-400">Search and filter your local expense logs</p>
+          <p class="text-xs text-slate-400">Search and tap any entry to view full bank SMS</p>
         </div>
 
         <!-- Search Bar -->
         <div class="relative">
-          <input type="text" id="searchInput" oninput="renderTransactionsList()" placeholder="Search merchant, bank, or note..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-9 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500">
+          <input type="text" id="searchInput" oninput="renderTransactionsList()" placeholder="Search merchant, bank, or SMS keyword..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-9 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500">
           <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
 
@@ -156,7 +215,20 @@
             <span class="text-xl">💬</span>
             <h1 class="text-2xl font-black text-white">Bank SMS Reader</h1>
           </div>
-          <p class="text-xs text-slate-400">On-device regex parser for bank transaction alerts.</p>
+          <p class="text-xs text-slate-400">On-device regex parser with full SMS preservation</p>
+        </div>
+
+        <!-- Android Inbox Scan Action (Visible on Android mode) -->
+        <div id="androidInboxCard" class="bg-blue-900/30 border border-blue-500/40 p-3.5 rounded-2xl space-y-2">
+          <div class="flex items-center space-x-2">
+            <span class="text-blue-400 font-bold text-xs">🤖 Android System Integration</span>
+          </div>
+          <p class="text-[11px] text-slate-300">
+            One-tap auto-scan queries your phone's SMS inbox and parses past bank alerts into SQLite.
+          </p>
+          <button onclick="scanAndroidInboxSim()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
+            Scan & Import Past Bank SMS
+          </button>
         </div>
 
         <!-- Interactive SMS Input -->
@@ -165,7 +237,7 @@
             <span>Paste Bank Notification</span>
             <button onclick="clearSMSInput()" class="text-red-400 hover:underline">Clear</button>
           </div>
-          <textarea id="smsInput" rows="3" oninput="parseLiveSMS()" placeholder="Paste bank SMS here... (e.g. 'Alert: You spent Rs.1,499.00 on HDFC Card ending 4321 at STARBUCKS on 05-SEP-26')" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"></textarea>
+          <textarea id="smsInput" rows="3" oninput="parseLiveSMS()" placeholder="Paste bank SMS here... (e.g. 'Alert: Rs.450.00 debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI')" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"></textarea>
         </div>
 
         <!-- Quick Sample Chips -->
@@ -192,7 +264,7 @@
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div>
               <span class="text-slate-400 text-[10px]">AMOUNT</span>
-              <div id="parsedAmount" class="text-lg font-black text-red-400">$0.00</div>
+              <div id="parsedAmount" class="text-lg font-black text-red-400">₹0.00</div>
             </div>
             <div>
               <span class="text-slate-400 text-[10px]">TYPE</span>
@@ -220,18 +292,18 @@
           </div>
 
           <button onclick="commitParsedTransaction()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 active:scale-95 transition">
-            Save to On-Device Expenses
+            Save to On-Device Database
           </button>
         </div>
 
         <!-- iOS Shortcuts Explainer Banner -->
-        <div class="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-700/40 p-3.5 rounded-2xl space-y-2">
+        <div id="iosShortcutCard" class="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-700/40 p-3.5 rounded-2xl space-y-2">
           <div class="flex items-center space-x-2">
             <span class="text-base">⚡</span>
             <span class="text-xs font-bold text-purple-200">Zero-Touch iOS Automation</span>
           </div>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            By setting up a 1-minute automation in Apple's <strong>Shortcuts App</strong>, your iPhone can forward incoming bank messages to this app in the background automatically!
+            By setting up a 1-minute automation in Apple's <strong>Shortcuts App</strong>, your iPhone forwards bank messages to the app in the background automatically!
           </p>
         </div>
       </div>
@@ -247,19 +319,19 @@
           <div class="flex justify-between items-center">
             <span class="text-slate-300 font-semibold">Currency</span>
             <select id="currencySelector" onchange="changeCurrency(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2 py-1 focus:outline-none">
-              <option value="$" selected>USD ($)</option>
-              <option value="₹">INR (₹)</option>
+              <option value="₹" selected>INR (₹)</option>
+              <option value="$">USD ($)</option>
               <option value="€">EUR (€)</option>
               <option value="£">GBP (£)</option>
             </select>
           </div>
           <div class="border-t border-slate-700 pt-2 flex justify-between items-center">
             <span class="text-slate-300 font-semibold">Storage Engine</span>
-            <span class="text-emerald-400 font-bold">SwiftData (Encrypted SQLite)</span>
+            <span id="storageLabel" class="text-emerald-400 font-bold">100% On-Device SQLite</span>
           </div>
           <div class="border-t border-slate-700 pt-2 flex justify-between items-center">
             <span class="text-slate-300 font-semibold">Cloud Sync</span>
-            <span class="text-slate-400">Disabled (100% Offline)</span>
+            <span class="text-slate-400">Disabled (Zero External Server)</span>
           </div>
         </div>
 
@@ -274,7 +346,7 @@
       </div>
     </div>
 
-    <!-- Bottom iOS Tab Bar -->
+    <!-- Bottom Navigation Bar -->
     <div class="absolute bottom-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 flex items-center justify-around px-2 z-40">
       <button onclick="switchTab('dashboard')" id="navDashboard" class="flex flex-col items-center justify-center w-16 text-blue-500 tab-active">
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
@@ -294,35 +366,65 @@
       </button>
     </div>
 
-    <!-- Home Indicator Bar -->
-    <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-600 rounded-full z-50"></div>
+    <!-- Home Indicator / Nav Bar -->
+    <div id="homeIndicator" class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-600 rounded-full z-50"></div>
+  </div>
+
+  <!-- Transaction Detail Modal (Displays Full Bank SMS) -->
+  <div id="txDetailModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-200">Transaction Details</h3>
+        <button onclick="closeTxDetailModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+      <div class="text-center py-2">
+        <div id="modalAmount" class="text-3xl font-black text-red-400">₹0.00</div>
+        <div id="modalMerchant" class="text-sm font-bold text-slate-300 mt-1">Merchant</div>
+        <div id="modalBadge" class="inline-block mt-2 px-2.5 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full text-[10px] font-bold">Auto-Parsed from SMS</div>
+      </div>
+      <div class="space-y-2 text-xs bg-slate-800/80 p-3 rounded-2xl">
+        <div class="flex justify-between"><span class="text-slate-400">Category</span><span id="modalCategory" class="font-semibold text-slate-200">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Bank / Source</span><span id="modalBank" class="font-semibold text-slate-200">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Payment Mode</span><span id="modalMode" class="font-semibold text-slate-200">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Date</span><span id="modalDate" class="font-semibold text-slate-200">-</span></div>
+      </div>
+      <div id="modalRawSMSContainer" class="space-y-1 text-xs">
+        <div class="text-[11px] font-bold text-slate-400">Original Bank Transaction SMS:</div>
+        <div id="modalRawSMS" class="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-300 leading-relaxed select-all">
+          No SMS recorded
+        </div>
+      </div>
+      <button onclick="closeTxDetailModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">
+        Close
+      </button>
+    </div>
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed top-8 bg-emerald-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none -translate-y-4">
-    Transaction Saved to iPhone!
+  <div id="toast" class="fixed top-8 bg-emerald-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 z-50">
+    Transaction Saved to Device!
   </div>
 
   <script>
-    // Initial Sample Database
-    let currencySymbol = '$';
+    let activePlatform = 'ios';
+    let currencySymbol = '₹';
     let currentFilter = 'all';
 
     const defaultTransactions = [
-      { id: '1', amount: 1499.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '4321', mode: 'Credit Card', date: 'Today, 2:15 PM', isAuto: true, raw: "Alert: You've spent Rs.1,499.00 on your HDFC Bank Credit Card ending 4321 at STARBUCKS COFFEE on 05-SEP-26." },
-      { id: '2', amount: 45.50, type: 'Expense', merchant: 'Whole Foods Market', category: 'Groceries', bank: 'Chase', last4: '8892', mode: 'Debit Card', date: 'Today, 10:30 AM', isAuto: true, raw: "Chase Alert: You made a $45.50 debit card transaction at WHOLE FOODS with card ending in 8892." },
-      { id: '3', amount: 385.00, type: 'Expense', merchant: 'Uber Ride', category: 'Transportation & Fuel', bank: 'ICICI Bank', last4: '', mode: 'UPI', date: 'Yesterday', isAuto: true, raw: "Paid Rs 385.00 for your Uber ride using ICICI NetBanking." },
-      { id: '4', amount: 3200.00, type: 'Income', merchant: 'Acme Corp', category: 'Salary', bank: 'Primary Bank', last4: '1234', mode: 'Net Banking', date: 'Sep 1, 2026', isAuto: false, raw: "" }
+      { id: '1', amount: 450.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '1234', mode: 'UPI', date: 'Today, 2:15 PM', isAuto: true, raw: "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50." },
+      { id: '2', amount: 1299.00, type: 'Expense', merchant: 'Blinkit Grocery', category: 'Groceries', bank: 'SBI', last4: '9876', mode: 'UPI', date: 'Today, 10:30 AM', isAuto: true, raw: "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT GROCERY via UPI Ref 629482. SBI." },
+      { id: '3', amount: 385.00, type: 'Expense', merchant: 'Uber Trip', category: 'Transportation & Fuel', bank: 'ICICI Bank', last4: '4321', mode: 'Card', date: 'Yesterday', isAuto: true, raw: "Alert: You made a payment of Rs 385.00 with Card ending 4321 at UBER TRIP." },
+      { id: '4', amount: 75000.00, type: 'Income', merchant: 'Infosys Ltd (Salary)', category: 'Salary', bank: 'HDFC Bank', last4: '1234', mode: 'Net Banking', date: 'Sep 1, 2026', isAuto: true, raw: "Salary of INR 75,000.00 credited to your Account **1234 by Infosys Technologies on 01-SEP-26." }
     ];
 
-    let transactions = JSON.parse(localStorage.getItem('expenses_data')) || defaultTransactions;
+    let transactions = JSON.parse(localStorage.getItem('expenses_dual_data')) || defaultTransactions;
 
     const sampleSMS = [
-      "Alert: You've spent Rs.1,499.00 on your HDFC Bank Credit Card ending 4321 at STARBUCKS COFFEE on 05-SEP-26. Avl Bal: Rs.45,200.00.",
-      "Dear SBI User, A/C 1234 debited by Rs 420.00 on 05Sep26 transfer to SWIGGY UPI: swiggy@icici Ref 429381. Bal: Rs 8,310.00",
-      "Chase Alert: You made a $45.50 debit card transaction at WHOLE FOODS with card ending in 8892 on 09/05/2026.",
-      "Your A/C ending in 1234 has been CREDITED with Rs 75,000.00 on 01-Sep-26 towards SALARY by ACME CORP. Avl Bal: Rs 82,450.00",
-      "Paid Rs 385.00 for your Uber ride using Paytm Wallet / ICICI NetBanking. Transaction ID: UB839201."
+      "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.",
+      "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.",
+      "Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER on Sep 5.",
+      "Salary of INR 75,000.00 credited to your HDFC Bank Account XX1234 on 01-SEP-26 by Infosys Technologies Ltd.",
+      "Paid Rs 650.00 at SHELL PETROL PUMP using Axis Bank Debit Card ending 7741 on 04-SEP-26."
     ];
 
     let currentParsed = null;
@@ -334,9 +436,56 @@
       renderTransactionsList();
     }
 
+    function switchPlatform(p) {
+      activePlatform = p;
+      const btnIos = document.getElementById('btnSwitchIos');
+      const btnAndroid = document.getElementById('btnSwitchAndroid');
+      const iosNotch = document.getElementById('iosNotch');
+      const androidStatusBar = document.getElementById('androidStatusBar');
+      const androidQuickSim = document.getElementById('androidQuickSim');
+      const androidInboxCard = document.getElementById('androidInboxCard');
+      const iosShortcutCard = document.getElementById('iosShortcutCard');
+      const deviceFrame = document.getElementById('deviceFrame');
+      const platformBadge = document.getElementById('platformDbBadge');
+
+      if (p === 'android') {
+        btnAndroid.classList.add('bg-blue-600', 'text-white');
+        btnAndroid.classList.remove('text-slate-400');
+        btnIos.classList.remove('bg-blue-600', 'text-white');
+        btnIos.classList.add('text-slate-400');
+
+        iosNotch.classList.add('hidden');
+        androidStatusBar.classList.remove('hidden');
+        androidQuickSim.classList.remove('hidden');
+        androidInboxCard.classList.remove('hidden');
+        iosShortcutCard.classList.add('hidden');
+        deviceFrame.classList.remove('rounded-[48px]');
+        deviceFrame.classList.add('rounded-[36px]');
+        platformBadge.textContent = '100% On-Device SQLite (Android)';
+        showToast('Switched to Android Mode');
+      } else {
+        btnIos.classList.add('bg-blue-600', 'text-white');
+        btnIos.classList.remove('text-slate-400');
+        btnAndroid.classList.remove('bg-blue-600', 'text-white');
+        btnAndroid.classList.add('text-slate-400');
+
+        iosNotch.classList.remove('hidden');
+        androidStatusBar.classList.add('hidden');
+        androidQuickSim.classList.add('hidden');
+        androidInboxCard.classList.add('hidden');
+        iosShortcutCard.classList.remove('hidden');
+        deviceFrame.classList.add('rounded-[48px]');
+        deviceFrame.classList.remove('rounded-[36px]');
+        platformBadge.textContent = '100% On-Device SQLite (iPhone)';
+        showToast('Switched to iPhone Mode');
+      }
+    }
+
     function updateClock() {
       const now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      document.getElementById('clock').textContent = timeStr;
+      document.getElementById('androidClock').textContent = timeStr;
     }
 
     function switchTab(tab) {
@@ -350,171 +499,217 @@
       document.getElementById('tab' + activeName).classList.remove('hidden');
       document.getElementById('nav' + activeName).classList.add('tab-active', 'text-blue-500');
       document.getElementById('nav' + activeName).classList.remove('text-slate-400');
+    }
 
-      if (tab === 'dashboard') renderDashboard();
-      if (tab === 'transactions') renderTransactionsList();
+    function simulateIncomingBankSMS() {
+      const incoming = "Dear Customer, Rs.550.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 14,690.50.";
+      
+      // Auto-parse directly
+      const newTx = {
+        id: Date.now().toString(),
+        amount: 550.00,
+        type: 'Expense',
+        merchant: 'Starbucks Coffee',
+        category: 'Food & Dining',
+        bank: 'HDFC Bank',
+        last4: '1234',
+        mode: 'UPI',
+        date: 'Just now',
+        isAuto: true,
+        raw: incoming
+      };
+
+      transactions.unshift(newTx);
+      localStorage.setItem('expenses_dual_data', JSON.stringify(transactions));
+      renderDashboard();
+      renderTransactionsList();
+
+      // Show floating notification
+      const banner = document.getElementById('androidNotificationBanner');
+      document.getElementById('notifBody').textContent = `Auto-Expense Logged: ₹550.00 at Starbucks Coffee`;
+      banner.classList.remove('hidden');
+
+      setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 4000);
+    }
+
+    function scanAndroidInboxSim() {
+      const dummyBatch = [
+        { id: 'b1', amount: 890.00, type: 'Expense', merchant: 'Shell Petrol', category: 'Transportation & Fuel', bank: 'HDFC Bank', last4: '1234', mode: 'Card', date: 'Yesterday', isAuto: true, raw: "Rs 890.00 spent on Card ending 1234 at SHELL FUEL on 04-SEP." },
+        { id: 'b2', amount: 340.00, type: 'Expense', merchant: 'Swiggy Food', category: 'Food & Dining', bank: 'SBI', last4: '9876', mode: 'UPI', date: '2 days ago', isAuto: true, raw: "A/c 9876 debited by Rs 340.00 to SWIGGY via UPI." }
+      ];
+
+      dummyBatch.forEach(item => transactions.unshift(item));
+      localStorage.setItem('expenses_dual_data', JSON.stringify(transactions));
+      renderDashboard();
+      renderTransactionsList();
+      showToast("Inbox Scanned: 2 Bank SMS Imported!");
+      switchTab('dashboard');
     }
 
     function renderDashboard() {
-      const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((acc, t) => acc + t.amount, 0);
-      const totalIncome = transactions.filter(t => t.type === 'Income').reduce((acc, t) => acc + t.amount, 0);
-      const net = totalIncome - totalExpense;
+      let spent = 0;
+      let income = 0;
+      const catTotals = {};
 
-      document.getElementById('statTotalSpent').textContent = `${currencySymbol}${totalExpense.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-      document.getElementById('statTotalIncome').textContent = `${currencySymbol}${totalIncome.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-      document.getElementById('statNetSavings').textContent = `${currencySymbol}${net.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-      document.getElementById('donutCenterAmount').textContent = `${currencySymbol}${Math.round(totalExpense)}`;
-
-      // Category share
-      const catMap = {};
-      transactions.filter(t => t.type === 'Expense').forEach(t => {
-        catMap[t.category] = (catMap[t.category] || 0) + t.amount;
+      transactions.forEach(t => {
+        if (t.type === 'Expense') {
+          spent += t.amount;
+          catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+        } else {
+          income += t.amount;
+        }
       });
 
+      document.getElementById('statTotalSpent').textContent = `${currencySymbol}${spent.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('statTotalIncome').textContent = `${currencySymbol}${income.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('statNetSavings').textContent = `${currencySymbol}${(income - spent).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('donutCenterAmount').textContent = `${currencySymbol}${Math.round(spent)}`;
+
+      // Render recent list (max 4)
+      const listContainer = document.getElementById('recentTransactionsList');
+      listContainer.innerHTML = '';
+      transactions.slice(0, 4).forEach((t, idx) => {
+        listContainer.appendChild(createTransactionRow(t, idx));
+      });
+
+      // Render Category Legends
       const legends = document.getElementById('categoryLegends');
       legends.innerHTML = '';
-      const colors = ['#FF6B6B', '#4ECDC4', '#6C5CE7', '#FFD93D'];
-      let idx = 0;
-
-      for (const [cat, amt] of Object.entries(catMap)) {
-        const pct = totalExpense > 0 ? Math.round((amt / totalExpense) * 100) : 0;
-        const color = colors[idx % colors.length];
-        legends.innerHTML += `
-          <div class="flex items-center space-x-1.5">
-            <span class="w-2 h-2 rounded-full" style="background-color: ${color}"></span>
-            <span class="text-slate-300 truncate">${cat}</span>
-            <span class="text-slate-500 font-bold ml-auto">${pct}%</span>
-          </div>
-        `;
-        idx++;
-      }
-
-      // Recent 3
-      const recentList = document.getElementById('recentTransactionsList');
-      recentList.innerHTML = '';
-      transactions.slice(0, 3).forEach(t => {
-        recentList.innerHTML += createTransactionRowHTML(t);
+      const topCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      topCats.forEach(([cat, amt]) => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-2 rounded-xl bg-slate-900/60 border border-slate-700/40';
+        div.innerHTML = `<span class="truncate text-slate-300">${cat}</span><span class="font-bold text-slate-100">${currencySymbol}${Math.round(amt)}</span>`;
+        legends.appendChild(div);
       });
     }
 
-    function createTransactionRowHTML(t) {
-      const isExpense = t.type === 'Expense';
-      return `
-        <div class="flex items-center justify-between p-3 bg-slate-800/80 border border-slate-700/50 rounded-2xl hover:border-slate-600 transition">
-          <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-full ${isExpense ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'} flex items-center justify-center font-bold text-sm">
-              ${isExpense ? '↑' : '↓'}
-            </div>
-            <div>
-              <div class="flex items-center space-x-1.5">
-                <span class="text-xs font-bold text-slate-100">${t.merchant}</span>
-                ${t.isAuto ? '<span class="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">SMS</span>' : ''}
-              </div>
-              <div class="text-[10px] text-slate-400">${t.category} ${t.last4 ? '• ••' + t.last4 : ''}</div>
-            </div>
+    function createTransactionRow(t, index) {
+      const isIncome = t.type === 'Income';
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between p-3 rounded-2xl bg-slate-800/80 border border-slate-700/50 hover:bg-slate-750 transition cursor-pointer';
+      div.onclick = () => openTransactionDetail(index);
+
+      let iconBg = isIncome ? 'bg-emerald-500/15 text-emerald-400' : 'bg-blue-500/15 text-blue-400';
+      if (t.category.includes('Food')) iconBg = 'bg-amber-500/15 text-amber-400';
+      if (t.category.includes('Transport')) iconBg = 'bg-cyan-500/15 text-cyan-400';
+
+      div.innerHTML = `
+        <div class="flex items-center space-x-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center font-bold text-sm">
+            ${isIncome ? '↓' : '↑'}
           </div>
-          <div class="text-right">
-            <div class="text-xs font-extrabold ${isExpense ? 'text-slate-200' : 'text-emerald-400'}">
-              ${isExpense ? '-' : '+'}${currencySymbol}${t.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
+          <div class="min-w-0">
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-bold text-slate-200 truncate">${t.merchant}</span>
+              ${t.isAuto ? '<span class="text-[9px] bg-blue-900/60 text-blue-300 px-1.5 py-0.2 rounded font-bold">SMS</span>' : ''}
             </div>
-            <div class="text-[10px] text-slate-500">${t.date}</div>
+            <div class="text-[11px] text-slate-400 truncate">${t.category} • ${t.date}</div>
           </div>
         </div>
+        <div class="text-right">
+          <div class="text-xs font-bold ${isIncome ? 'text-emerald-400' : 'text-red-400'}">
+            ${isIncome ? '+' : '-'}${currencySymbol}${t.amount.toFixed(2)}
+          </div>
+          <div class="text-[10px] text-slate-500">${t.bank}</div>
+        </div>
       `;
+      return div;
     }
 
     function renderTransactionsList() {
-      const query = (document.getElementById('searchInput').value || '').toLowerCase();
       const list = document.getElementById('fullTransactionsList');
+      const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
       list.innerHTML = '';
 
       const filtered = transactions.filter(t => {
-        const matchesQuery = t.merchant.toLowerCase().includes(query) || t.category.toLowerCase().includes(query);
-        const matchesFilter = currentFilter === 'all' || t.type.toLowerCase() === currentFilter;
-        return matchesQuery && matchesFilter;
+        const matchesType = currentFilter === 'all' || t.type.toLowerCase() === currentFilter;
+        const matchesQ = !q || t.merchant.toLowerCase().includes(q) || t.bank.toLowerCase().includes(q) || (t.raw || '').toLowerCase().includes(q);
+        return matchesType && matchesQ;
       });
 
       if (filtered.length === 0) {
-        list.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No transactions match your filter</div>`;
+        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">No transactions found</div>';
         return;
       }
 
-      filtered.forEach(t => {
-        list.innerHTML += createTransactionRowHTML(t);
+      filtered.forEach((t, i) => {
+        list.appendChild(createTransactionRow(t, i));
       });
     }
 
-    function setFilter(f) {
-      currentFilter = f;
-      ['all', 'expense', 'income'].forEach(type => {
-        const btn = document.getElementById('filter' + type.charAt(0).toUpperCase() + type.slice(1));
-        if (type === f) {
-          btn.className = "px-3 py-1 bg-blue-600 text-white rounded-full font-semibold";
-        } else {
-          btn.className = "px-3 py-1 bg-slate-800 text-slate-300 rounded-full";
-        }
-      });
-      renderTransactionsList();
+    function openTransactionDetail(index) {
+      const t = transactions[index];
+      if (!t) return;
+
+      document.getElementById('modalAmount').textContent = `${t.type === 'Income' ? '+' : '-'}${currencySymbol}${t.amount.toFixed(2)}`;
+      document.getElementById('modalAmount').className = `text-3xl font-black ${t.type === 'Income' ? 'text-emerald-400' : 'text-red-400'}`;
+      document.getElementById('modalMerchant').textContent = t.merchant;
+      document.getElementById('modalCategory').textContent = t.category;
+      document.getElementById('modalBank').textContent = `${t.bank} ${t.last4 ? '(••' + t.last4 + ')' : ''}`;
+      document.getElementById('modalMode').textContent = t.mode;
+      document.getElementById('modalDate').textContent = t.date;
+      document.getElementById('modalRawSMS').textContent = t.raw && t.raw.length > 0 ? t.raw : "Transaction added manually (no SMS raw body)";
+      document.getElementById('modalBadge').textContent = t.isAuto ? 'Auto-Parsed from Bank SMS' : 'Manual Entry';
+
+      document.getElementById('txDetailModal').classList.remove('hidden');
     }
 
-    // --- Bank SMS Parser in JS ---
-    function loadSampleSMS(index) {
-      document.getElementById('smsInput').value = sampleSMS[index];
-      parseLiveSMS();
-    }
-
-    function clearSMSInput() {
-      document.getElementById('smsInput').value = '';
-      document.getElementById('smsOutputCard').classList.add('hidden');
+    function closeTxDetailModal() {
+      document.getElementById('txDetailModal').classList.add('hidden');
     }
 
     function parseLiveSMS() {
       const text = document.getElementById('smsInput').value.trim();
       const card = document.getElementById('smsOutputCard');
-
       if (!text) {
         card.classList.add('hidden');
         return;
       }
 
-      // Regex Extraction
-      const amountMatch = text.match(/(?:rs\.?|inr|usd|\$|€|£)\s*([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]{1,2})?)/i) ||
-                          text.match(/(?:debited|spent|paid|withdrawn|credited)\s+(?:by\s+)?(?:rs\.?|inr|\$)?\s*([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]{1,2})?)/i);
+      const lower = text.toLowerCase();
+      let type = (lower.includes('credited') || lower.includes('deposited') || lower.includes('salary') || lower.includes('refund')) ? 'Income' : 'Expense';
 
-      if (!amountMatch) {
+      // Amount regex
+      const amtMatch = text.match(/(?:Rs\.?|INR|\$|€|debited by|credited by)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+      let amount = 0;
+      if (amtMatch) {
+        amount = parseFloat(amtMatch[1].replace(/,/g, ''));
+      }
+
+      if (amount <= 0) {
         card.classList.add('hidden');
         return;
       }
 
-      const amount = parseFloat(amountMatch[1].replace(/,/g, ''));
-      const lower = text.toLowerCase();
-      const isIncome = lower.includes('credited') || lower.includes('deposited') || lower.includes('salary');
-      const type = isIncome ? 'Income' : 'Expense';
-
       // Bank
-      let bank = "Local Bank";
-      if (/hdfc/i.test(text)) bank = "HDFC Bank";
-      else if (/sbi/i.test(text)) bank = "State Bank of India";
-      else if (/chase/i.test(text)) bank = "JPMorgan Chase";
-      else if (/icici/i.test(text)) bank = "ICICI Bank";
+      let bank = 'Bank Transaction';
+      if (/hdfc/i.test(text)) bank = 'HDFC Bank';
+      else if (/sbi/i.test(text)) bank = 'SBI';
+      else if (/icici/i.test(text)) bank = 'ICICI Bank';
+      else if (/chase/i.test(text)) bank = 'Chase';
+      else if (/axis/i.test(text)) bank = 'Axis Bank';
 
       // Last 4
       const last4Match = text.match(/(?:ending in|ending with|ending|a\/c|card)\s*(?:no\.?)?\s*[:\-]?\s*(?:[xX\*]+)?([0-9]{4})\b/i);
       const last4 = last4Match ? last4Match[1] : '';
 
       // Merchant
-      let merchant = "Unknown Merchant";
+      let merchant = "General Store";
       if (/starbucks/i.test(text)) merchant = "Starbucks Coffee";
-      else if (/whole foods/i.test(text)) merchant = "Whole Foods Market";
+      else if (/blinkit/i.test(text)) merchant = "Blinkit Grocery";
       else if (/swiggy/i.test(text)) merchant = "Swiggy Food";
-      else if (/uber/i.test(text)) merchant = "Uber Ride";
-      else if (/salary/i.test(text)) merchant = "Salary Deposit";
+      else if (/uber/i.test(text)) merchant = "Uber Trip";
+      else if (/salary|infosys/i.test(text)) merchant = "Infosys Ltd (Salary)";
+      else if (/shell/i.test(text)) merchant = "Shell Petrol Pump";
 
       // Category
-      let category = "General / Misc";
-      if (/starbucks|swiggy|mcdonald/i.test(text)) category = "Food & Dining";
-      else if (/whole foods|walmart|grocer/i.test(text)) category = "Groceries";
-      else if (/uber|lyft|fuel/i.test(text)) category = "Transportation & Fuel";
+      let category = "General";
+      if (/starbucks|swiggy|dining|food/i.test(text)) category = "Food & Dining";
+      else if (/blinkit|grocery|walmart/i.test(text)) category = "Groceries";
+      else if (/uber|petrol|fuel|shell/i.test(text)) category = "Transportation & Fuel";
       else if (/salary/i.test(text)) category = "Salary";
 
       currentParsed = {
@@ -544,10 +739,40 @@
     function commitParsedTransaction() {
       if (!currentParsed) return;
       transactions.unshift(currentParsed);
-      localStorage.setItem('expenses_data', JSON.stringify(transactions));
+      localStorage.setItem('expenses_dual_data', JSON.stringify(transactions));
       clearSMSInput();
       showToast("Bank Transaction Logged Locally!");
       switchTab('dashboard');
+    }
+
+    function clearSMSInput() {
+      document.getElementById('smsInput').value = '';
+      document.getElementById('smsOutputCard').classList.add('hidden');
+      currentParsed = null;
+    }
+
+    function loadSampleSMS(idx) {
+      document.getElementById('smsInput').value = sampleSMS[idx];
+      parseLiveSMS();
+    }
+
+    function setFilter(f) {
+      currentFilter = f;
+      ['all', 'expense', 'income'].forEach(t => {
+        const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === f) {
+          btn.className = 'px-3 py-1 bg-blue-600 text-white rounded-full font-semibold';
+        } else {
+          btn.className = 'px-3 py-1 bg-slate-800 text-slate-300 rounded-full';
+        }
+      });
+      renderTransactionsList();
+    }
+
+    function changeCurrency(val) {
+      currencySymbol = val;
+      renderDashboard();
+      renderTransactionsList();
     }
 
     function showToast(msg) {
@@ -560,28 +785,22 @@
       }, 2000);
     }
 
-    function changeCurrency(val) {
-      currencySymbol = val;
-      renderDashboard();
-      renderTransactionsList();
-    }
-
     function exportCSV() {
-      let csv = "Merchant,Amount,Type,Category,Bank,AccountLast4,Date\n";
+      let csv = "Merchant,Amount,Type,Category,Bank,AccountLast4,Date,RawSMS\n";
       transactions.forEach(t => {
-        csv += `"${t.merchant}",${t.amount},${t.type},"${t.category}","${t.bank}","${t.last4}","${t.date}"\n`;
+        csv += `"${t.merchant}",${t.amount},${t.type},"${t.category}","${t.bank}","${t.last4}","${t.date}","${(t.raw || '').replace(/"/g, '""')}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Expenses_Export.csv';
+      a.download = 'DualPlatform_Expenses.csv';
       a.click();
-      showToast("CSV Exported to your device!");
+      showToast("CSV Exported locally!");
     }
 
     function resetData() {
-      localStorage.removeItem('expenses_data');
+      localStorage.removeItem('expenses_dual_data');
       transactions = [...defaultTransactions];
       renderDashboard();
       renderTransactionsList();
@@ -592,4 +811,3 @@
   </script>
 </body>
 </html>
-
