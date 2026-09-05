@@ -30,6 +30,7 @@ jobs:
 
       - name: Build App for iOS Device (Ad-Hoc / Sideloadly)
         run: |
+          set -o pipefail
           xcodebuild \
             -project ExpenseTracker.xcodeproj \
             -scheme ExpenseTracker \
@@ -40,10 +41,15 @@ jobs:
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=YES \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES \
             DEVELOPMENT_TEAM="" \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            clean build
+            clean build 2>&1 | tee xcodebuild.log || {
+              echo "==================== BUILD FAILED - RECENT LOGS ===================="
+              tail -n 120 xcodebuild.log
+              echo "==================== ERRORS EXTRACTED ===================="
+              grep -E "(error:|fatal error:|BUILD FAILED)" xcodebuild.log || true
+              exit 1
+            }
 
       - name: Package .IPA for iPhone Sideloading
         run: |
