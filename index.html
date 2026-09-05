@@ -182,43 +182,51 @@
         <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <p class="text-xs text-slate-300 leading-relaxed">
-        Apple restricts all third-party apps from reading SMS directly. But Apple built an official tool called <strong>Shortcuts Automation</strong> that automatically forwards bank messages into this app!
-      </p>
+      <div class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl text-xs text-amber-200 leading-relaxed">
+        <strong>Important:</strong> Apple Shortcuts only triggers for <strong>NEW incoming messages</strong> received from now on. Apple prohibits all shortcuts and apps from reading past/existing SMS history. (To add past messages, use the paste box on the Bank SMS tab!).
+      </div>
 
       <div class="space-y-3 pt-1">
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
           <div>
-            <h4 class="text-xs font-bold text-white">Open the "Shortcuts" App on iPhone</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Shortcuts comes pre-installed on every iPhone. Open it and tap the <strong>Automation</strong> tab at the bottom.</p>
+            <h4 class="text-xs font-bold text-white">Open "Shortcuts" App → Automation Tab</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Open Apple's pre-installed <strong>Shortcuts</strong> app and tap the <strong>Automation</strong> tab at the bottom.</p>
           </div>
         </div>
 
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
           <div>
-            <h4 class="text-xs font-bold text-white">Create New Automation → Message</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>+</strong> &rarr; select <strong>Message</strong>. In "Message Contains", enter keywords:</p>
+            <h4 class="text-xs font-bold text-white">Create New Automation → "Message"</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>+</strong> &rarr; choose <strong>Message</strong>. In "Message Contains", enter keywords:</p>
             <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-emerald-400">debited, spent, credited, paid, INR, Rs</div>
-            <p class="text-[10px] text-blue-400 font-semibold mt-1">Select "Run Immediately" (no prompt needed!).</p>
+            <p class="text-[10px] text-blue-400 font-semibold mt-1">Select "Run Immediately" (so it runs automatically without asking).</p>
           </div>
         </div>
 
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
           <div>
-            <h4 class="text-xs font-bold text-white">Add Action: Open Web App with Text</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Add action <strong>"Open URLs"</strong> and set URL to:</p>
-            <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all">
-              https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]
+            <h4 class="text-xs font-bold text-white">Add Actions (Choose Either Method)</h4>
+            
+            <p class="text-[11px] text-slate-300 font-semibold mt-1">Method A (Recommended):</p>
+            <p class="text-[10px] text-slate-400">Add action <strong>"Copy to Clipboard"</strong> (Input: <em>Shortcut Input</em>), then add action <strong>"Open URLs"</strong> with:</p>
+            <div class="mt-1 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all">
+              https://dinakardharsiguntala-rgb.github.io/expense-tracker/
+            </div>
+
+            <p class="text-[11px] text-slate-300 font-semibold mt-2.5">Method B (Direct URL Parameter):</p>
+            <p class="text-[10px] text-slate-400">Add action <strong>"URL Encode"</strong> (Input: <em>Shortcut Input</em>), then add <strong>"Open URLs"</strong> with:</p>
+            <div class="mt-1 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all">
+              https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[URL Encoded Text]
             </div>
           </div>
         </div>
       </div>
 
       <button onclick="closeShortcutsModal()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
-        Understood!
+        Got It!
       </button>
     </div>
   </div>
@@ -426,20 +434,36 @@
         <div class="space-y-4">
           <div>
             <h2 class="text-lg font-extrabold text-white">Bank SMS Reader</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Paste any SMS message from HDFC, SBI, ICICI, Axis, Chase, etc.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Parse past or new bank SMS from HDFC, SBI, ICICI, Axis, Chase, etc.</p>
+          </div>
+
+          <!-- iPhone Privacy Notice & Explanation -->
+          <div class="bg-blue-950/40 border border-blue-500/30 p-3.5 rounded-2xl flex items-start space-x-3">
+            <span class="text-lg shrink-0">ℹ️</span>
+            <div class="text-xs text-slate-300 leading-relaxed">
+              <span class="font-bold text-blue-300">Why doesn't iPhone read existing SMS automatically?</span><br>
+              Apple's iOS security strictly blocks all apps from accessing your past SMS inbox.
+              To import past messages, select and copy them from the Messages app and paste them below. <strong>You can paste 1 or multiple messages at once!</strong>
+            </div>
           </div>
 
           <!-- 1-Tap Paste Box -->
           <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3">
-            <textarea id="smsInput" rows="4" placeholder="Paste bank SMS text here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-bold text-slate-300">Paste Bank SMS (Single or Multiple)</label>
+              <button onclick="clearSMSInput()" class="text-[11px] text-slate-400 hover:text-white">Clear</button>
+            </div>
+
+            <textarea id="smsInput" rows="5" placeholder="Paste one or multiple past bank SMS messages here...\n\nTip: You can copy several SMS alerts from your bank and paste them all together!" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
             
             <div class="flex gap-2">
               <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
                 <span>📋</span>
                 <span>Paste from Clipboard</span>
               </button>
-              <button onclick="parseAndLogSMS()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
-                Parse & Record
+              <button onclick="parseAndLogSMS()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-1.5">
+                <span>⚡</span>
+                <span>Parse & Import</span>
               </button>
             </div>
           </div>
@@ -447,31 +471,35 @@
           <!-- Shortcuts Auto-Sync Guide Card -->
           <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 p-4 rounded-2xl space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-indigo-300">🍎 Automatic SMS on iPhone</span>
+              <span class="text-xs font-bold text-indigo-300">🍎 Real-Time Auto SMS for Future Alerts</span>
               <button onclick="openShortcutsModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition">
-                View 1-Min Guide
+                Setup Guide
               </button>
             </div>
             <p class="text-[11px] text-slate-300 leading-relaxed">
-              Use Apple's built-in <strong>Shortcuts app</strong> to automatically forward incoming bank messages into this tracker whenever your bank sends a text!
+              For <strong>new incoming</strong> bank alerts, Apple Shortcuts automation can instantly forward them to this app the moment they arrive!
             </p>
           </div>
 
           <!-- Sample Messages to Test -->
           <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Try Sample Bank Alerts</h3>
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Try Sample Bank Alerts (1-Tap Test)</h3>
             <div class="space-y-2">
               <button onclick="loadSampleSMS(0)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
                 <span class="text-[10px] text-blue-400 font-bold uppercase">HDFC Bank UPI</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS using UPI...</p>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS using UPI...</p>
               </button>
               <button onclick="loadSampleSMS(1)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
                 <span class="text-[10px] text-emerald-400 font-bold uppercase">SBI Grocery</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Your A/C 9876 is debited by INR 1,299.00 to BLINKIT via UPI...</p>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI...</p>
               </button>
               <button onclick="loadSampleSMS(2)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
                 <span class="text-[10px] text-purple-400 font-bold uppercase">Chase Card</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Chase Alert: You made a $42.50 purchase with Card ending 4321 at UBER...</p>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER...</p>
+              </button>
+              <button onclick="loadSampleSMS(3)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
+                <span class="text-[10px] text-amber-400 font-bold uppercase">Bulk 3-in-1 Test (Multiple SMS)</span>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Loads 3 past transactions together to test multi-SMS batch import...</p>
               </button>
             </div>
           </div>
@@ -481,13 +509,18 @@
 
     const sampleAlerts = [
       "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.",
-      "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.",
-      "Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER on Sep 5."
+      "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. Avl Bal INR 4,320.00 - SBI",
+      "Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER on Sep 5.",
+      "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.\n\nYour A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.\n\nINR 850.00 debited from Axis Bank A/c 3210 on 05-09-26 at ZOMATO. Avail Bal: INR 8,100."
     ];
 
     function loadSampleSMS(idx) {
       document.getElementById('smsInput').value = sampleAlerts[idx];
-      showToast('Sample SMS Loaded!');
+      showToast('Sample SMS Loaded! Tap "Parse & Import"');
+    }
+
+    function clearSMSInput() {
+      document.getElementById('smsInput').value = '';
     }
 
     async function pasteFromClipboard() {
@@ -495,72 +528,105 @@
         const text = await navigator.clipboard.readText();
         if (text) {
           document.getElementById('smsInput').value = text;
-          showToast('Pasted from clipboard!');
+          showToast('Pasted from clipboard! Tap "Parse & Import"');
         }
       } catch (err) {
-        showToast('Please tap into box and paste');
+        showToast('Please tap inside the box and choose Paste');
       }
     }
 
-    // --- ADVANCED ON-DEVICE REGEX PARSER ---
-    function parseBankSMSText(text) {
-      let amount = null;
-      let type = 'Expense';
-      let merchant = 'Bank Transaction';
-      let category = 'Other';
-      let bank = 'Bank';
-      let last4 = '';
-      let mode = 'UPI';
+    // --- ROCK-SOLID ON-DEVICE SMS PARSER ---
+    function parseBankSMSText(clean) {
+      if (!clean) return null;
+      clean = clean.trim();
 
-      // Amount extraction
-      const amtMatch = text.match(/(?:(?:Rs\.?|INR|\$)\s*([\d,]+\.?\d*)|([\d,]+\.?\d*)\s*(?:Rs\.?|INR|\$))/i);
-      if (amtMatch) {
-        const val = amtMatch[1] || amtMatch[2];
+      // 1. Credit vs Debit
+      const isCredit = /\b(credited|credit|deposited|received|refund|salary)\b/i.test(clean);
+      const type = isCredit ? 'Income' : 'Expense';
+
+      // 2. Extract transaction amount (ignoring balance)
+      let amount = null;
+
+      // Priority 1: Action word followed by amount (e.g. "debited by Rs. 450", "credited with INR 1,299")
+      const p1 = clean.match(/(?:debited|spent|paid|credited|transferred|withdrawn|deposited|sent|purchase\s+with|purchase\s+of)\s+(?:by|with|of|for)?\s*(?:(?:Rs\.?|INR|USD|\$)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR))/i);
+      if (p1) {
+        const val = p1[1] || p1[2];
         amount = parseFloat(val.replace(/,/g, ''));
+      } else {
+        // Priority 2: Amount preceding action word (e.g. "Rs. 450 debited", "INR 1,299.00 has been credited")
+        const p2 = clean.match(/(?:(?:Rs\.?|INR|USD|\$)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR))\s+(?:has\s+been\s+)?(?:debited|spent|paid|credited|transferred|deposited|sent)/i);
+        if (p2) {
+          const val = p2[1] || p2[2];
+          amount = parseFloat(val.replace(/,/g, ''));
+        } else {
+          // Priority 3: Any currency pattern not preceded by "bal" or "balance"
+          const curRegex = /(?:(?:Rs\.?|INR|USD|\$)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR))/gi;
+          let match;
+          while ((match = curRegex.exec(clean)) !== null) {
+            const val = match[1] || match[2];
+            const startIdx = match.index;
+            const preceding = clean.substring(Math.max(0, startIdx - 15), startIdx).toLowerCase();
+            if (preceding.includes('bal') || preceding.includes('balance')) {
+              continue;
+            }
+            const candidate = parseFloat(val.replace(/,/g, ''));
+            if (candidate && !isNaN(candidate) && candidate > 0) {
+              amount = candidate;
+              break;
+            }
+          }
+        }
       }
 
-      // Type detection
-      if (/credited|salary|received|deposited|refund/i.test(text)) {
-        type = 'Income';
+      if (!amount || isNaN(amount) || amount <= 0) {
+        return null;
+      }
+
+      // 3. Merchant detection
+      let merchant = 'Bank Transaction';
+      let category = 'Other';
+
+      if (/starbucks|cafe|coffee|mcdonalds|kfc|pizza|burger|swiggy|zomato|dining|restaurant/i.test(clean)) {
+        merchant = 'Dining / Food';
+        category = 'Food & Dining';
+      } else if (/blinkit|zepto|bigbasket|grocery|supermarket|mart|dmart|instamart/i.test(clean)) {
+        merchant = 'Groceries / Mart';
+        category = 'Groceries';
+      } else if (/uber|ola|rapido|fuel|petrol|shell|hpcl|bpcl|metro|irctc/i.test(clean)) {
+        merchant = 'Transport / Fuel';
+        category = 'Transportation';
+      } else if (/amazon|flipkart|myntra|meesho|ajio|nykaa|zara|h&m|shopping/i.test(clean)) {
+        merchant = 'Online Shopping';
+        category = 'Shopping';
+      } else if (/electricity|water|bill|bescom|airtel|jio|vi|recharge/i.test(clean)) {
+        merchant = 'Bills & Utilities';
+        category = 'Utilities & Bills';
+      } else if (/pharmacy|apollo|pharmeasy|1mg|hospital|clinic/i.test(clean)) {
+        merchant = 'Healthcare';
+        category = 'Healthcare';
+      } else if (isCredit) {
+        merchant = 'Salary / Deposit';
         category = 'Salary';
       }
 
-      // Merchant & Category matching
-      if (/starbucks|cafe|coffee|mcdonalds|kfc|pizza|burger|swiggy|zomato|dining|restaurant/i.test(text)) {
-        merchant = 'Dining / Food';
-        category = 'Food & Dining';
-      } else if (/blinkit|zepto|bigbasket|grocery|supermarket|mart|dmart|instamart/i.test(text)) {
-        merchant = 'Groceries / Mart';
-        category = 'Groceries';
-      } else if (/uber|ola|rapido|fuel|petrol|shell|hpcl|bpcl|metro|irctc/i.test(text)) {
-        merchant = 'Transport / Fuel';
-        category = 'Transportation';
-      } else if (/amazon|flipkart|myntra|meesho|ajio|nykaa|zara|h&m|shopping/i.test(text)) {
-        merchant = 'Online Shopping';
-        category = 'Shopping';
-      } else if (/electricity|water|bill|bescom|airtel|jio|vi|recharge/i.test(text)) {
-        merchant = 'Bills & Utilities';
-        category = 'Utilities & Bills';
-      } else if (/pharmacy|apollo|pharmeasy|1mg|hospital|clinic/i.test(text)) {
-        merchant = 'Healthcare';
-        category = 'Healthcare';
-      }
+      // 4. Bank name
+      let bank = 'Bank';
+      if (/hdfc/i.test(clean)) bank = 'HDFC Bank';
+      else if (/sbi/i.test(clean)) bank = 'SBI';
+      else if (/icici/i.test(clean)) bank = 'ICICI Bank';
+      else if (/axis/i.test(clean)) bank = 'Axis Bank';
+      else if (/kotak/i.test(clean)) bank = 'Kotak Bank';
+      else if (/chase/i.test(clean)) bank = 'Chase';
 
-      // Bank detection
-      if (/hdfc/i.test(text)) bank = 'HDFC Bank';
-      else if (/sbi/i.test(text)) bank = 'SBI';
-      else if (/icici/i.test(text)) bank = 'ICICI Bank';
-      else if (/axis/i.test(text)) bank = 'Axis Bank';
-      else if (/kotak/i.test(text)) bank = 'Kotak Bank';
-      else if (/chase/i.test(text)) bank = 'Chase';
+      // 5. Payment mode
+      let mode = 'UPI';
+      if (/upi/i.test(clean)) mode = 'UPI';
+      else if (/card|credit|debit/i.test(clean)) mode = 'Card';
+      else if (/netbanking|neft|rtgs|imps/i.test(clean)) mode = 'NetBanking';
 
-      // Payment Mode
-      if (/upi/i.test(text)) mode = 'UPI';
-      else if (/card|credit|debit/i.test(text)) mode = 'Card';
-      else if (/netbanking|neft|rtgs|imps/i.test(text)) mode = 'NetBanking';
-
-      // Last 4 digits
-      const cardMatch = text.match(/(?:card|a\/c|account|xx|\*\*)[^\d]*(\d{4})/i);
+      // 6. Last 4 digits
+      let last4 = '';
+      const cardMatch = clean.match(/(?:card|a\/c|account|xx|\*\*)[^\d]*(\d{4})/i);
       if (cardMatch) last4 = cardMatch[1];
 
       return {
@@ -571,69 +637,128 @@
         bank,
         last4,
         mode,
-        raw: text
+        raw: clean
       };
     }
 
+    // --- PARSE & LOG (SUPPORTS SINGLE OR BATCH / PAST SMS) ---
     function parseAndLogSMS() {
       const text = document.getElementById('smsInput').value.trim();
       if (!text) {
-        showToast('Please enter or paste an SMS first!');
+        showToast('Please enter or paste SMS text first!');
         return;
       }
 
-      const res = parseBankSMSText(text);
-      if (!res.amount || isNaN(res.amount)) {
-        showToast('Could not extract transaction amount from this text.');
+      // 1. Try splitting by double newlines
+      let chunks = text.split(/\n\s*\n/).map(c => c.trim()).filter(c => c.length > 0);
+
+      // 2. If 1 chunk with multiple lines, check if each line has an amount
+      if (chunks.length === 1 && text.includes('\n')) {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const lineRes = lines.map(l => parseBankSMSText(l)).filter(r => r !== null);
+        if (lineRes.length > 1) {
+          lineRes.forEach(r => {
+            transactions.unshift({
+              id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+              amount: r.amount,
+              type: r.type,
+              merchant: r.merchant,
+              category: r.category,
+              bank: r.bank,
+              last4: r.last4,
+              mode: r.mode,
+              date: 'Imported SMS',
+              isAuto: true,
+              raw: r.raw
+            });
+          });
+          saveState();
+          showToast(`Recorded ${lineRes.length} past SMS transactions!`);
+          document.getElementById('smsInput').value = '';
+          switchTab('expenses');
+          return;
+        }
+      }
+
+      // 3. Process all chunks (also splitting by common bank headers if pasted continuously)
+      const parsedItems = [];
+      chunks.forEach(c => {
+        const subSplits = c.split(/(?=(?:Dear\s+(?:Customer|SBI|HDFC|ICICI|Cardholder)|Your\s+A\/?c|Chase\s+Alert|Bank\s+Alert)\b)/i)
+                           .map(s => s.trim())
+                           .filter(s => s.length > 0);
+        if (subSplits.length > 1) {
+          subSplits.forEach(sub => {
+            const p = parseBankSMSText(sub);
+            if (p) parsedItems.push(p);
+          });
+        } else {
+          const p = parseBankSMSText(c);
+          if (p) parsedItems.push(p);
+        }
+      });
+
+      if (parsedItems.length === 0) {
+        showToast('Could not find transaction amount in this text.');
         return;
       }
 
-      const newRec = {
-        id: Date.now().toString(),
-        amount: res.amount,
-        type: res.type,
-        merchant: res.merchant,
-        category: res.category,
-        bank: res.bank,
-        last4: res.last4,
-        mode: res.mode,
-        date: 'Just Now',
-        isAuto: true,
-        raw: text
-      };
+      parsedItems.forEach(r => {
+        transactions.unshift({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          amount: r.amount,
+          type: r.type,
+          merchant: r.merchant,
+          category: r.category,
+          bank: r.bank,
+          last4: r.last4,
+          mode: r.mode,
+          date: parsedItems.length > 1 ? 'Imported SMS' : 'Just Now',
+          isAuto: true,
+          raw: r.raw
+        });
+      });
 
-      transactions.unshift(newRec);
       saveState();
-      showToast(`Recorded ${currencySymbol}${res.amount.toFixed(2)} at ${res.merchant}`);
+      document.getElementById('smsInput').value = '';
+      if (parsedItems.length === 1) {
+        showToast(`Recorded ${currencySymbol}${parsedItems[0].amount.toFixed(2)} at ${parsedItems[0].merchant}`);
+      } else {
+        showToast(`Successfully recorded ${parsedItems.length} past transactions!`);
+      }
       switchTab('expenses');
     }
 
     // --- AUTOMATIC URL INGESTION (SHORTCUTS INTEGRATION) ---
     function checkURLParameters() {
-      const params = new URLSearchParams(window.location.search);
-      const sms = params.get('sms') || params.get('text');
-      if (sms) {
-        const res = parseBankSMSText(sms);
-        if (res.amount && !isNaN(res.amount)) {
-          const newRec = {
-            id: Date.now().toString(),
-            amount: res.amount,
-            type: res.type,
-            merchant: res.merchant,
-            category: res.category,
-            bank: res.bank,
-            last4: res.last4,
-            mode: res.mode,
-            date: 'Just Now',
-            isAuto: true,
-            raw: sms
-          };
-          transactions.unshift(newRec);
-          saveState();
-          showToast(`⚡ Auto-Recorded from SMS: ${currencySymbol}${res.amount.toFixed(2)}`);
-          window.history.replaceState({}, document.title, window.location.pathname);
-          switchTab('expenses');
+      try {
+        const params = new URLSearchParams(window.location.search);
+        let sms = params.get('sms') || params.get('text');
+        if (sms) {
+          sms = decodeURIComponent(sms);
+          const res = parseBankSMSText(sms);
+          if (res && res.amount && !isNaN(res.amount)) {
+            const newRec = {
+              id: Date.now().toString(),
+              amount: res.amount,
+              type: res.type,
+              merchant: res.merchant,
+              category: res.category,
+              bank: res.bank,
+              last4: res.last4,
+              mode: res.mode,
+              date: 'Just Now',
+              isAuto: true,
+              raw: sms
+            };
+            transactions.unshift(newRec);
+            saveState();
+            showToast(`⚡ Auto-Recorded: ${currencySymbol}${res.amount.toFixed(2)} (${res.merchant})`);
+            window.history.replaceState({}, document.title, window.location.pathname);
+            switchTab('expenses');
+          }
         }
+      } catch (e) {
+        console.error('URL parse error:', e);
       }
     }
 
