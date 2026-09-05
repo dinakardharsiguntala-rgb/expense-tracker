@@ -15,49 +15,8 @@ public struct TransactionListView: View {
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Filter Bar (Type tabs: All / Expense / Income)
                 filterBar
-
-                // Transactions List
-                if transactions.isEmpty {
-                    emptyStateView
-                } else {
-                    let groups = viewModel.groupedByDate(from: transactions)
-                    if groups.isEmpty {
-                        noResultsView
-                    } else {
-                        List {
-                            ForEach(groups) { group in
-                                Section {
-                                    ForEach(group.transactions) { transaction in
-                                        NavigationLink(destination: TransactionDetailView(transaction: transaction)) {
-                                            TransactionRowView(transaction: transaction)
-                                        }
-                                        .swipeActions(edge: .destructive, allowsFullSwipe: true) {
-                                            Button(role: .destructive) {
-                                                modelContext.delete(transaction)
-                                                try? modelContext.save()
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
-                                            }
-                                        }
-                                    }
-                                } header: {
-                                    HStack {
-                                        Text(group.title)
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                        Spacer()
-                                        Text(CurrencyFormatter.format(group.totalAmount))
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                            }
-                        }
-                        .listStyle(.insetGrouped)
-                    }
-                }
+                contentBody
             }
             .background(Color.appBackground)
             .navigationTitle("Transactions")
@@ -65,47 +24,10 @@ public struct TransactionListView: View {
             .searchable(text: $viewModel.searchText, prompt: "Search merchant, note, or bank")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Menu {
-                        Picker("Sort By", selection: $viewModel.sortOption) {
-                            ForEach(TransactionListViewModel.SortOption.allCases) { opt in
-                                Text(opt.rawValue).tag(opt)
-                            }
-                        }
-
-                        Divider()
-
-                        Menu("Filter by Category") {
-                            Button("All Categories") {
-                                viewModel.selectedCategory = nil
-                            }
-                            ForEach(categories) { cat in
-                                Button(cat.name) {
-                                    viewModel.selectedCategory = cat.name
-                                }
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                    }
+                    leadingToolbarMenu
                 }
-
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            showingSMSSheet = true
-                        } label: {
-                            Label("Paste Bank SMS", systemImage: "sparkles")
-                        }
-
-                        Button {
-                            showingAddSheet = true
-                        } label: {
-                            Label("Add Expense", systemImage: "plus")
-                        }
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title3)
-                    }
+                    trailingToolbarMenu
                 }
             }
             .sheet(isPresented: $showingAddSheet) {
@@ -114,6 +36,97 @@ public struct TransactionListView: View {
             .sheet(isPresented: $showingSMSSheet) {
                 QuickSMSInputView()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var contentBody: some View {
+        if transactions.isEmpty {
+            emptyStateView
+        } else {
+            let groups = viewModel.groupedByDate(from: transactions)
+            if groups.isEmpty {
+                noResultsView
+            } else {
+                groupedListView(groups: groups)
+            }
+        }
+    }
+
+    private func groupedListView(groups: [TransactionListViewModel.TransactionGroup]) -> some View {
+        List {
+            ForEach(groups) { group in
+                Section {
+                    ForEach(group.transactions) { transaction in
+                        NavigationLink(destination: TransactionDetailView(transaction: transaction)) {
+                            TransactionRowView(transaction: transaction)
+                        }
+                        .swipeActions(edge: .destructive, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                modelContext.delete(transaction)
+                                try? modelContext.save()
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text(group.title)
+                            .font(.caption)
+                            .fontWeight(.bold)
+                        Spacer()
+                        Text(CurrencyFormatter.format(group.totalAmount))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+    }
+
+    private var leadingToolbarMenu: some View {
+        Menu {
+            Picker("Sort By", selection: $viewModel.sortOption) {
+                ForEach(TransactionListViewModel.SortOption.allCases) { opt in
+                    Text(opt.rawValue).tag(opt)
+                }
+            }
+
+            Divider()
+
+            Menu("Filter by Category") {
+                Button("All Categories") {
+                    viewModel.selectedCategory = nil
+                }
+                ForEach(categories) { cat in
+                    Button(cat.name) {
+                        viewModel.selectedCategory = cat.name
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+        }
+    }
+
+    private var trailingToolbarMenu: some View {
+        Menu {
+            Button {
+                showingSMSSheet = true
+            } label: {
+                Label("Paste Bank SMS", systemImage: "sparkles")
+            }
+
+            Button {
+                showingAddSheet = true
+            } label: {
+                Label("Add Expense", systemImage: "plus")
+            }
+        } label: {
+            Image(systemName: "plus.circle.fill")
+                .font(.title3)
         }
     }
 
