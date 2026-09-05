@@ -54,11 +54,14 @@ jobs:
 
 
 
+      - name: List APK outputs
+        run: find build/ -name "*.apk" || true
+
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
           name: ExpenseTracker-Android-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/**/*.apk
           if-no-files-found: error
 
 

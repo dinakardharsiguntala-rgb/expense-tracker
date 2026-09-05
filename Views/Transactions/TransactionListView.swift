@@ -89,7 +89,7 @@ public struct TransactionListView: View {
         NavigationLink(destination: TransactionDetailView(transaction: transaction)) {
             TransactionRowView(transaction: transaction)
         }
-        .swipeActions(edge: .destructive, allowsFullSwipe: true) {
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 modelContext.delete(transaction)
                 try? modelContext.save()
