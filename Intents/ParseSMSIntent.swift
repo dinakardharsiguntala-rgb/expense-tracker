@@ -35,14 +35,14 @@ public struct ParseBankSMSIntent: AppIntent {
         let context = ModelContext(container)
 
         // Find or create category
-        var descriptor = FetchDescriptor<ExpenseCategory>()
+        let descriptor = FetchDescriptor<ExpenseCategory>()
         let existingCategories = (try? context.fetch(descriptor)) ?? []
         let matchedCategory = existingCategories.first {
             $0.name.lowercased() == result.suggestedCategoryName.lowercased()
         }
 
         // Find matching bank account
-        var accountDescriptor = FetchDescriptor<BankAccount>()
+        let accountDescriptor = FetchDescriptor<BankAccount>()
         let existingAccounts = (try? context.fetch(accountDescriptor)) ?? []
         let matchedAccount = existingAccounts.first {
             if let last4 = result.accountLast4, !last4.isEmpty {

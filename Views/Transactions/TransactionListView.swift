@@ -56,34 +56,47 @@ public struct TransactionListView: View {
     private func groupedListView(groups: [TransactionListViewModel.TransactionGroup]) -> some View {
         List {
             ForEach(groups) { group in
-                Section {
-                    ForEach(group.transactions) { transaction in
-                        NavigationLink(destination: TransactionDetailView(transaction: transaction)) {
-                            TransactionRowView(transaction: transaction)
-                        }
-                        .swipeActions(edge: .destructive, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                modelContext.delete(transaction)
-                                try? modelContext.save()
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                    }
-                } header: {
-                    HStack {
-                        Text(group.title)
-                            .font(.caption)
-                            .fontWeight(.bold)
-                        Spacer()
-                        Text(CurrencyFormatter.format(group.totalAmount))
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                groupSection(group)
             }
         }
         .listStyle(.insetGrouped)
+    }
+
+    @ViewBuilder
+    private func groupSection(_ group: TransactionListViewModel.TransactionGroup) -> some View {
+        Section(header: sectionHeader(title: group.title, total: group.totalAmount)) {
+            ForEach(group.transactions) { transaction in
+                transactionRow(transaction)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func sectionHeader(title: String, total: Double) -> some View {
+        HStack {
+            Text(title)
+                .font(.caption)
+                .fontWeight(.bold)
+            Spacer()
+            Text(CurrencyFormatter.format(total))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func transactionRow(_ transaction: ExpenseTransaction) -> some View {
+        NavigationLink(destination: TransactionDetailView(transaction: transaction)) {
+            TransactionRowView(transaction: transaction)
+        }
+        .swipeActions(edge: .destructive, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                modelContext.delete(transaction)
+                try? modelContext.save()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
 
     private var leadingToolbarMenu: some View {
