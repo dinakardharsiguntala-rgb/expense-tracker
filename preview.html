@@ -667,28 +667,30 @@
             </div>
           </div>
 
-          <!-- Bank Statement CSV / File Importer Card -->
+          <!-- Universal Bank & Credit Card Statement Importer Card -->
           <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-xl">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2.5">
                 <span class="text-2xl">📂</span>
                 <div>
-                  <h3 class="text-xs font-bold text-white">Import Bank Statement (PDF / CSV)</h3>
-                  <p class="text-[10px] text-indigo-300">Handles password-protected bank PDFs & CSVs</p>
+                  <h3 class="text-xs font-bold text-white">Universal Statement Parser (PDF / CSV)</h3>
+                  <p class="text-[10px] text-indigo-300">Auto-detects Credit Cards & Savings Accounts</p>
                 </div>
               </div>
-              <div class="flex gap-1.5">
-                <button onclick="loadICICISampleStatement()" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
-                  ICICI Card Demo
+              <div class="flex gap-1.5 flex-wrap justify-end">
+                <button onclick="loadICICISampleStatement()" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm flex items-center space-x-1">
+                  <span>💳</span>
+                  <span>Credit Card Demo</span>
                 </button>
-                <button onclick="loadSampleCSVStatement()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
-                  Bank CSV Demo
+                <button onclick="loadSavingsSampleStatement()" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm flex items-center space-x-1">
+                  <span>🏦</span>
+                  <span>Savings A/c Demo</span>
                 </button>
               </div>
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed">
-              Upload monthly statements sent to your email from <strong>HDFC, SBI, ICICI, Axis</strong>. Supports <strong>password-protected PDFs</strong> and CSVs!
+              Dynamically reads statements from <strong>ICICI, HDFC, SBI, Axis, Kotak</strong>: handles <strong>Credit Cards</strong> (Coral, Regalia, SimplyCLICK) and <strong>Savings / Current A/cs</strong> with <strong>password-protected PDFs</strong> and CSVs!
             </p>
 
             <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
@@ -772,7 +774,7 @@
     }
 
 
-    // --- BANK STATEMENT (PDF / CSV / TEXT) IMPORTER ---
+    // --- UNIVERSAL DYNAMIC BANK & CREDIT CARD STATEMENT IMPORTER ---
     let pendingPdfBuffer = null;
     let pendingPdfFilename = '';
 
@@ -796,7 +798,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           const text = e.target.result;
-          importStatementCSVText(text, file.name);
+          importDynamicBankStatement(text, file.name);
         };
         reader.readAsText(file);
       }
@@ -813,17 +815,53 @@
         const loadingTask = pdfjsLib.getDocument({ data: buffer, password: password || undefined });
         const pdf = await loadingTask.promise;
         closePdfPasswordModal();
-        showToast(`Decrypting PDF (${pdf.numPages} pages)...`);
+        showToast(`⚡ Decrypting ${pdf.numPages} statement pages on-device...`);
 
         let extractedText = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          const pageText = content.items.map(item => item.str).join(' ');
-          extractedText += pageText + '\n';
+          
+          // Reconstruct rows by grouping text items by vertical Y coordinate (~4px bucket)
+          // and sorting columns horizontally left-to-right by X coordinate
+          const sortedItems = content.items.slice().sort((a, b) => {
+            const yA = a.transform ? a.transform[5] : 0;
+            const yB = b.transform ? b.transform[5] : 0;
+            const bucketA = Math.round(yA / 4);
+            const bucketB = Math.round(yB / 4);
+            if (bucketA !== bucketB) return bucketB - bucketA; // Top to bottom
+            const xA = a.transform ? a.transform[4] : 0;
+            const xB = b.transform ? b.transform[4] : 0;
+            return xA - xB; // Left to right
+          });
+
+          let pageLines = [];
+          let currentLine = [];
+          let currentBucket = null;
+
+          for (const item of sortedItems) {
+            const str = (item.str || '').trim();
+            if (!str) continue;
+            const y = item.transform ? item.transform[5] : 0;
+            const bucket = Math.round(y / 4);
+
+            if (currentBucket === null || bucket !== currentBucket) {
+              if (currentLine.length > 0) {
+                pageLines.push(currentLine.join(' '));
+                currentLine = [];
+              }
+              currentBucket = bucket;
+            }
+            currentLine.push(str);
+          }
+          if (currentLine.length > 0) {
+            pageLines.push(currentLine.join(' '));
+          }
+
+          extractedText += pageLines.join('\n') + '\n';
         }
 
-        importStatementCSVText(extractedText, pendingPdfFilename || 'Bank_Statement.pdf');
+        importDynamicBankStatement(extractedText, pendingPdfFilename || 'Bank_Statement.pdf');
       } catch (err) {
         if (err.name === 'PasswordException' || (err.message && err.message.toLowerCase().includes('password'))) {
           openPdfPasswordModal();
@@ -855,10 +893,11 @@
       } else {
         closePdfPasswordModal();
         showToast('⚡ Decrypted HDFC Bank PDF with password!');
-        importStatementCSVText(sampleCSVStatement, 'HDFC_Password_Protected_Statement.pdf');
+        importDynamicBankStatement(sampleCSVStatement, 'HDFC_Password_Protected_Statement.pdf');
       }
     }
 
+    // --- SAMPLE STATEMENTS FOR 1-TAP DEMOS ---
     const sampleCSVStatement = `Date,Narration,Withdrawal Amt,Deposit Amt,Balance
 05/09/2026,UPI-STARBUCKS-starbucks@hdfcbank,450.00,,15240.50
 05/09/2026,UPI-BLINKIT-blinkit@icici,1299.00,,13941.50
@@ -867,7 +906,6 @@
 10/08/2026,NETBANK-BESCOM ELECTRICITY BILL,2400.00,,14791.50
 20/07/2026,CARD PURCHASE SHELL FUEL STATION,1500.00,,17191.50`;
 
-
     const iciciSampleStatementText = `ICICI Bank Credit Cards - Coral
 6528XXXXXXXX4009
 MR DINAKAR LUKESH DARSIGUNTALA
@@ -875,14 +913,30 @@ STATEMENT DATE: September 2, 2026
 04/08/2026 13921126192 SWIGGYFOOD 4 230.00
 07/08/2026 13931750699 BBPS Payment received 0 23,746.69 CR
 07/08/2026 13931753349 INFINITY PAYMENT RECEIVED, THANK YOU 0 230.00 CR
-09/08/2026 13952204095 SWIGGYFOOD 8 447.00`;
+09/08/2026 13952204095 SWIGGYFOOD 8 447.00
+15/08/2026 13961234567 RELIANCE DIGITAL 12 4,999.00
+20/08/2026 13978901234 BLINKIT GROCERY 10 1,299.00`;
+
+    const savingsSampleStatementText = `HDFC BANK LIMITED
+ACCOUNT STATEMENT FOR SAVINGS ACCOUNT NO: XXXXXXXX1234
+Period: 01/08/2026 to 05/09/2026
+01/08/2026 SALARY CREDIT ACME TECHNOLOGIES 0.00 85,000.00 125,000.00
+05/08/2026 UPI/STARBUCKS/12345/MUMBAI 450.00 0.00 124,550.00
+10/08/2026 NETBANK-BESCOM ELECTRICITY 2,400.00 0.00 122,150.00
+15/08/2026 UPI-SENT TO RAHUL SHARMA 1,500.00 0.00 120,650.00
+20/08/2026 UPI-RECEIVED FROM PRIYA SINGH 0.00 3,000.00 123,650.00
+28/08/2026 CARD PURCHASE SHELL FUEL STATION 2,100.00 0.00 121,550.00`;
 
     function loadICICISampleStatement() {
-      importStatementCSVText(iciciSampleStatementText, 'ICICI_Coral_Credit_Card.pdf');
+      importDynamicBankStatement(iciciSampleStatementText, 'ICICI_Coral_Credit_Card.pdf');
+    }
+
+    function loadSavingsSampleStatement() {
+      importDynamicBankStatement(savingsSampleStatementText, 'HDFC_Savings_Account_Statement.pdf');
     }
 
     function loadSampleCSVStatement() {
-      importStatementCSVText(sampleCSVStatement, 'HDFC_Sample_Statement.csv');
+      importDynamicBankStatement(sampleCSVStatement, 'HDFC_Sample_Statement.csv');
     }
 
     function cleanBankNarration(raw) {
@@ -898,19 +952,21 @@ STATEMENT DATE: September 2, 2026
         if (m) return 'Received from ' + m[1].trim().split(/\s+/).slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
       }
 
-      clean = clean.replace(/^(UPI|POS|NEFT|RTGS|IMPS|NETBANK|BILLPAY|TRANSFER TO|CARD PURCHASE|PURCHASE AT)[-:\s]+/i, '');
+      clean = clean.replace(/^(UPI|POS|NEFT|RTGS|IMPS|NETBANK|BILLPAY|TRANSFER TO|CARD PURCHASE|PURCHASE AT)[-:\s/]+/i, '');
       if (clean.includes('@')) {
         clean = clean.split('@')[0];
       }
-      clean = clean.replace(/[-/]\d{5,}$/, '').replace(/^[-/]+|[-/]+$/g, '').trim();
+      clean = clean.replace(/[-/]\d{5,}$/, '').replace(/\/\d{6,}\//g, ' ').replace(/^[-/]+|[-/]+$/g, '').trim();
       if (/starbucks/i.test(clean)) return 'Starbucks Coffee';
       if (/blinkit/i.test(clean)) return 'Blinkit Grocery';
       if (/swiggy/i.test(clean)) return 'Swiggy Food';
       if (/zomato/i.test(clean)) return 'Zomato Dining';
       if (/bescom|electricity/i.test(clean)) return 'Electricity Bill';
-      if (/shell|fuel|petrol/i.test(clean)) return 'Fuel Station';
-      if (/salary|infosys/i.test(clean)) return 'Monthly Salary';
-      return clean.length > 25 ? clean.substring(0, 25) : clean;
+      if (/shell|fuel|petrol|hpcl|bpcl/i.test(clean)) return 'Fuel Station';
+      if (/salary|infosys|payroll/i.test(clean)) return 'Monthly Salary';
+      if (/bbps|infinity payment|payment received/i.test(clean)) return 'Credit Card Bill Payment';
+      if (/reliance digital/i.test(clean)) return 'Reliance Digital';
+      return clean.length > 25 ? clean.substring(0, 25).trim() : clean;
     }
 
     function extractP2PTransfer(clean, isCredit) {
@@ -932,7 +988,7 @@ STATEMENT DATE: September 2, 2026
       }
 
       if (isCredit) {
-        const m = clean.match(/\b(?:from|by)\s+([A-Za-z\s]{2,30})/i);
+        const m = clean.match(/\b(?:from|by|received from|by transfer-upi)\s+([A-Za-z\s]{2,30})/i);
         if (m) {
           const name = cleanName(m[1]);
           if (name && !/customer|user|account/i.test(name)) {
@@ -951,154 +1007,252 @@ STATEMENT DATE: September 2, 2026
       return null;
     }
 
-    function importStatementCSVText(csvText, filename) {
-      const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length < 2) {
-        showToast('Statement text or file is empty.');
+    // --- UNIVERSAL DYNAMIC STATEMENT PARSER FOR ALL BANKS & ACCOUNTS ---
+    function importDynamicBankStatement(rawText, filename) {
+      if (!rawText || !rawText.trim()) {
+        showToast('Statement file or text is empty.');
         return;
       }
 
-      // Detect card number if present (e.g. 6528XXXXXXXX4009)
-      let cardLast4 = '4009';
-      const cardMatch = csvText.match(/\b(?:\d{4}X{4,8}(\d{4})|X{4,12}(\d{4}))\b/i);
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length === 0) {
+        showToast('No readable text found in statement.');
+        return;
+      }
+
+      const sampleScan = rawText.substring(0, 4000);
+
+      // 1. Detect Bank Name
+      let bankName = 'Bank';
+      if (/\bicici\b/i.test(sampleScan + ' ' + filename)) bankName = 'ICICI Bank';
+      else if (/\bhdfc\b/i.test(sampleScan + ' ' + filename)) bankName = 'HDFC Bank';
+      else if (/\bsbi|state bank of india\b/i.test(sampleScan + ' ' + filename)) bankName = 'SBI';
+      else if (/\baxis\b/i.test(sampleScan + ' ' + filename)) bankName = 'Axis Bank';
+      else if (/\bkotak\b/i.test(sampleScan + ' ' + filename)) bankName = 'Kotak Mahindra';
+      else if (/\bindusind\b/i.test(sampleScan + ' ' + filename)) bankName = 'IndusInd Bank';
+      else if (/\bpnb|punjab national\b/i.test(sampleScan + ' ' + filename)) bankName = 'PNB';
+      else if (/\bcanara\b/i.test(sampleScan + ' ' + filename)) bankName = 'Canara Bank';
+
+      // 2. Detect Account Type (Credit Card vs Savings / Current A/c)
+      let isCreditCard = false;
+      let last4 = '1234';
+
+      const cardMatch = sampleScan.match(/\b(?:\d{4}[X\*\-]{4,10}(\d{4})|[X\*\-]{4,12}(\d{4}))\b/i);
       if (cardMatch) {
-        cardLast4 = cardMatch[1] || cardMatch[2] || '4009';
+        last4 = cardMatch[1] || cardMatch[2] || '4009';
+        isCreditCard = true;
       }
 
-      // --- METHOD 1: Line-by-Line Regex (for ICICI, HDFC, SBI Credit Card & PDF statements) ---
-      let lineRecords = [];
-      for (const line of lines) {
-        const m = line.match(/(\d{1,2}[-/](?:[a-z]{3}|\d{1,2})[-/]\d{2,4})\s+(?:\d{5,}\s+)?(.+?)\s+([\d,]+\.\d{2})\s*(CR)?$/i);
-        if (m) {
-          const rawDate = m[1];
-          const rawDesc = m[2];
-          const amtStr = m[3];
-          const isCr = Boolean(m[4]) || /payment received|credited|refund/i.test(rawDesc);
-          const amt = parseFloat(amtStr.replace(/,/g, ''));
-          
-          if (amt > 0) {
-            const parsedDate = extractDateFromSMS(rawDate);
-            const cleanDesc = cleanBankNarration(rawDesc);
-            let category = 'Other';
-            if (/swiggy|zomato|starbucks|food|dining|restaurant/i.test(cleanDesc)) category = 'Food & Dining';
-            else if (/blinkit|zepto|grocery/i.test(cleanDesc)) category = 'Groceries';
-            else if (/fuel|shell|petrol|uber/i.test(cleanDesc)) category = 'Transportation';
-            else if (/bill|payment received|infinity|bbps/i.test(cleanDesc)) category = 'Card Payment';
-
-            lineRecords.push({
-              id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
-              amount: amt,
-              type: isCr ? 'Income' : 'Expense',
-              merchant: cleanDesc,
-              category,
-              bank: /icici/i.test(filename) ? `ICICI Bank Card (${cardLast4})` : `Bank Card (${cardLast4})`,
-              last4: cardLast4,
-              mode: 'Card',
-              date: parsedDate,
-              isAuto: true,
-              raw: `Imported statement: ${line}`
-            });
-          }
-        }
+      if (/\b(credit card|coral|regalia|infinia|millennia|simplyclick|simplysave|magnus|total amount due|minimum amount due|reward points|credit limit)\b/i.test(sampleScan) || /credit.*card|card/i.test(filename)) {
+        isCreditCard = true;
+      } else if (/\b(savings|current|sb a\/c|saving bank|account statement|available balance|closing balance)\b/i.test(sampleScan)) {
+        isCreditCard = false;
       }
 
-      if (lineRecords.length > 0) {
-        lineRecords.forEach(r => transactions.unshift(r));
-        saveState();
-        showToast(`⚡ Successfully imported ${lineRecords.length} transactions from ${filename || 'statement'}!`);
-        switchTab('expenses');
-        return;
+      const acctMatch = sampleScan.match(/\b(?:a\/c|acct|account)(?:\s+no\.?)?[:\s]+[X\*\d]{4,12}(\d{4})\b/i);
+      if (acctMatch && !isCreditCard) {
+        last4 = acctMatch[1];
       }
 
-      // --- METHOD 2: CSV Table Parsing ---
-      let headerIdx = -1;
-      let dateCol = -1, descCol = -1, debitCol = -1, creditCol = -1, amtCol = -1;
+      const accountBadge = isCreditCard ? `💳 ${bankName} Card (${last4})` : `🏦 ${bankName} Savings A/c (${last4})`;
 
-      for (let i = 0; i < Math.min(10, lines.length); i++) {
-        const cols = lines[i].split(',').map(c => c.replace(/["']/g, '').trim().toLowerCase());
-        cols.forEach((col, idx) => {
-          if (/date/i.test(col) && dateCol === -1) dateCol = idx;
-          else if (/narration|description|particular|details|remarks|merchant/i.test(col) && descCol === -1) descCol = idx;
-          else if (/withdrawal|debit|dr/i.test(col) && debitCol === -1) debitCol = idx;
-          else if (/deposit|credit|cr/i.test(col) && creditCol === -1) creditCol = idx;
-          else if (/amount|amt/i.test(col) && amtCol === -1) amtCol = idx;
-        });
-
-        if (dateCol !== -1 && (debitCol !== -1 || amtCol !== -1 || descCol !== -1)) {
-          headerIdx = i;
-          break;
-        }
-      }
-
-      if (headerIdx === -1) {
-        showToast('Could not find transaction rows in this statement.');
-        return;
-      }
-
-      let importedCount = 0;
-      for (let i = headerIdx + 1; i < lines.length; i++) {
-        const row = lines[i].split(',').map(c => c.replace(/["']/g, '').trim());
-        if (row.length <= dateCol) continue;
-
-        const rawDate = row[dateCol];
-        if (!rawDate) continue;
-
+      // Helper for building transaction record
+      function createRecord(rawDate, rawDesc, amt, isCr, originalLine) {
         const parsedDate = extractDateFromSMS(rawDate);
-        const rawDesc = descCol !== -1 ? row[descCol] : 'Bank Transaction';
-        const merchant = cleanBankNarration(rawDesc);
+        let clean = (rawDesc || '').trim();
 
-        let amount = 0;
-        let type = 'Expense';
+        let merchant = clean;
+        let category = 'Other';
+        let mode = isCreditCard ? 'Card' : 'NetBanking';
 
-        if (debitCol !== -1 && creditCol !== -1) {
-          const deb = parseFloat((row[debitCol] || '').replace(/,/g, ''));
-          const cred = parseFloat((row[creditCol] || '').replace(/,/g, ''));
-          if (!isNaN(deb) && deb > 0) {
-            amount = deb;
-            type = 'Expense';
-          } else if (!isNaN(cred) && cred > 0) {
-            amount = cred;
-            type = 'Income';
-          }
-        } else if (amtCol !== -1) {
-          const a = parseFloat((row[amtCol] || '').replace(/,/g, ''));
-          if (!isNaN(a) && Math.abs(a) > 0) {
-            amount = Math.abs(a);
-            type = 'Expense';
+        // Check for P2P transfers
+        const p2p = extractP2PTransfer(clean, isCr);
+        if (p2p) {
+          merchant = p2p.merchant;
+          category = p2p.category;
+          mode = 'UPI';
+        } else {
+          merchant = cleanBankNarration(clean);
+          if (/swiggy/i.test(clean)) { category = 'Food & Dining'; }
+          else if (/zomato/i.test(clean)) { category = 'Food & Dining'; }
+          else if (/starbucks/i.test(clean)) { category = 'Food & Dining'; }
+          else if (/blinkit|zepto|grocery/i.test(clean)) { category = 'Groceries'; }
+          else if (/fuel|shell|petrol|hpcl|uber|ola/i.test(clean)) { category = 'Transportation'; }
+          else if (/bescom|electricity|power|bill/i.test(clean)) { category = 'Utilities & Bills'; }
+          else if (/bbps|infinity payment|payment received|autopay/i.test(clean)) { category = 'Card Payment'; }
+          else if (/salary|payroll/i.test(clean) || isCr) { category = isCr ? (isCreditCard ? 'Card Payment' : 'Salary') : 'Other'; }
+          else if (/reliance digital|amazon|flipkart/i.test(clean)) { category = 'Shopping'; }
+        }
+
+        if (/upi/i.test(clean)) mode = 'UPI';
+
+        return {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          amount: amt,
+          type: isCr ? 'Income' : 'Expense',
+          merchant,
+          category,
+          bank: isCreditCard ? `${bankName} Card (${last4})` : `${bankName} (${last4})`,
+          last4,
+          mode,
+          date: parsedDate,
+          isAuto: true,
+          raw: `Statement: ${originalLine}`
+        };
+      }
+
+      const parsedRecords = [];
+      const DATE_REGEX_STR = '(?:\d{1,2}[-/](?:[a-zA-Z]{3}|\d{1,2})[-/]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3}\s+\d{2,4})';
+      const DATE_REGEX = new RegExp(DATE_REGEX_STR, 'i');
+
+      // --- METHOD A: Scan line-by-line ---
+      for (const line of lines) {
+        if (/^(statement date|opening balance|closing balance|total amount due|minimum amount due|credit limit|page \d+)/i.test(line)) {
+          continue;
+        }
+
+        // CSV line with commas
+        if (line.includes(',')) {
+          const cols = line.split(',').map(c => c.replace(/["']/g, '').trim());
+          if (cols.length >= 3 && DATE_REGEX.test(cols[0])) {
+            const rawDate = cols[0];
+            const rawDesc = cols[1];
+            let debitAmt = null, creditAmt = null;
+
+            if (cols.length >= 4) {
+              const d = parseFloat((cols[2] || '').replace(/,/g, ''));
+              const c = parseFloat((cols[3] || '').replace(/,/g, ''));
+              if (!isNaN(d) && d > 0) debitAmt = d;
+              if (!isNaN(c) && c > 0) creditAmt = c;
+            } else if (cols.length === 3) {
+              const a = parseFloat((cols[2] || '').replace(/,/g, '').replace(/CR|DR/ig, '').trim());
+              if (!isNaN(a) && a > 0) {
+                if (/CR/i.test(cols[2])) creditAmt = a;
+                else debitAmt = a;
+              }
+            }
+
+            if (debitAmt !== null || creditAmt !== null) {
+              const isCr = creditAmt !== null;
+              const amt = isCr ? creditAmt : debitAmt;
+              parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
+              continue;
+            }
           }
         }
 
-        if (amount > 0) {
-          let category = 'Other';
-          if (/food|dining|starbucks|cafe|restaurant|swiggy|zomato/i.test(merchant)) category = 'Food & Dining';
-          else if (/grocery|blinkit|zepto|mart/i.test(merchant)) category = 'Groceries';
-          else if (/fuel|shell|transport|uber|ola/i.test(merchant)) category = 'Transportation';
-          else if (/bill|electricity|bescom|utility/i.test(merchant)) category = 'Utilities & Bills';
-          else if (type === 'Income') category = 'Salary';
+        // Space-delimited line matching:
+        // Pattern 1: Savings Account with 3 amounts at end (Debit, Credit, Balance)
+        // e.g.: "01/08/2026 SALARY CREDIT ACME TECHNOLOGIES 0.00 85,000.00 125,000.00"
+        const m3 = line.match(new RegExp('^(' + DATE_REGEX_STR + ')\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})$', 'i'));
+        if (m3) {
+          const rawDate = m3[1];
+          const rawDesc = m3[2].trim();
+          const deb = parseFloat(m3[3].replace(/,/g, ''));
+          const cred = parseFloat(m3[4].replace(/,/g, ''));
+          if (deb > 0) {
+            parsedRecords.push(createRecord(rawDate, rawDesc, deb, false, line));
+          } else if (cred > 0) {
+            parsedRecords.push(createRecord(rawDate, rawDesc, cred, true, line));
+          }
+          continue;
+        }
 
-          transactions.unshift({
-            id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
-            amount,
-            type,
-            merchant,
-            category,
-            bank: /sbi/i.test(filename) ? 'SBI' : /icici/i.test(filename) ? 'ICICI Bank' : /axis/i.test(filename) ? 'Axis Bank' : 'HDFC Bank',
-            last4: '1234',
-            mode: 'NetBanking',
-            date: parsedDate,
-            isAuto: true,
-            raw: `Imported from ${filename}: ${lines[i]}`
-          });
-          importedCount++;
+        // Pattern 2: Savings Account with 2 amounts at end (Amount [CR/DR] Balance)
+        // e.g.: "10/08/2026 BESCOM BILL 2,400.00 122,150.00" or "... 3,000.00 CR 123,650.00"
+        const m2 = line.match(new RegExp('^(' + DATE_REGEX_STR + ')\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr)?\\s+([\\d,]+\\.\\d{2})$', 'i'));
+        if (m2) {
+          const rawDate = m2[1];
+          const rawDesc = m2[2].trim();
+          const amt = parseFloat(m2[3].replace(/,/g, ''));
+          const flag = (m2[4] || '').toUpperCase();
+          let isCr = (flag === 'CR') || /salary|deposit|refund|interest credit|credit/i.test(rawDesc);
+          if (flag === 'DR') isCr = false;
+
+          if (amt > 0) {
+            parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
+          }
+          continue;
+        }
+
+        // Pattern 3: Credit Card or Single Amount lines
+        // e.g.: "04/08/2026 13921126192 SWIGGYFOOD 4 230.00"
+        // or "07/08/2026 13931750699 BBPS Payment received 0 23,746.69 CR"
+        const m1 = line.match(new RegExp('^(' + DATE_REGEX_STR + ')\\s+(?:[\\d:]{5,15}\\s+)?(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr|C|D)?$', 'i'));
+        if (m1) {
+          const rawDate = m1[1];
+          let rawDesc = m1[2].trim();
+          const amt = parseFloat(m1[3].replace(/,/g, ''));
+          const flag = (m1[4] || '').toUpperCase();
+
+          // Remove reward points suffix e.g. "SWIGGYFOOD 4" -> "SWIGGYFOOD"
+          rawDesc = rawDesc.replace(/\s+\d{1,3}$/, '');
+
+          let isCr = (flag === 'CR' || flag === 'C') || /payment received|infinity payment|bbps|refund|cashback/i.test(rawDesc);
+          if (flag === 'DR' || flag === 'D') isCr = false;
+
+          if (amt > 0) {
+            parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
+          }
+          continue;
         }
       }
 
-      if (importedCount > 0) {
+      // --- METHOD B: If line parsing missed, fallback to CSV header detection ---
+      if (parsedRecords.length === 0) {
+        let headerIdx = -1;
+        let dateCol = -1, descCol = -1, debitCol = -1, creditCol = -1, amtCol = -1;
+
+        for (let i = 0; i < Math.min(10, lines.length); i++) {
+          const cols = lines[i].split(',').map(c => c.replace(/["']/g, '').trim().toLowerCase());
+          cols.forEach((col, idx) => {
+            if (/date/i.test(col) && dateCol === -1) dateCol = idx;
+            else if (/narration|description|particular|details|remarks|merchant/i.test(col) && descCol === -1) descCol = idx;
+            else if (/withdrawal|debit|dr/i.test(col) && debitCol === -1) debitCol = idx;
+            else if (/deposit|credit|cr/i.test(col) && creditCol === -1) creditCol = idx;
+            else if (/amount|amt/i.test(col) && amtCol === -1) amtCol = idx;
+          });
+
+          if (dateCol !== -1 && (debitCol !== -1 || amtCol !== -1 || descCol !== -1)) {
+            headerIdx = i;
+            break;
+          }
+        }
+
+        if (headerIdx !== -1) {
+          for (let i = headerIdx + 1; i < lines.length; i++) {
+            const row = lines[i].split(',').map(c => c.replace(/["']/g, '').trim());
+            if (row.length <= dateCol) continue;
+            const rawDate = row[dateCol];
+            if (!rawDate) continue;
+
+            const rawDesc = descCol !== -1 ? row[descCol] : 'Bank Transaction';
+            let amt = 0, isCr = false;
+
+            if (debitCol !== -1 && creditCol !== -1) {
+              const deb = parseFloat((row[debitCol] || '').replace(/,/g, ''));
+              const cred = parseFloat((row[creditCol] || '').replace(/,/g, ''));
+              if (!isNaN(deb) && deb > 0) { amt = deb; isCr = false; }
+              else if (!isNaN(cred) && cred > 0) { amt = cred; isCr = true; }
+            } else if (amtCol !== -1) {
+              const a = parseFloat((row[amtCol] || '').replace(/,/g, ''));
+              if (!isNaN(a) && Math.abs(a) > 0) { amt = Math.abs(a); isCr = false; }
+            }
+
+            if (amt > 0) {
+              parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, lines[i]));
+            }
+          }
+        }
+      }
+
+      if (parsedRecords.length > 0) {
+        parsedRecords.forEach(r => transactions.unshift(r));
         saveState();
-        showToast(`⚡ Successfully imported ${importedCount} past transactions!`);
+        showToast(`⚡ Successfully imported ${parsedRecords.length} transactions from ${accountBadge}!`);
         switchTab('expenses');
       } else {
-        showToast('No valid transactions found in statement.');
+        showToast('No readable transactions detected in this statement.');
       }
     }
 
