@@ -677,9 +677,14 @@
                   <p class="text-[10px] text-indigo-300">Handles password-protected bank PDFs & CSVs</p>
                 </div>
               </div>
-              <button onclick="loadSampleCSVStatement()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
-                Try Sample File
-              </button>
+              <div class="flex gap-1.5">
+                <button onclick="loadICICISampleStatement()" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
+                  ICICI Card Demo
+                </button>
+                <button onclick="loadSampleCSVStatement()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
+                  Bank CSV Demo
+                </button>
+              </div>
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed">
@@ -862,6 +867,20 @@
 10/08/2026,NETBANK-BESCOM ELECTRICITY BILL,2400.00,,14791.50
 20/07/2026,CARD PURCHASE SHELL FUEL STATION,1500.00,,17191.50`;
 
+
+    const iciciSampleStatementText = `ICICI Bank Credit Cards - Coral
+6528XXXXXXXX4009
+MR DINAKAR LUKESH DARSIGUNTALA
+STATEMENT DATE: September 2, 2026
+04/08/2026 13921126192 SWIGGYFOOD 4 230.00
+07/08/2026 13931750699 BBPS Payment received 0 23,746.69 CR
+07/08/2026 13931753349 INFINITY PAYMENT RECEIVED, THANK YOU 0 230.00 CR
+09/08/2026 13952204095 SWIGGYFOOD 8 447.00`;
+
+    function loadICICISampleStatement() {
+      importStatementCSVText(iciciSampleStatementText, 'ICICI_Coral_Credit_Card.pdf');
+    }
+
     function loadSampleCSVStatement() {
       importStatementCSVText(sampleCSVStatement, 'HDFC_Sample_Statement.csv');
     }
@@ -935,11 +954,63 @@
     function importStatementCSVText(csvText, filename) {
       const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 2) {
-        showToast('CSV file is empty or invalid.');
+        showToast('Statement text or file is empty.');
         return;
       }
 
-      // Detect header row
+      // Detect card number if present (e.g. 6528XXXXXXXX4009)
+      let cardLast4 = '4009';
+      const cardMatch = csvText.match(/\b(?:\d{4}X{4,8}(\d{4})|X{4,12}(\d{4}))\b/i);
+      if (cardMatch) {
+        cardLast4 = cardMatch[1] || cardMatch[2] || '4009';
+      }
+
+      // --- METHOD 1: Line-by-Line Regex (for ICICI, HDFC, SBI Credit Card & PDF statements) ---
+      let lineRecords = [];
+      for (const line of lines) {
+        const m = line.match(/(\d{1,2}[-/](?:[a-z]{3}|\d{1,2})[-/]\d{2,4})\s+(?:\d{5,}\s+)?(.+?)\s+([\d,]+\.\d{2})\s*(CR)?$/i);
+        if (m) {
+          const rawDate = m[1];
+          const rawDesc = m[2];
+          const amtStr = m[3];
+          const isCr = Boolean(m[4]) || /payment received|credited|refund/i.test(rawDesc);
+          const amt = parseFloat(amtStr.replace(/,/g, ''));
+          
+          if (amt > 0) {
+            const parsedDate = extractDateFromSMS(rawDate);
+            const cleanDesc = cleanBankNarration(rawDesc);
+            let category = 'Other';
+            if (/swiggy|zomato|starbucks|food|dining|restaurant/i.test(cleanDesc)) category = 'Food & Dining';
+            else if (/blinkit|zepto|grocery/i.test(cleanDesc)) category = 'Groceries';
+            else if (/fuel|shell|petrol|uber/i.test(cleanDesc)) category = 'Transportation';
+            else if (/bill|payment received|infinity|bbps/i.test(cleanDesc)) category = 'Card Payment';
+
+            lineRecords.push({
+              id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+              amount: amt,
+              type: isCr ? 'Income' : 'Expense',
+              merchant: cleanDesc,
+              category,
+              bank: /icici/i.test(filename) ? `ICICI Bank Card (${cardLast4})` : `Bank Card (${cardLast4})`,
+              last4: cardLast4,
+              mode: 'Card',
+              date: parsedDate,
+              isAuto: true,
+              raw: `Imported statement: ${line}`
+            });
+          }
+        }
+      }
+
+      if (lineRecords.length > 0) {
+        lineRecords.forEach(r => transactions.unshift(r));
+        saveState();
+        showToast(`⚡ Successfully imported ${lineRecords.length} transactions from ${filename || 'statement'}!`);
+        switchTab('expenses');
+        return;
+      }
+
+      // --- METHOD 2: CSV Table Parsing ---
       let headerIdx = -1;
       let dateCol = -1, descCol = -1, debitCol = -1, creditCol = -1, amtCol = -1;
 
@@ -960,7 +1031,7 @@
       }
 
       if (headerIdx === -1) {
-        showToast('Could not find Date/Amount columns in this CSV.');
+        showToast('Could not find transaction rows in this statement.');
         return;
       }
 
