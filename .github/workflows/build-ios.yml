@@ -7,6 +7,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build iOS Application
@@ -64,6 +67,19 @@ jobs:
             grep -E "(error:|fatal error:|BUILD FAILED)" xcodebuild.log | head -n 40 >> $GITHUB_STEP_SUMMARY || true
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Push Build Log to Git Branch on Failure
+        if: failure()
+        run: |
+          if [ -f xcodebuild.log ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout -B ios-log
+            git add xcodebuild.log
+            git commit -m "Save xcodebuild log" || true
+            git push origin ios-log --force || true
+          fi
+
 
 
       - name: Package .IPA for iPhone Sideloading

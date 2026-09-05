@@ -5,6 +5,9 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-android:
     name: Build Android APK
@@ -26,14 +29,6 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Configure Android platform scaffolding
-        run: |
-          flutter create . --platforms=android --org com.expensetracker --project-name expense_tracker --overwrite 2>&1 | tee create.log || {
-            echo "### Flutter Create Failed" >> $GITHUB_STEP_SUMMARY
-            cat create.log >> $GITHUB_STEP_SUMMARY
-            exit 1
-          }
-
       - name: Install dependencies
         run: flutter pub get
 
@@ -46,6 +41,16 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             exit 1
           }
+
+      - name: Push Android log to branch
+        if: failure()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B android-log
+          git add build_apk.log
+          git commit -m "Save Android APK build log" || true
+          git push origin android-log --force || true
 
 
 
