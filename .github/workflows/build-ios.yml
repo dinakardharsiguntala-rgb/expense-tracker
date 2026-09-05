@@ -51,6 +51,21 @@ jobs:
               exit 1
             }
 
+      - name: Report Build Logs in Step Summary
+        if: always()
+        run: |
+          if [ -f xcodebuild.log ]; then
+            echo "### Xcodebuild Tail Log" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 100 xcodebuild.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "### Extracted Errors" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            grep -E "(error:|fatal error:|BUILD FAILED)" xcodebuild.log | head -n 40 >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+
       - name: Package .IPA for iPhone Sideloading
         run: |
           mkdir -p build/Payload

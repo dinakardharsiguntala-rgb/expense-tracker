@@ -27,13 +27,26 @@ jobs:
           cache: true
 
       - name: Configure Android platform scaffolding
-        run: flutter create . --platforms=android
+        run: |
+          flutter create . --platforms=android --org com.expensetracker --project-name expense_tracker --overwrite 2>&1 | tee create.log || {
+            echo "### Flutter Create Failed" >> $GITHUB_STEP_SUMMARY
+            cat create.log >> $GITHUB_STEP_SUMMARY
+            exit 1
+          }
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Android Release APK
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release 2>&1 | tee build_apk.log || {
+            echo "### Flutter APK Build Failed" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 80 build_apk.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          }
+
 
 
       - name: Upload Android APK
