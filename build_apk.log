@@ -1,0 +1,33 @@
+
+Running Gradle task 'assembleRelease'...                        
+Checking the license for package Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/licenses
+License for package Android SDK Build-Tools 33.0.1 accepted.
+Preparing "Install Android SDK Build-Tools 33.0.1 v.33.0.1".
+"Install Android SDK Build-Tools 33.0.1 v.33.0.1" ready.
+Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-tools/33.0.1
+"Install Android SDK Build-Tools 33.0.1 v.33.0.1" complete.
+"Install Android SDK Build-Tools 33.0.1 v.33.0.1" finished.
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 7320 bytes (99.6% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:processReleaseResources'.
+> A failure occurred while executing com.android.build.gradle.internal.res.LinkApplicationAndroidResourcesTask$TaskAction
+   > Android resource linking failed
+     /home/runner/work/expense-tracker/expense-tracker/build/app/intermediates/packaged_manifests/release/AndroidManifest.xml:23: error: resource mipmap/ic_launcher (aka com.expensetracker.app:mipmap/ic_launcher) not found.
+     /home/runner/work/expense-tracker/expense-tracker/build/app/intermediates/packaged_manifests/release/AndroidManifest.xml:30: error: resource style/LaunchTheme (aka com.expensetracker.app:style/LaunchTheme) not found.
+     /home/runner/work/expense-tracker/expense-tracker/build/app/intermediates/packaged_manifests/release/AndroidManifest.xml:39: error: resource style/NormalTheme (aka com.expensetracker.app:style/NormalTheme) not found.
+     error: failed processing manifest.
+
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 2m 39s
+Running Gradle task 'assembleRelease'...                          159.7s
+Gradle task assembleRelease failed with exit code 1
