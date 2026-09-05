@@ -30,7 +30,7 @@ class _SmsImportScreenState extends State<SmsImportScreen> {
     },
     {
       'bank': 'Chase Bank',
-      'sms': 'Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER TRIP on Sep 2.',
+      'sms': 'Chase Alert: You made a \$42.50 purchase with Card ending in 4321 at UBER TRIP on Sep 2.',
     },
     {
       'bank': 'ICICI Bank (Salary)',

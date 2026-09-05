@@ -78,7 +78,7 @@ class TransactionTile extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                           maxLines: 1,
-                          overflow: TextEllipsis.ellipsis,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (transaction.isAutoParsed) ...[
@@ -113,7 +113,7 @@ class TransactionTile extends StatelessWidget {
                     '${DateFormat('d MMM, h:mm a').format(transaction.date)} • ${transaction.bankName ?? category?.name ?? "General"}',
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                     maxLines: 1,
-                    overflow: TextEllipsis.ellipsis,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
