@@ -1,7 +1,7 @@
 {
+  "git.enabled": false,
+  "git.autorefresh": false,
   "git.autofetch": false,
-  "git.autoStash": false,
-  "git.confirmSync": false,
   "swift.disableSwiftPackageManagerIntegration": true,
   "swift.disableAutoResolve": true,
   "swift.backgroundCompilation": false,
