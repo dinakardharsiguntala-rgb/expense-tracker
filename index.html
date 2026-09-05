@@ -30,13 +30,20 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     }
     .safe-bottom {
-      padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 4rem);
+      padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 4.5rem);
     }
     .tab-bar-safe {
       padding-bottom: env(safe-area-inset-bottom, 8px);
     }
     .tab-active { color: #007AFF !important; }
     ::-webkit-scrollbar { width: 0px; background: transparent; }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-banner {
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-500 selection:text-white">
@@ -49,13 +56,32 @@
       </div>
       <div>
         <h1 class="text-base font-bold text-white leading-tight">Expense Tracker</h1>
-        <p class="text-[10px] text-emerald-400 font-medium">100% On-Device • Zero Cloud</p>
+        <p class="text-[10px] text-emerald-400 font-medium">100% On-Device • Bank SMS Reader</p>
       </div>
     </div>
     <button onclick="openAddModal()" class="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-600/30 transition">
       +
     </button>
   </header>
+
+  <!-- Smart Clipboard Auto-Detected Banner -->
+  <div id="clipboardBanner" class="hidden max-w-lg mx-auto w-full px-4 pt-3">
+    <div class="bg-gradient-to-r from-blue-900/90 to-indigo-950/90 border border-blue-500/40 p-3 rounded-2xl shadow-xl animate-banner flex items-center justify-between gap-3">
+      <div class="flex items-center space-x-2.5 min-w-0">
+        <span class="text-xl">✨</span>
+        <div class="min-w-0">
+          <p class="text-xs font-bold text-white truncate">Bank SMS Detected on Clipboard!</p>
+          <p id="clipboardPreviewText" class="text-[10px] text-blue-200 truncate">Tap to record transaction</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-1.5 shrink-0">
+        <button onclick="dismissClipboardBanner()" class="px-2 py-1 text-[11px] text-slate-400 hover:text-white font-medium">Dismiss</button>
+        <button onclick="acceptClipboardSMS()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-600/30">
+          Record
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Main Scrollable Screen Content -->
   <main id="appContent" class="flex-1 px-4 py-4 safe-bottom max-w-lg mx-auto w-full">
@@ -145,6 +171,58 @@
     </div>
   </div>
 
+  <!-- iOS Shortcuts Instructions Modal -->
+  <div id="shortcutsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">🍎</span>
+          <h3 class="text-base font-bold text-white">100% Auto-SMS on iPhone</h3>
+        </div>
+        <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Apple restricts all third-party apps from reading SMS directly. But Apple built an official tool called <strong>Shortcuts Automation</strong> that automatically forwards bank messages into this app!
+      </p>
+
+      <div class="space-y-3 pt-1">
+        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
+          <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
+          <div>
+            <h4 class="text-xs font-bold text-white">Open the "Shortcuts" App on iPhone</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Shortcuts comes pre-installed on every iPhone. Open it and tap the <strong>Automation</strong> tab at the bottom.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
+          <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
+          <div>
+            <h4 class="text-xs font-bold text-white">Create New Automation → Message</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>+</strong> &rarr; select <strong>Message</strong>. In "Message Contains", enter keywords:</p>
+            <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-emerald-400">debited, spent, credited, paid, INR, Rs</div>
+            <p class="text-[10px] text-blue-400 font-semibold mt-1">Select "Run Immediately" (no prompt needed!).</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
+          <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
+          <div>
+            <h4 class="text-xs font-bold text-white">Add Action: Open Web App with Text</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Add action <strong>"Open URLs"</strong> and set URL to:</p>
+            <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all">
+              https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeShortcutsModal()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
+        Understood!
+      </button>
+    </div>
+  </div>
+
   <!-- Transaction Details & Raw SMS Inspector Modal -->
   <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl">
@@ -179,6 +257,7 @@
     let currentTab = 'dashboard';
     let activeFormType = 'Expense';
     let viewingItem = null;
+    let detectedClipboardText = null;
 
     const initialData = [
       { id: '1', amount: 450.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '1234', mode: 'UPI', date: 'Today, 2:15 PM', isAuto: true, raw: 'Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.' },
@@ -187,10 +266,10 @@
       { id: '4', amount: 75000.00, type: 'Income', merchant: 'Infosys Ltd (Salary)', category: 'Salary', bank: 'HDFC Bank', last4: '1234', mode: 'NetBanking', date: 'Sep 1, 2026', isAuto: true, raw: 'Salary of INR 75,000.00 credited to your Account **1234 by Infosys Technologies on 01-SEP-26.' }
     ];
 
-    let transactions = JSON.parse(localStorage.getItem('expenses_pwa_records_v1')) || initialData;
+    let transactions = JSON.parse(localStorage.getItem('expenses_pwa_records_v2')) || initialData;
 
     function saveState() {
-      localStorage.setItem('expenses_pwa_records_v1', JSON.stringify(transactions));
+      localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
     }
 
     function showToast(msg) {
@@ -267,6 +346,22 @@
             </button>
           </div>
 
+          <!-- Shortcuts Automation Banner on iPhone -->
+          <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-sm font-bold">
+                ⚡
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white">Apple Shortcuts Auto-Sync</p>
+                <p class="text-[10px] text-slate-400">Auto-catch bank SMS when received</p>
+              </div>
+            </div>
+            <button onclick="openShortcutsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl text-[11px] font-bold transition">
+              Setup
+            </button>
+          </div>
+
           <!-- Recent Transactions -->
           <div>
             <div class="flex justify-between items-center mb-2">
@@ -334,12 +429,12 @@
             <p class="text-xs text-slate-400 mt-0.5">Paste any SMS message from HDFC, SBI, ICICI, Axis, Chase, etc.</p>
           </div>
 
-          <!-- SMS Input Box -->
+          <!-- 1-Tap Paste Box -->
           <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3">
             <textarea id="smsInput" rows="4" placeholder="Paste bank SMS text here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
             
             <div class="flex gap-2">
-              <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1 transition">
+              <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
                 <span>📋</span>
                 <span>Paste from Clipboard</span>
               </button>
@@ -347,6 +442,19 @@
                 Parse & Record
               </button>
             </div>
+          </div>
+
+          <!-- Shortcuts Auto-Sync Guide Card -->
+          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 p-4 rounded-2xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-300">🍎 Automatic SMS on iPhone</span>
+              <button onclick="openShortcutsModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition">
+                View 1-Min Guide
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+              Use Apple's built-in <strong>Shortcuts app</strong> to automatically forward incoming bank messages into this tracker whenever your bank sends a text!
+            </p>
           </div>
 
           <!-- Sample Messages to Test -->
@@ -390,8 +498,81 @@
           showToast('Pasted from clipboard!');
         }
       } catch (err) {
-        showToast('Please tap and paste into the box');
+        showToast('Please tap into box and paste');
       }
+    }
+
+    // --- ADVANCED ON-DEVICE REGEX PARSER ---
+    function parseBankSMSText(text) {
+      let amount = null;
+      let type = 'Expense';
+      let merchant = 'Bank Transaction';
+      let category = 'Other';
+      let bank = 'Bank';
+      let last4 = '';
+      let mode = 'UPI';
+
+      // Amount extraction
+      const amtMatch = text.match(/(?:(?:Rs\.?|INR|\$)\s*([\d,]+\.?\d*)|([\d,]+\.?\d*)\s*(?:Rs\.?|INR|\$))/i);
+      if (amtMatch) {
+        const val = amtMatch[1] || amtMatch[2];
+        amount = parseFloat(val.replace(/,/g, ''));
+      }
+
+      // Type detection
+      if (/credited|salary|received|deposited|refund/i.test(text)) {
+        type = 'Income';
+        category = 'Salary';
+      }
+
+      // Merchant & Category matching
+      if (/starbucks|cafe|coffee|mcdonalds|kfc|pizza|burger|swiggy|zomato|dining|restaurant/i.test(text)) {
+        merchant = 'Dining / Food';
+        category = 'Food & Dining';
+      } else if (/blinkit|zepto|bigbasket|grocery|supermarket|mart|dmart|instamart/i.test(text)) {
+        merchant = 'Groceries / Mart';
+        category = 'Groceries';
+      } else if (/uber|ola|rapido|fuel|petrol|shell|hpcl|bpcl|metro|irctc/i.test(text)) {
+        merchant = 'Transport / Fuel';
+        category = 'Transportation';
+      } else if (/amazon|flipkart|myntra|meesho|ajio|nykaa|zara|h&m|shopping/i.test(text)) {
+        merchant = 'Online Shopping';
+        category = 'Shopping';
+      } else if (/electricity|water|bill|bescom|airtel|jio|vi|recharge/i.test(text)) {
+        merchant = 'Bills & Utilities';
+        category = 'Utilities & Bills';
+      } else if (/pharmacy|apollo|pharmeasy|1mg|hospital|clinic/i.test(text)) {
+        merchant = 'Healthcare';
+        category = 'Healthcare';
+      }
+
+      // Bank detection
+      if (/hdfc/i.test(text)) bank = 'HDFC Bank';
+      else if (/sbi/i.test(text)) bank = 'SBI';
+      else if (/icici/i.test(text)) bank = 'ICICI Bank';
+      else if (/axis/i.test(text)) bank = 'Axis Bank';
+      else if (/kotak/i.test(text)) bank = 'Kotak Bank';
+      else if (/chase/i.test(text)) bank = 'Chase';
+
+      // Payment Mode
+      if (/upi/i.test(text)) mode = 'UPI';
+      else if (/card|credit|debit/i.test(text)) mode = 'Card';
+      else if (/netbanking|neft|rtgs|imps/i.test(text)) mode = 'NetBanking';
+
+      // Last 4 digits
+      const cardMatch = text.match(/(?:card|a\/c|account|xx|\*\*)[^\d]*(\d{4})/i);
+      if (cardMatch) last4 = cardMatch[1];
+
+      return {
+        amount,
+        type,
+        merchant,
+        category,
+        bank,
+        last4,
+        mode,
+        raw: text
+      };
     }
 
     function parseAndLogSMS() {
@@ -401,65 +582,21 @@
         return;
       }
 
-      // Regex Extractor Engine
-      let amount = null;
-      let type = 'Expense';
-      let merchant = 'Unknown Merchant';
-      let category = 'Other';
-      let bank = 'Bank';
-      let last4 = '';
-      let mode = 'UPI';
-
-      const amtMatch = text.match(/(?:(?:Rs\.?|INR|\$)\s*([\d,]+\.?\d*)|([\d,]+\.?\d*)\s*(?:Rs\.?|INR|\$))/i);
-      if (amtMatch) {
-        const val = amtMatch[1] || amtMatch[2];
-        amount = parseFloat(val.replace(/,/g, ''));
-      }
-
-      if (/credited|salary|received|deposited/i.test(text)) {
-        type = 'Income';
-        category = 'Salary';
-      }
-
-      if (/starbucks|cafe|coffee|mcdonalds|swiggy|zomato/i.test(text)) {
-        merchant = 'Starbucks / Dining';
-        category = 'Food & Dining';
-      } else if (/blinkit|zepto|grocery|supermarket|mart/i.test(text)) {
-        merchant = 'Blinkit Grocery';
-        category = 'Groceries';
-      } else if (/uber|ola|fuel|petrol|shell/i.test(text)) {
-        merchant = 'Uber / Fuel';
-        category = 'Transportation';
-      } else if (/amazon|flipkart|myntra|zara/i.test(text)) {
-        merchant = 'Shopping';
-        category = 'Shopping';
-      } else {
-        merchant = 'Bank Transaction';
-      }
-
-      if (/hdfc/i.test(text)) bank = 'HDFC Bank';
-      else if (/sbi/i.test(text)) bank = 'SBI';
-      else if (/icici/i.test(text)) bank = 'ICICI Bank';
-      else if (/axis/i.test(text)) bank = 'Axis Bank';
-      else if (/chase/i.test(text)) bank = 'Chase';
-
-      const cardMatch = text.match(/(?:card|a\/c|account)[^\d]*(\d{4})/i);
-      if (cardMatch) last4 = cardMatch[1];
-
-      if (!amount || isNaN(amount)) {
-        showToast('Could not find transaction amount in this SMS.');
+      const res = parseBankSMSText(text);
+      if (!res.amount || isNaN(res.amount)) {
+        showToast('Could not extract transaction amount from this text.');
         return;
       }
 
       const newRec = {
         id: Date.now().toString(),
-        amount: amount,
-        type: type,
-        merchant: merchant,
-        category: category,
-        bank: bank,
-        last4: last4,
-        mode: mode,
+        amount: res.amount,
+        type: res.type,
+        merchant: res.merchant,
+        category: res.category,
+        bank: res.bank,
+        last4: res.last4,
+        mode: res.mode,
         date: 'Just Now',
         isAuto: true,
         raw: text
@@ -467,9 +604,92 @@
 
       transactions.unshift(newRec);
       saveState();
-      showToast(`Parsed: ${currencySymbol}${amount.toFixed(2)} at ${merchant}`);
+      showToast(`Recorded ${currencySymbol}${res.amount.toFixed(2)} at ${res.merchant}`);
       switchTab('expenses');
     }
+
+    // --- AUTOMATIC URL INGESTION (SHORTCUTS INTEGRATION) ---
+    function checkURLParameters() {
+      const params = new URLSearchParams(window.location.search);
+      const sms = params.get('sms') || params.get('text');
+      if (sms) {
+        const res = parseBankSMSText(sms);
+        if (res.amount && !isNaN(res.amount)) {
+          const newRec = {
+            id: Date.now().toString(),
+            amount: res.amount,
+            type: res.type,
+            merchant: res.merchant,
+            category: res.category,
+            bank: res.bank,
+            last4: res.last4,
+            mode: res.mode,
+            date: 'Just Now',
+            isAuto: true,
+            raw: sms
+          };
+          transactions.unshift(newRec);
+          saveState();
+          showToast(`⚡ Auto-Recorded from SMS: ${currencySymbol}${res.amount.toFixed(2)}`);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          switchTab('expenses');
+        }
+      }
+    }
+
+    // --- AUTOMATIC CLIPBOARD DETECTION ---
+    async function checkClipboardOnResume() {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text && text.length > 20 && /debited|credited|spent|inr|rs\./i.test(text)) {
+            if (text !== detectedClipboardText) {
+              const res = parseBankSMSText(text);
+              if (res.amount) {
+                detectedClipboardText = text;
+                document.getElementById('clipboardPreviewText').textContent = `${res.merchant} • ${currencySymbol}${res.amount.toFixed(2)}`;
+                document.getElementById('clipboardBanner').classList.remove('hidden');
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // Silent
+      }
+    }
+
+    function dismissClipboardBanner() {
+      document.getElementById('clipboardBanner').classList.add('hidden');
+    }
+
+    function acceptClipboardSMS() {
+      if (detectedClipboardText) {
+        const res = parseBankSMSText(detectedClipboardText);
+        transactions.unshift({
+          id: Date.now().toString(),
+          amount: res.amount,
+          type: res.type,
+          merchant: res.merchant,
+          category: res.category,
+          bank: res.bank,
+          last4: res.last4,
+          mode: res.mode,
+          date: 'Just Now',
+          isAuto: true,
+          raw: detectedClipboardText
+        });
+        saveState();
+        dismissClipboardBanner();
+        showToast(`Recorded ${currencySymbol}${res.amount.toFixed(2)} from clipboard!`);
+        switchTab('expenses');
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkClipboardOnResume();
+      }
+    });
 
     // --- TAB 4: ANALYTICS ---
     function renderAnalytics(container) {
@@ -538,6 +758,14 @@
           </div>
 
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+            <h3 class="text-xs font-bold text-slate-300">Apple Shortcuts Integration</h3>
+            <button onclick="openShortcutsModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2">
+              <span>🍎</span>
+              <span>View iPhone Automation Guide</span>
+            </button>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
             <h3 class="text-xs font-bold text-slate-300">Data Management</h3>
             <button onclick="exportData()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2">
               <span>📥</span>
@@ -576,6 +804,15 @@
         showToast('Data reset complete.');
         switchTab('dashboard');
       }
+    }
+
+    // --- SHORTCUTS MODAL ---
+    function openShortcutsModal() {
+      document.getElementById('shortcutsModal').classList.remove('hidden');
+    }
+
+    function closeShortcutsModal() {
+      document.getElementById('shortcutsModal').classList.add('hidden');
     }
 
     // --- TRANSACTION DETAIL INSPECTOR ---
@@ -700,7 +937,8 @@
       switchTab('expenses');
     }
 
-    // Initial render
+    // Run on boot
+    checkURLParameters();
     render();
   </script>
 </body>
