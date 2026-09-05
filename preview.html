@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Expenses">
   <meta name="theme-color" content="#090d16">
+  <link rel="manifest" href="manifest.json">
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23007AFF'/><text x='50' y='68' font-size='50' font-weight='900' fill='white' text-anchor='middle' font-family='-apple-system, sans-serif'>₹</text></svg>">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='42' fill='%23007AFF'/><text x='90' y='122' font-size='95' font-weight='900' fill='white' text-anchor='middle' font-family='-apple-system, sans-serif'>₹</text></svg>">
@@ -184,6 +185,18 @@
 
       <div class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl text-xs text-amber-200 leading-relaxed">
         <strong>Important:</strong> Apple Shortcuts only triggers for <strong>NEW incoming messages</strong> received from now on. Apple prohibits all shortcuts and apps from reading past/existing SMS history. (To add past messages, use the paste box on the Bank SMS tab!).
+      </div>
+
+      <!-- 1-Tap Quick Launcher into Shortcuts App -->
+      <div class="flex gap-2">
+        <a href="shortcuts://" class="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-lg shadow-purple-600/30">
+          <span>⚡</span>
+          <span>1-Tap: Open Shortcuts App</span>
+        </a>
+        <button onclick="copySetupURL()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1">
+          <span>📋</span>
+          <span>Copy URL</span>
+        </button>
       </div>
 
       <div class="space-y-3 pt-1">
@@ -917,7 +930,7 @@
           if (text && text.length > 20 && /debited|credited|spent|inr|rs\./i.test(text)) {
             if (text !== detectedClipboardText) {
               const res = parseBankSMSText(text);
-              if (res.amount) {
+              if (res && res.amount) {
                 detectedClipboardText = text;
                 document.getElementById('clipboardPreviewText').textContent = `${res.merchant} • ${currencySymbol}${res.amount.toFixed(2)}`;
                 document.getElementById('clipboardBanner').classList.remove('hidden');
@@ -1110,6 +1123,19 @@
     // --- SHORTCUTS MODAL ---
     function openShortcutsModal() {
       document.getElementById('shortcutsModal').classList.remove('hidden');
+    }
+
+        function copySetupURL() {
+      const url = "https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('Copied Setup URL to clipboard!');
+        }).catch(() => {
+          showToast('Setup URL ready to copy');
+        });
+      } else {
+        showToast('Setup URL ready');
+      }
     }
 
     function closeShortcutsModal() {
