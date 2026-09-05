@@ -91,6 +91,7 @@ jobs:
           fi
           echo "Found app at: $APP_PATH"
           cp -R "$APP_PATH" build/Payload/
+          rm -rf build/Payload/ExpenseTracker.app/PlugIns || true
           cd build
           zip -r ExpenseTracker.ipa Payload
           zip -r ExpenseTracker-App.zip Payload/ExpenseTracker.app
