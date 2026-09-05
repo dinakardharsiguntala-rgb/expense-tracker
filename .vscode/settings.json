@@ -1,0 +1,10 @@
+{
+  "swift.disableSwiftPackageManagerIntegration": true,
+  "swift.disableAutoResolve": true,
+  "swift.backgroundCompilation": false,
+  "swift.autoGenerateLaunchConfigurations": false,
+  "swift.diagnosticsCollection": "onlySwiftc",
+  "files.associations": {
+    "*.swift": "swift"
+  }
+}
