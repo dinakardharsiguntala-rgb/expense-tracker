@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Android Release APK
         run: |
+          set -o pipefail
           flutter build apk --release 2>&1 | tee build_apk.log || {
             echo "### Flutter APK Build Failed" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
