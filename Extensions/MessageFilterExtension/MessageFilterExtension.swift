@@ -27,11 +27,8 @@ extension MessageFilterExtension: ILMessageFilterQueryHandling {
             // 1. Automatically save transaction into shared App Group database
             SharedExpenseDatabase.shared.saveAutoParsedTransaction(from: result)
 
-            // 2. Classify as Transactional for iOS Messages app
+            // 2. Allow transaction to Messages inbox
             response.action = .allow
-            if #available(iOS 14.0, *) {
-                response.subAction = .transactional
-            }
         } else {
             response.action = .none
         }
