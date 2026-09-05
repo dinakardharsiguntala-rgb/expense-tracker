@@ -625,6 +625,33 @@
             </div>
           </div>
 
+          <!-- Bank Statement CSV / File Importer Card -->
+          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="text-2xl">📂</span>
+                <div>
+                  <h3 class="text-xs font-bold text-white">Import Bank Statement (CSV / Excel)</h3>
+                  <p class="text-[10px] text-indigo-300">Sync all past months in 1 tap without SMS</p>
+                </div>
+              </div>
+              <button onclick="loadSampleCSVStatement()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
+                Try Sample File
+              </button>
+            </div>
+
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+              Download your statement CSV from <strong>HDFC, SBI, ICICI, or NetBanking</strong> and upload it here. It parses 100+ past transactions instantly!
+            </p>
+
+            <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv" class="hidden" onchange="handleStatementFileUpload(event)">
+
+            <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>Choose Bank Statement File (.CSV)</span>
+            </button>
+          </div>
+
           <!-- Shortcuts Auto-Sync Guide Card -->
           <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 p-4 rounded-2xl space-y-2">
             <div class="flex items-center justify-between">
@@ -689,6 +716,150 @@
         }
       } catch (err) {
         showToast('Please tap inside the box and choose Paste');
+      }
+    }
+
+
+    // --- BANK STATEMENT CSV / TEXT IMPORTER ---
+    function handleStatementFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        importStatementCSVText(text, file.name);
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    const sampleCSVStatement = `Date,Narration,Withdrawal Amt,Deposit Amt,Balance
+05/09/2026,UPI-STARBUCKS-starbucks@hdfcbank,450.00,,15240.50
+05/09/2026,UPI-BLINKIT-blinkit@icici,1299.00,,13941.50
+01/09/2026,SALARY-INFOSYS TECHNOLOGIES-AUG26,,75000.00,88941.50
+25/08/2026,POS-ZOMATO RESTAURANT-MUMBAI,850.00,,13941.50
+10/08/2026,NETBANK-BESCOM ELECTRICITY BILL,2400.00,,14791.50
+20/07/2026,CARD PURCHASE SHELL FUEL STATION,1500.00,,17191.50`;
+
+    function loadSampleCSVStatement() {
+      importStatementCSVText(sampleCSVStatement, 'HDFC_Sample_Statement.csv');
+    }
+
+    function cleanBankNarration(raw) {
+      if (!raw) return 'Bank Transaction';
+      let clean = raw.trim();
+      clean = clean.replace(/^(UPI|POS|NEFT|RTGS|IMPS|NETBANK|BILLPAY|TRANSFER TO|CARD PURCHASE|PURCHASE AT)[-:\s]+/i, '');
+      if (clean.includes('@')) {
+        clean = clean.split('@')[0];
+      }
+      clean = clean.replace(/[-/]\d{5,}$/, '').replace(/^[-/]+|[-/]+$/g, '').trim();
+      if (/starbucks/i.test(clean)) return 'Starbucks Coffee';
+      if (/blinkit/i.test(clean)) return 'Blinkit Grocery';
+      if (/swiggy/i.test(clean)) return 'Swiggy Food';
+      if (/zomato/i.test(clean)) return 'Zomato Dining';
+      if (/bescom|electricity/i.test(clean)) return 'Electricity Bill';
+      if (/shell|fuel|petrol/i.test(clean)) return 'Fuel Station';
+      if (/salary|infosys/i.test(clean)) return 'Monthly Salary';
+      return clean.length > 25 ? clean.substring(0, 25) : clean;
+    }
+
+    function importStatementCSVText(csvText, filename) {
+      const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length < 2) {
+        showToast('CSV file is empty or invalid.');
+        return;
+      }
+
+      // Detect header row
+      let headerIdx = -1;
+      let dateCol = -1, descCol = -1, debitCol = -1, creditCol = -1, amtCol = -1;
+
+      for (let i = 0; i < Math.min(10, lines.length); i++) {
+        const cols = lines[i].split(',').map(c => c.replace(/["']/g, '').trim().toLowerCase());
+        cols.forEach((col, idx) => {
+          if (/date/i.test(col) && dateCol === -1) dateCol = idx;
+          else if (/narration|description|particular|details|remarks|merchant/i.test(col) && descCol === -1) descCol = idx;
+          else if (/withdrawal|debit|dr/i.test(col) && debitCol === -1) debitCol = idx;
+          else if (/deposit|credit|cr/i.test(col) && creditCol === -1) creditCol = idx;
+          else if (/amount|amt/i.test(col) && amtCol === -1) amtCol = idx;
+        });
+
+        if (dateCol !== -1 && (debitCol !== -1 || amtCol !== -1 || descCol !== -1)) {
+          headerIdx = i;
+          break;
+        }
+      }
+
+      if (headerIdx === -1) {
+        showToast('Could not find Date/Amount columns in this CSV.');
+        return;
+      }
+
+      let importedCount = 0;
+      for (let i = headerIdx + 1; i < lines.length; i++) {
+        const row = lines[i].split(',').map(c => c.replace(/["']/g, '').trim());
+        if (row.length <= dateCol) continue;
+
+        const rawDate = row[dateCol];
+        if (!rawDate) continue;
+
+        const parsedDate = extractDateFromSMS(rawDate);
+        const rawDesc = descCol !== -1 ? row[descCol] : 'Bank Transaction';
+        const merchant = cleanBankNarration(rawDesc);
+
+        let amount = 0;
+        let type = 'Expense';
+
+        if (debitCol !== -1 && creditCol !== -1) {
+          const deb = parseFloat((row[debitCol] || '').replace(/,/g, ''));
+          const cred = parseFloat((row[creditCol] || '').replace(/,/g, ''));
+          if (!isNaN(deb) && deb > 0) {
+            amount = deb;
+            type = 'Expense';
+          } else if (!isNaN(cred) && cred > 0) {
+            amount = cred;
+            type = 'Income';
+          }
+        } else if (amtCol !== -1) {
+          const a = parseFloat((row[amtCol] || '').replace(/,/g, ''));
+          if (!isNaN(a) && Math.abs(a) > 0) {
+            amount = Math.abs(a);
+            type = 'Expense';
+          }
+        }
+
+        if (amount > 0) {
+          let category = 'Other';
+          if (/food|dining|starbucks|cafe|restaurant|swiggy|zomato/i.test(merchant)) category = 'Food & Dining';
+          else if (/grocery|blinkit|zepto|mart/i.test(merchant)) category = 'Groceries';
+          else if (/fuel|shell|transport|uber|ola/i.test(merchant)) category = 'Transportation';
+          else if (/bill|electricity|bescom|utility/i.test(merchant)) category = 'Utilities & Bills';
+          else if (type === 'Income') category = 'Salary';
+
+          transactions.unshift({
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+            amount,
+            type,
+            merchant,
+            category,
+            bank: /sbi/i.test(filename) ? 'SBI' : /icici/i.test(filename) ? 'ICICI Bank' : /axis/i.test(filename) ? 'Axis Bank' : 'HDFC Bank',
+            last4: '1234',
+            mode: 'NetBanking',
+            date: parsedDate,
+            isAuto: true,
+            raw: `Imported from ${filename}: ${lines[i]}`
+          });
+          importedCount++;
+        }
+      }
+
+      if (importedCount > 0) {
+        saveState();
+        showToast(`⚡ Successfully imported ${importedCount} past transactions!`);
+        switchTab('expenses');
+      } else {
+        showToast('No valid transactions found in statement.');
       }
     }
 
