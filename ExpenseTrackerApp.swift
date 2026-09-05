@@ -24,9 +24,9 @@ public struct ExpenseTrackerApp: App {
     }()
 
     public init() {
-        // Seed default initial categories and accounts on first launch
         let context = ModelContext(sharedModelContainer)
         seedInitialDataIfNeeded(context: context)
+        syncAutoParsedFromExtension(context: context)
     }
 
     public var body: some Scene {
@@ -55,6 +55,8 @@ public struct ExpenseTrackerApp: App {
             .modelContainer(sharedModelContainer)
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
+                    let context = ModelContext(sharedModelContainer)
+                    syncAutoParsedFromExtension(context: context)
                     checkClipboardForBankSMS()
                 }
             }
@@ -81,6 +83,45 @@ public struct ExpenseTrackerApp: App {
             for acc in BankAccount.defaultAccounts() {
                 context.insert(acc)
             }
+        }
+
+        try? context.save()
+    }
+
+    // MARK: - Background SMS Extension Sync
+
+    private func syncAutoParsedFromExtension(context: ModelContext) {
+        let pending = SharedExpenseDatabase.shared.fetchAndClearPendingRecords()
+        guard !pending.isEmpty else { return }
+
+        let categories = (try? context.fetch(FetchDescriptor<ExpenseCategory>())) ?? []
+        let accounts = (try? context.fetch(FetchDescriptor<BankAccount>())) ?? []
+
+        for record in pending {
+            let matchedCategory = categories.first { $0.name.lowercased() == record.category.lowercased() }
+            let matchedAccount = accounts.first {
+                if let last4 = record.accountLast4, !last4.isEmpty {
+                    return $0.accountLast4 == last4
+                }
+                return false
+            }
+
+            let transaction = ExpenseTransaction(
+                amount: record.amount,
+                type: TransactionType(rawValue: record.type) ?? .expense,
+                merchant: record.merchant,
+                date: record.timestamp,
+                category: matchedCategory,
+                account: matchedAccount,
+                note: "Automatically read from incoming bank SMS",
+                rawSMS: record.rawSMS,
+                bankName: record.bankName,
+                accountLast4: record.accountLast4,
+                paymentMode: PaymentMode(rawValue: record.paymentMode) ?? .other,
+                isAutoParsed: true
+            )
+
+            context.insert(transaction)
         }
 
         try? context.save()

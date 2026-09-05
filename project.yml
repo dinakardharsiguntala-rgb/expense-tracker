@@ -16,6 +16,8 @@ targets:
       - path: ViewModels
       - path: Views
       - path: Intents
+    dependencies:
+      - target: MessageFilterExtension
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.local.ExpenseTracker
@@ -29,3 +31,22 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
         CODE_SIGN_STYLE: Automatic
 
+  MessageFilterExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Extensions/MessageFilterExtension/MessageFilterExtension.swift
+      - path: Services/BankSMSParser.swift
+      - path: Services/BankPatternRegistry.swift
+      - path: Services/SharedExpenseDatabase.swift
+      - path: Models/Enums.swift
+    info:
+      path: Extensions/MessageFilterExtension/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.local.ExpenseTracker.MessageFilterExtension
+        PRODUCT_NAME: MessageFilterExtension
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Automatic
