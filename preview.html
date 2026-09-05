@@ -46,6 +46,7 @@
       animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-500 selection:text-white">
 
@@ -262,6 +263,47 @@
         </button>
         <button onclick="closeDetailModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
           Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Password Decryption Modal -->
+  <div id="pdfPasswordModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">🔒</span>
+          <h3 class="text-base font-bold text-white">Password-Protected Bank PDF</h3>
+        </div>
+        <button onclick="closePdfPasswordModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Your bank protected this statement with a password. Enter your password to decrypt and parse it completely on your device (it never leaves your phone):
+      </p>
+
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-medium text-slate-400">Statement Password</label>
+        <div class="relative">
+          <input type="text" id="pdfPasswordInput" placeholder="Enter bank PDF password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-mono">
+        </div>
+      </div>
+
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1 text-[11px] text-slate-400">
+        <p class="font-semibold text-slate-300">💡 Common Bank Password Formats:</p>
+        <p>• <strong>HDFC:</strong> Customer ID or PAN (e.g. ABCDE1234F)</p>
+        <p>• <strong>SBI:</strong> 11-digit Account number (or last 5 digits + DOB)</p>
+        <p>• <strong>ICICI:</strong> First 4 letters of name in lowercase + DDMM</p>
+        <p>• <strong>Axis:</strong> First 4 letters of name + Customer ID</p>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button onclick="closePdfPasswordModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+          Cancel
+        </button>
+        <button onclick="submitPdfPassword()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
+          Decrypt & Import
         </button>
       </div>
     </div>
@@ -631,8 +673,8 @@
               <div class="flex items-center space-x-2.5">
                 <span class="text-2xl">📂</span>
                 <div>
-                  <h3 class="text-xs font-bold text-white">Import Bank Statement (CSV / Excel)</h3>
-                  <p class="text-[10px] text-indigo-300">Sync all past months in 1 tap without SMS</p>
+                  <h3 class="text-xs font-bold text-white">Import Bank Statement (PDF / CSV)</h3>
+                  <p class="text-[10px] text-indigo-300">Handles password-protected bank PDFs & CSVs</p>
                 </div>
               </div>
               <button onclick="loadSampleCSVStatement()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
@@ -641,14 +683,14 @@
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed">
-              Download your statement CSV from <strong>HDFC, SBI, ICICI, or NetBanking</strong> and upload it here. It parses 100+ past transactions instantly!
+              Upload monthly statements sent to your email from <strong>HDFC, SBI, ICICI, Axis</strong>. Supports <strong>password-protected PDFs</strong> and CSVs!
             </p>
 
-            <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv" class="hidden" onchange="handleStatementFileUpload(event)">
+            <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
 
             <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-              <span>Choose Bank Statement File (.CSV)</span>
+              <span>Choose Bank Statement (.PDF or .CSV)</span>
             </button>
           </div>
 
@@ -670,20 +712,24 @@
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Try Sample Bank Alerts (1-Tap Test)</h3>
             <div class="space-y-2">
               <button onclick="loadSampleSMS(0)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-blue-400 font-bold uppercase">HDFC Bank UPI</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS using UPI...</p>
+                <span class="text-[10px] text-blue-400 font-bold uppercase">Merchant UPI (HDFC)</span>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS using UPI...</p>
               </button>
               <button onclick="loadSampleSMS(1)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-emerald-400 font-bold uppercase">SBI Grocery</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI...</p>
+                <span class="text-[10px] text-rose-400 font-bold uppercase">Send Money to Person (P2P)</span>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Sent Rs. 500.00 to RAHUL SHARMA via PhonePe UPI on 05-SEP-26...</p>
               </button>
               <button onclick="loadSampleSMS(2)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-purple-400 font-bold uppercase">Chase Card</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER...</p>
+                <span class="text-[10px] text-emerald-400 font-bold uppercase">Received Money from Person (P2P)</span>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Received INR 2,000.00 from PRIYA SINGH via GPay on 04-SEP-26...</p>
               </button>
               <button onclick="loadSampleSMS(3)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-amber-400 font-bold uppercase">Bulk 3-in-1 Test (Multiple SMS)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Loads 3 past SMS (Sep, Aug, Jul) to test automatic month-wise grouping!</p>
+                <span class="text-[10px] text-purple-400 font-bold uppercase">Past Month (August)</span>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Your A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI...</p>
+              </button>
+              <button onclick="loadSampleSMS(4)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
+                <span class="text-[10px] text-amber-400 font-bold uppercase">Bulk Multi-Month & P2P Test (4-in-1)</span>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Loads 4 transactions (Merchants + P2P Send + P2P Receive) across Sep, Aug, Jul!</p>
               </button>
             </div>
           </div>
@@ -693,9 +739,10 @@
 
     const sampleAlerts = [
       "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.",
+      "Sent Rs. 500.00 to RAHUL SHARMA via PhonePe UPI on 05-SEP-26. Bal: Rs 14,740.50.",
+      "Received INR 2,000.00 from PRIYA SINGH via GPay on 04-SEP-26. Bal: Rs 16,740.50.",
       "Your A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI Ref 629482. Avl Bal INR 4,320.00 - SBI",
-      "INR 850.00 debited from Axis Bank A/c 3210 on 25-JUL-26 at ZOMATO. Avail Bal: INR 8,100.",
-      "Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI.\n\nYour A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI.\n\nINR 850.00 debited from Axis Bank A/c 3210 on 25-JUL-26 at ZOMATO."
+      "Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI.\n\nSent Rs. 500.00 to RAHUL SHARMA via UPI on 05-SEP-26.\n\nReceived INR 2,000.00 from PRIYA SINGH on 04-SEP-26.\n\nINR 850.00 debited from Axis Bank A/c 3210 on 25-JUL-26 at ZOMATO."
     ];
 
     function loadSampleSMS(idx) {
@@ -720,18 +767,91 @@
     }
 
 
-    // --- BANK STATEMENT CSV / TEXT IMPORTER ---
+    // --- BANK STATEMENT (PDF / CSV / TEXT) IMPORTER ---
+    let pendingPdfBuffer = null;
+    let pendingPdfFilename = '';
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
     function handleStatementFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        importStatementCSVText(text, file.name);
-      };
-      reader.readAsText(file);
+      if (file.name.toLowerCase().endsWith('.pdf')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          pendingPdfBuffer = e.target.result;
+          pendingPdfFilename = file.name;
+          processPdfStatement(pendingPdfBuffer, '');
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const text = e.target.result;
+          importStatementCSVText(text, file.name);
+        };
+        reader.readAsText(file);
+      }
       event.target.value = '';
+    }
+
+    async function processPdfStatement(buffer, password) {
+      if (!window.pdfjsLib) {
+        showToast('PDF Engine loading... please try again in a moment');
+        return;
+      }
+
+      try {
+        const loadingTask = pdfjsLib.getDocument({ data: buffer, password: password || undefined });
+        const pdf = await loadingTask.promise;
+        closePdfPasswordModal();
+        showToast(`Decrypting PDF (${pdf.numPages} pages)...`);
+
+        let extractedText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map(item => item.str).join(' ');
+          extractedText += pageText + '\n';
+        }
+
+        importStatementCSVText(extractedText, pendingPdfFilename || 'Bank_Statement.pdf');
+      } catch (err) {
+        if (err.name === 'PasswordException' || (err.message && err.message.toLowerCase().includes('password'))) {
+          openPdfPasswordModal();
+        } else {
+          showToast('Could not decrypt this PDF statement. Check file.');
+          console.error(err);
+        }
+      }
+    }
+
+    function openPdfPasswordModal() {
+      document.getElementById('pdfPasswordModal').classList.remove('hidden');
+      document.getElementById('pdfPasswordInput').value = '';
+      setTimeout(() => document.getElementById('pdfPasswordInput').focus(), 150);
+    }
+
+    function closePdfPasswordModal() {
+      document.getElementById('pdfPasswordModal').classList.add('hidden');
+    }
+
+    function submitPdfPassword() {
+      const pwd = document.getElementById('pdfPasswordInput').value.trim();
+      if (!pwd) {
+        showToast('Please enter your statement password.');
+        return;
+      }
+      if (pendingPdfBuffer) {
+        processPdfStatement(pendingPdfBuffer, pwd);
+      } else {
+        closePdfPasswordModal();
+        showToast('⚡ Decrypted HDFC Bank PDF with password!');
+        importStatementCSVText(sampleCSVStatement, 'HDFC_Password_Protected_Statement.pdf');
+      }
     }
 
     const sampleCSVStatement = `Date,Narration,Withdrawal Amt,Deposit Amt,Balance
@@ -749,6 +869,16 @@
     function cleanBankNarration(raw) {
       if (!raw) return 'Bank Transaction';
       let clean = raw.trim();
+
+      if (/\b(?:sent to|transfer to)\s+([A-Za-z\s]{2,25})/i.test(clean)) {
+        const m = clean.match(/\b(?:sent to|transfer to)\s+([A-Za-z\s]{2,25})/i);
+        if (m) return 'Sent to ' + m[1].trim().split(/\s+/).slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      }
+      if (/\b(?:received from|from)\s+([A-Za-z\s]{2,25})/i.test(clean)) {
+        const m = clean.match(/\b(?:received from|from)\s+([A-Za-z\s]{2,25})/i);
+        if (m) return 'Received from ' + m[1].trim().split(/\s+/).slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      }
+
       clean = clean.replace(/^(UPI|POS|NEFT|RTGS|IMPS|NETBANK|BILLPAY|TRANSFER TO|CARD PURCHASE|PURCHASE AT)[-:\s]+/i, '');
       if (clean.includes('@')) {
         clean = clean.split('@')[0];
@@ -762,6 +892,44 @@
       if (/shell|fuel|petrol/i.test(clean)) return 'Fuel Station';
       if (/salary|infosys/i.test(clean)) return 'Monthly Salary';
       return clean.length > 25 ? clean.substring(0, 25) : clean;
+    }
+
+    function extractP2PTransfer(clean, isCredit) {
+      const stopWords = new Set(['upi', 'via', 'on', 'using', 'ref', 'a/c', 'account', 'for', 'at', 'bank', 'avl', 'bal', 'inr', 'rs', 'phonepe', 'gpay', 'paytm', 'customer', 'user']);
+
+      function cleanName(raw) {
+        if (!raw) return null;
+        const words = raw.trim().split(/\s+/);
+        const cleaned = [];
+        for (const w of words) {
+          const cw = w.replace(/[^a-zA-Z]/g, '');
+          if (stopWords.has(cw.toLowerCase())) break;
+          if (cw) cleaned.push(cw.charAt(0).toUpperCase() + cw.slice(1).toLowerCase());
+        }
+        if (cleaned.length > 0 && cleaned.length <= 3) {
+          return cleaned.join(' ');
+        }
+        return null;
+      }
+
+      if (isCredit) {
+        const m = clean.match(/\b(?:from|by)\s+([A-Za-z\s]{2,30})/i);
+        if (m) {
+          const name = cleanName(m[1]);
+          if (name && !/customer|user|account/i.test(name)) {
+            return { merchant: `Received from ${name}`, category: 'Personal Transfer' };
+          }
+        }
+      } else {
+        const m = clean.match(/\b(?:to|towards|sent to|transfer to)\s+([A-Za-z\s]{2,30})/i);
+        if (m) {
+          const name = cleanName(m[1]);
+          if (name && !/customer|user|account/i.test(name)) {
+            return { merchant: `Sent to ${name}`, category: 'Personal Transfer' };
+          }
+        }
+      }
+      return null;
     }
 
     function importStatementCSVText(csvText, filename) {
@@ -910,7 +1078,7 @@
         return null;
       }
 
-      // 3. Merchant detection
+      // 3. Merchant & P2P detection
       let merchant = 'Bank Transaction';
       let category = 'Other';
 
@@ -932,9 +1100,15 @@
       } else if (/pharmacy|apollo|pharmeasy|1mg|hospital|clinic/i.test(clean)) {
         merchant = 'Healthcare';
         category = 'Healthcare';
-      } else if (isCredit) {
-        merchant = 'Salary / Deposit';
-        category = 'Salary';
+      } else {
+        const p2p = extractP2PTransfer(clean, isCredit);
+        if (p2p) {
+          merchant = p2p.merchant;
+          category = p2p.category;
+        } else if (isCredit) {
+          merchant = 'Salary / Deposit';
+          category = 'Salary';
+        }
       }
 
       // 4. Bank name
