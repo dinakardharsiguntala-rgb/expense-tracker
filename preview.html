@@ -3,421 +3,337 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual-Platform Expense Tracker - iPhone & Android Simulator</title>
+  <title>Dual-Platform Expense Tracker - iPhone & Android Live Side-by-Side</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 4px; }
     .tab-active { color: #007AFF !important; }
-    .android-tab-active { color: #1E88E5 !important; }
     @keyframes slideDown {
-      from { transform: translateY(-100%); opacity: 0; }
+      from { transform: translateY(-120%); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
     .animate-notification {
-      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col items-center justify-center min-h-screen p-4 antialiased font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 md:p-6 antialiased font-sans flex flex-col items-center">
 
-  <!-- Top Platform Switcher Bar -->
-  <div class="flex items-center space-x-3 mb-4 bg-slate-900/90 border border-slate-700/80 p-1.5 rounded-2xl shadow-xl">
-    <button id="btnSwitchIos" onclick="switchPlatform('ios')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-md transition">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.38c.62-.75 1.04-1.8 0.92-2.85-.9.04-2 .6-2.65 1.35-.58.66-1.09 1.73-.95 2.76 1.01.08 2.06-.51 2.68-1.26z"/></svg>
-      <span>iPhone 15 Pro (iOS)</span>
-    </button>
-    <button id="btnSwitchAndroid" onclick="switchPlatform('android')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.411 13.8566 8.1 12 8.1s-3.5902.311-5.1368.8497L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9974 3.4592C2.6889 11.1867.3432 14.6589 0 18.742h24c-.3432-4.0831-2.6889-7.5553-6.1185-9.4206"/></svg>
-      <span>Android Phone</span>
-    </button>
-  </div>
-
-  <!-- Outer Mobile Device Frame -->
-  <div id="deviceFrame" class="relative w-full max-w-[420px] bg-slate-900 border-4 border-slate-700 rounded-[48px] shadow-2xl overflow-hidden flex flex-col h-[840px] transition-all duration-300">
-    
-    <!-- iPhone Dynamic Island / Notch -->
-    <div id="iosNotch" class="absolute top-0 left-0 right-0 h-10 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-between px-7 pt-2 select-none">
-      <span id="clock" class="text-xs font-semibold text-slate-200">9:41</span>
-      <div class="w-24 h-5 bg-black rounded-full flex items-center justify-center space-x-2">
-        <div class="w-2.5 h-2.5 bg-slate-800 rounded-full"></div>
-        <div class="w-2 h-2 bg-blue-900/40 rounded-full"></div>
+  <!-- Top Global Header -->
+  <header class="w-full max-w-6xl mb-5 flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white text-lg shadow-md shadow-blue-500/20">
+        ₹
       </div>
-      <div class="flex items-center space-x-1.5 text-xs text-slate-300">
-        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.63 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
-        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      <div>
+        <h1 class="text-base font-extrabold text-white flex items-center gap-2">
+          <span>Dual-Platform Expense Tracker</span>
+          <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-full font-bold">100% On-Device</span>
+        </h1>
+        <p class="text-xs text-slate-400">Zero Server • Zero Cloud • Local SQLite Sandbox • Auto Bank SMS Reader</p>
       </div>
     </div>
 
-    <!-- Android Punch-Hole & Status Bar -->
-    <div id="androidStatusBar" class="hidden absolute top-0 left-0 right-0 h-9 bg-slate-900/95 backdrop-blur-md z-50 flex items-center justify-between px-5 pt-1 select-none">
-      <span id="androidClock" class="text-xs font-bold text-slate-200">9:41</span>
-      <!-- Centered Punch Hole Camera -->
-      <div class="w-3.5 h-3.5 bg-black rounded-full border border-slate-800"></div>
-      <div class="flex items-center space-x-2 text-xs text-slate-300">
-        <span class="text-[10px] font-bold text-emerald-400">5G</span>
-        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.63 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
-        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
-      </div>
+    <!-- Installation Guides & Controls -->
+    <div class="flex items-center space-x-2">
+      <button onclick="openInstallModal('android')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-xs font-bold transition">
+        <span>🤖 Install on Android</span>
+      </button>
+      <button onclick="openInstallModal('ios')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 rounded-xl text-xs font-bold transition">
+        <span>🍎 Install on iPhone</span>
+      </button>
+      <button onclick="showAddModal()" class="flex items-center space-x-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/30 transition">
+        <span>+ Add Expense</span>
+      </button>
     </div>
+  </header>
 
-    <!-- Android Heads-Up Notification Banner (Simulated Incoming SMS) -->
-    <div id="androidNotificationBanner" class="hidden absolute top-11 left-3 right-3 bg-slate-800/95 border border-blue-500/40 p-3 rounded-2xl shadow-2xl z-50 animate-notification cursor-pointer" onclick="openTransactionDetail(0)">
-      <div class="flex items-start space-x-2.5">
-        <div class="p-2 bg-blue-600 rounded-xl text-white">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></svg>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-baseline">
-            <span class="text-xs font-bold text-blue-400">Bank SMS Receiver • Just Now</span>
-            <span class="text-[10px] text-slate-400">Auto-Logged</span>
+  <!-- Side-by-Side Dual Phone Container -->
+  <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-start justify-center">
+
+    <!-- ======================================================== -->
+    <!-- DEVICE 1: iPHONE 15 PRO (iOS 17+)                        -->
+    <!-- ======================================================== -->
+    <div class="flex flex-col items-center">
+      <div class="flex items-center space-x-2 mb-2 text-xs font-bold text-slate-300">
+        <span class="text-blue-400 text-sm">🍎</span>
+        <span>iPhone 15 Pro (iOS)</span>
+        <span class="text-[10px] text-slate-500 font-normal">• Apple Sandboxed</span>
+      </div>
+
+      <!-- iPhone Frame -->
+      <div class="relative w-full max-w-[390px] bg-slate-900 border-4 border-slate-700 rounded-[50px] shadow-2xl overflow-hidden flex flex-col h-[780px]">
+        
+        <!-- iPhone Dynamic Island -->
+        <div class="absolute top-0 left-0 right-0 h-10 bg-slate-900/90 backdrop-blur-md z-40 flex items-center justify-between px-7 pt-2 select-none">
+          <span class="text-xs font-semibold text-slate-200 clock-time">9:41</span>
+          <div class="w-24 h-5 bg-black rounded-full flex items-center justify-center space-x-2">
+            <div class="w-2.5 h-2.5 bg-slate-800 rounded-full"></div>
+            <div class="w-2 h-2 bg-blue-900/40 rounded-full"></div>
           </div>
-          <p id="notifBody" class="text-xs text-slate-200 font-semibold mt-0.5 truncate">Auto-Expense Logged: ₹450 at STARBUCKS</p>
-          <p class="text-[10px] text-slate-400">Saved to local SQLite database</p>
+          <div class="flex items-center space-x-1.5 text-xs text-slate-300">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.63 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+          </div>
         </div>
+
+        <!-- iPhone Screen Content (Scrollable) -->
+        <div id="iosScreenContainer" class="flex-1 overflow-y-auto pt-12 pb-20 px-3.5 space-y-3.5">
+          <!-- Dynamic Content rendered via JS -->
+        </div>
+
+        <!-- iPhone Bottom Tab Bar -->
+        <div class="absolute bottom-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 flex items-center justify-around px-2 z-30">
+          <button onclick="setTab('ios', 'dashboard')" id="iosNav-dashboard" class="flex flex-col items-center justify-center w-14 text-blue-500 tab-active">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Dashboard</span>
+          </button>
+          <button onclick="setTab('ios', 'transactions')" id="iosNav-transactions" class="flex flex-col items-center justify-center w-14 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Expenses</span>
+          </button>
+          <button onclick="setTab('ios', 'sms')" id="iosNav-sms" class="flex flex-col items-center justify-center w-14 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Bank SMS</span>
+          </button>
+          <button onclick="setTab('ios', 'settings')" id="iosNav-settings" class="flex flex-col items-center justify-center w-14 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Settings</span>
+          </button>
+        </div>
+
+        <!-- iPhone Home Indicator Bar -->
+        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-28 h-1 bg-slate-600 rounded-full z-40"></div>
       </div>
     </div>
 
-    <!-- Main Screen Content Area -->
-    <div id="screenContainer" class="flex-1 overflow-y-auto pt-12 pb-20 px-4 space-y-4">
-      
-      <!-- ================= TAB 1: DASHBOARD ================= -->
-      <div id="tabDashboard" class="space-y-4">
-        <!-- Top Bar -->
-        <div class="flex items-center justify-between pt-2">
-          <div>
-            <div class="flex items-center space-x-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span id="platformDbBadge" class="text-[10px] font-bold tracking-wider text-emerald-400 uppercase">100% On-Device SQLite</span>
+
+    <!-- ======================================================== -->
+    <!-- DEVICE 2: ANDROID PHONE (Pixel 8 / Galaxy)               -->
+    <!-- ======================================================== -->
+    <div class="flex flex-col items-center">
+      <div class="flex items-center space-x-2 mb-2 text-xs font-bold text-slate-300">
+        <span class="text-emerald-400 text-sm">🤖</span>
+        <span>Android Phone (Pixel / Samsung)</span>
+        <span class="text-[10px] text-slate-500 font-normal">• Background SMS Receiver</span>
+      </div>
+
+      <!-- Android Frame -->
+      <div class="relative w-full max-w-[390px] bg-slate-900 border-4 border-slate-700 rounded-[38px] shadow-2xl overflow-hidden flex flex-col h-[780px]">
+        
+        <!-- Android Status Bar & Centered Punch Hole -->
+        <div class="absolute top-0 left-0 right-0 h-9 bg-slate-900/95 backdrop-blur-md z-40 flex items-center justify-between px-5 pt-1 select-none">
+          <span class="text-xs font-bold text-slate-200 clock-time">9:41</span>
+          <div class="w-3.5 h-3.5 bg-black rounded-full border border-slate-800"></div>
+          <div class="flex items-center space-x-1.5 text-xs text-slate-300">
+            <span class="text-[9px] font-bold text-emerald-400">5G</span>
+            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.63 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+          </div>
+        </div>
+
+        <!-- Android Floating Heads-up Notification (Simulated Real-Time SMS) -->
+        <div id="androidNotifBanner" class="hidden absolute top-11 left-3 right-3 bg-slate-800/98 border border-emerald-500/50 p-3 rounded-2xl shadow-2xl z-50 animate-notification cursor-pointer" onclick="viewTransactionDetails(0)">
+          <div class="flex items-start space-x-2.5">
+            <div class="p-2 bg-emerald-600 rounded-xl text-white">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></svg>
             </div>
-            <h1 class="text-2xl font-black tracking-tight text-white">Expense Tracker</h1>
-          </div>
-          <button onclick="switchTab('sms')" class="flex items-center space-x-1 px-3 py-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-semibold hover:bg-blue-600 hover:text-white transition">
-            <span>⚡ Bank SMS</span>
-          </button>
-        </div>
-
-        <!-- Android Simulation Live Banner -->
-        <div id="androidQuickSim" class="hidden bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 p-3 rounded-2xl flex items-center justify-between">
-          <div class="text-xs">
-            <div class="font-bold text-blue-300">Android SMS Auto-Receiver</div>
-            <div class="text-[10px] text-slate-400">Test real-time background SMS detection</div>
-          </div>
-          <button onclick="simulateIncomingBankSMS()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
-            Simulate SMS
-          </button>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="switchTab('sms')" class="flex items-center justify-center space-x-2 py-3 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold text-xs shadow-lg shadow-blue-500/20 active:scale-95 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-            <span id="quickSmsBtnLabel">Read Bank SMS</span>
-          </button>
-          <button onclick="showAddManualModal()" class="flex items-center justify-center space-x-2 py-3 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-2xl font-bold text-xs border border-slate-700 active:scale-95 transition">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            <span>Add Expense</span>
-          </button>
-        </div>
-
-        <!-- Summary Metrics Grid -->
-        <div class="grid grid-cols-3 gap-2">
-          <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl">
-            <div class="text-[11px] text-slate-400 font-medium">Spent</div>
-            <div id="statTotalSpent" class="text-base font-bold text-red-400 mt-1 truncate">₹0.00</div>
-          </div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl">
-            <div class="text-[11px] text-slate-400 font-medium">Income</div>
-            <div id="statTotalIncome" class="text-base font-bold text-emerald-400 mt-1 truncate">₹0.00</div>
-          </div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl">
-            <div class="text-[11px] text-slate-400 font-medium">Net Left</div>
-            <div id="statNetSavings" class="text-base font-bold text-blue-400 mt-1 truncate">₹0.00</div>
-          </div>
-        </div>
-
-        <!-- Interactive Donut Breakdown & Trends -->
-        <div class="bg-slate-800/90 border border-slate-700/60 p-4 rounded-3xl space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-slate-200">Category Breakdown</h3>
-            <span class="text-[11px] text-slate-400">This Month</span>
-          </div>
-
-          <!-- SVG Donut Chart -->
-          <div class="flex items-center justify-center py-2">
-            <div class="relative w-36 h-36">
-              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#334155" stroke-width="3.8"></circle>
-                <circle id="donutSegment1" cx="18" cy="18" r="15.915" fill="none" stroke="#FF6B6B" stroke-width="3.8" stroke-dasharray="45 55" stroke-dashoffset="0"></circle>
-                <circle id="donutSegment2" cx="18" cy="18" r="15.915" fill="none" stroke="#4ECDC4" stroke-width="3.8" stroke-dasharray="30 70" stroke-dashoffset="-45"></circle>
-                <circle id="donutSegment3" cx="18" cy="18" r="15.915" fill="none" stroke="#6C5CE7" stroke-width="3.8" stroke-dasharray="25 75" stroke-dashoffset="-75"></circle>
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span id="donutCenterAmount" class="text-sm font-extrabold text-white">₹1,944</span>
-                <span class="text-[9px] text-slate-400">Total Spent</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-baseline">
+                <span class="text-xs font-bold text-emerald-400">Bank SMS Receiver • Incoming</span>
+                <span class="text-[9px] text-slate-400">Just Now</span>
               </div>
+              <p id="androidNotifText" class="text-xs text-slate-100 font-semibold mt-0.5 truncate">Auto-Expense Logged: ₹450.00 at STARBUCKS</p>
+              <p class="text-[10px] text-slate-400">Inserted directly into local SQLite database</p>
             </div>
           </div>
-
-          <!-- Mini Legends -->
-          <div id="categoryLegends" class="grid grid-cols-2 gap-2 text-xs"></div>
         </div>
 
-        <!-- Monthly Budget Target -->
-        <div class="bg-slate-800/80 border border-slate-700/60 p-3.5 rounded-2xl space-y-2">
-          <div class="flex justify-between items-center text-xs">
-            <span class="font-semibold text-slate-300">Monthly Budget</span>
-            <span id="budgetProgressLabel" class="text-slate-400">₹1,944 / ₹2,500</span>
-          </div>
-          <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
-            <div id="budgetProgressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: 77%"></div>
-          </div>
+        <!-- Android Screen Content (Scrollable) -->
+        <div id="androidScreenContainer" class="flex-1 overflow-y-auto pt-11 pb-20 px-3.5 space-y-3.5">
+          <!-- Dynamic Content rendered via JS -->
         </div>
 
-        <!-- Recent Transactions -->
-        <div class="space-y-2 pt-1">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Activity</h3>
-            <button onclick="switchTab('transactions')" class="text-xs font-semibold text-blue-400 hover:underline">View All</button>
-          </div>
-          <div id="recentTransactionsList" class="space-y-2"></div>
-        </div>
-      </div>
-
-      <!-- ================= TAB 2: TRANSACTIONS ================= -->
-      <div id="tabTransactions" class="space-y-3 hidden">
-        <div class="pt-2">
-          <h1 class="text-2xl font-black text-white">Transactions</h1>
-          <p class="text-xs text-slate-400">Search and tap any entry to view full bank SMS</p>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="relative">
-          <input type="text" id="searchInput" oninput="renderTransactionsList()" placeholder="Search merchant, bank, or SMS keyword..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-9 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500">
-          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        </div>
-
-        <!-- Filter Chips -->
-        <div class="flex space-x-2 overflow-x-auto pb-1 text-xs">
-          <button onclick="setFilter('all')" id="filterAll" class="px-3 py-1 bg-blue-600 text-white rounded-full font-semibold">All</button>
-          <button onclick="setFilter('expense')" id="filterExpense" class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full">Expenses</button>
-          <button onclick="setFilter('income')" id="filterIncome" class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full">Income</button>
-        </div>
-
-        <!-- Full List Container -->
-        <div id="fullTransactionsList" class="space-y-2 pb-6"></div>
-      </div>
-
-      <!-- ================= TAB 3: BANK SMS READER ================= -->
-      <div id="tabSMS" class="space-y-4 hidden">
-        <div class="pt-2">
-          <div class="flex items-center space-x-2">
-            <span class="text-xl">💬</span>
-            <h1 class="text-2xl font-black text-white">Bank SMS Reader</h1>
-          </div>
-          <p class="text-xs text-slate-400">On-device regex parser with full SMS preservation</p>
-        </div>
-
-        <!-- Android Inbox Scan Action (Visible on Android mode) -->
-        <div id="androidInboxCard" class="bg-blue-900/30 border border-blue-500/40 p-3.5 rounded-2xl space-y-2">
-          <div class="flex items-center space-x-2">
-            <span class="text-blue-400 font-bold text-xs">🤖 Android System Integration</span>
-          </div>
-          <p class="text-[11px] text-slate-300">
-            One-tap auto-scan queries your phone's SMS inbox and parses past bank alerts into SQLite.
-          </p>
-          <button onclick="scanAndroidInboxSim()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
-            Scan & Import Past Bank SMS
+        <!-- Android Bottom Navigation Bar -->
+        <div class="absolute bottom-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 flex items-center justify-around px-2 z-30">
+          <button onclick="setTab('android', 'dashboard')" id="androidNav-dashboard" class="flex flex-col items-center justify-center w-14 text-emerald-400 tab-active">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Dashboard</span>
+          </button>
+          <button onclick="setTab('android', 'transactions')" id="androidNav-transactions" class="flex flex-col items-center justify-center w-14 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Expenses</span>
+          </button>
+          <button onclick="setTab('android', 'sms')" id="androidNav-sms" class="flex flex-col items-center justify-center w-14 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Bank SMS</span>
+          </button>
+          <button onclick="setTab('android', 'settings')" id="androidNav-settings" class="flex flex-col items-center justify-center w-14 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-[9px] font-semibold mt-0.5">Settings</span>
           </button>
         </div>
 
-        <!-- Interactive SMS Input -->
-        <div class="bg-slate-800/90 border border-slate-700 p-3.5 rounded-2xl space-y-2">
-          <div class="flex justify-between items-center text-xs font-semibold text-slate-300">
-            <span>Paste Bank Notification</span>
-            <button onclick="clearSMSInput()" class="text-red-400 hover:underline">Clear</button>
-          </div>
-          <textarea id="smsInput" rows="3" oninput="parseLiveSMS()" placeholder="Paste bank SMS here... (e.g. 'Alert: Rs.450.00 debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI')" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"></textarea>
-        </div>
-
-        <!-- Quick Sample Chips -->
-        <div class="space-y-1.5">
-          <div class="text-[11px] font-semibold text-slate-400">Try Pre-Loaded Bank Messages:</div>
-          <div class="flex flex-wrap gap-1.5">
-            <button onclick="loadSampleSMS(0)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-blue-400 rounded-lg text-[11px] font-medium">💳 HDFC Card</button>
-            <button onclick="loadSampleSMS(1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-blue-400 rounded-lg text-[11px] font-medium">⚡ SBI UPI</button>
-            <button onclick="loadSampleSMS(2)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-blue-400 rounded-lg text-[11px] font-medium">🏦 Chase Bank</button>
-            <button onclick="loadSampleSMS(3)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 text-emerald-400 rounded-lg text-[11px] font-medium">💵 Salary Credit</button>
-            <button onclick="loadSampleSMS(4)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-blue-400 rounded-lg text-[11px] font-medium">🚗 Uber Ride</button>
-          </div>
-        </div>
-
-        <!-- Extracted Data Preview Card -->
-        <div id="smsOutputCard" class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl space-y-3 hidden">
-          <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-            <span class="text-xs font-bold text-emerald-400 flex items-center space-x-1">
-              <span>✓</span> <span>Parsed Successfully</span>
-            </span>
-            <span id="smsMatchScore" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-full font-bold">100% Match</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <span class="text-slate-400 text-[10px]">AMOUNT</span>
-              <div id="parsedAmount" class="text-lg font-black text-red-400">₹0.00</div>
-            </div>
-            <div>
-              <span class="text-slate-400 text-[10px]">TYPE</span>
-              <div id="parsedType" class="text-sm font-bold text-slate-200">Expense</div>
-            </div>
-          </div>
-
-          <div class="space-y-1.5 text-xs">
-            <div class="flex justify-between py-1 border-t border-slate-700/60">
-              <span class="text-slate-400">Merchant</span>
-              <span id="parsedMerchant" class="font-semibold text-slate-200">-</span>
-            </div>
-            <div class="flex justify-between py-1 border-t border-slate-700/60">
-              <span class="text-slate-400">Category</span>
-              <span id="parsedCategory" class="font-semibold text-blue-400">-</span>
-            </div>
-            <div class="flex justify-between py-1 border-t border-slate-700/60">
-              <span class="text-slate-400">Bank / Account</span>
-              <span id="parsedAccount" class="font-semibold text-slate-200">-</span>
-            </div>
-            <div class="flex justify-between py-1 border-t border-slate-700/60">
-              <span class="text-slate-400">Payment Mode</span>
-              <span id="parsedPaymentMode" class="font-semibold text-slate-200">-</span>
-            </div>
-          </div>
-
-          <button onclick="commitParsedTransaction()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 active:scale-95 transition">
-            Save to On-Device Database
-          </button>
-        </div>
-
-        <!-- iOS Shortcuts Explainer Banner -->
-        <div id="iosShortcutCard" class="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-700/40 p-3.5 rounded-2xl space-y-2">
-          <div class="flex items-center space-x-2">
-            <span class="text-base">⚡</span>
-            <span class="text-xs font-bold text-purple-200">Zero-Touch iOS Automation</span>
-          </div>
-          <p class="text-[11px] text-slate-300 leading-relaxed">
-            By setting up a 1-minute automation in Apple's <strong>Shortcuts App</strong>, your iPhone forwards bank messages to the app in the background automatically!
-          </p>
-        </div>
-      </div>
-
-      <!-- ================= TAB 4: SETTINGS ================= -->
-      <div id="tabSettings" class="space-y-4 hidden">
-        <div class="pt-2">
-          <h1 class="text-2xl font-black text-white">Settings</h1>
-          <p class="text-xs text-slate-400">Preferences and 100% on-device backup</p>
-        </div>
-
-        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 space-y-3 text-xs">
-          <div class="flex justify-between items-center">
-            <span class="text-slate-300 font-semibold">Currency</span>
-            <select id="currencySelector" onchange="changeCurrency(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2 py-1 focus:outline-none">
-              <option value="₹" selected>INR (₹)</option>
-              <option value="$">USD ($)</option>
-              <option value="€">EUR (€)</option>
-              <option value="£">GBP (£)</option>
-            </select>
-          </div>
-          <div class="border-t border-slate-700 pt-2 flex justify-between items-center">
-            <span class="text-slate-300 font-semibold">Storage Engine</span>
-            <span id="storageLabel" class="text-emerald-400 font-bold">100% On-Device SQLite</span>
-          </div>
-          <div class="border-t border-slate-700 pt-2 flex justify-between items-center">
-            <span class="text-slate-300 font-semibold">Cloud Sync</span>
-            <span class="text-slate-400">Disabled (Zero External Server)</span>
-          </div>
-        </div>
-
-        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 space-y-2">
-          <button onclick="exportCSV()" class="w-full py-2.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition">
-            Export Local Data (CSV)
-          </button>
-          <button onclick="resetData()" class="w-full py-2.5 bg-red-600/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">
-            Reset Demo Data
-          </button>
-        </div>
+        <!-- Android 3-Button / Pill Bar -->
+        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-20 h-1 bg-slate-600 rounded-full z-40"></div>
       </div>
     </div>
+  </main>
 
-    <!-- Bottom Navigation Bar -->
-    <div class="absolute bottom-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 flex items-center justify-around px-2 z-40">
-      <button onclick="switchTab('dashboard')" id="navDashboard" class="flex flex-col items-center justify-center w-16 text-blue-500 tab-active">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-        <span class="text-[10px] font-medium mt-0.5">Dashboard</span>
-      </button>
-      <button onclick="switchTab('transactions')" id="navTransactions" class="flex flex-col items-center justify-center w-16 text-slate-400">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-        <span class="text-[10px] font-medium mt-0.5">Expenses</span>
-      </button>
-      <button onclick="switchTab('sms')" id="navSMS" class="flex flex-col items-center justify-center w-16 text-slate-400">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <span class="text-[10px] font-medium mt-0.5">SMS Reader</span>
-      </button>
-      <button onclick="switchTab('settings')" id="navSettings" class="flex flex-col items-center justify-center w-16 text-slate-400">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        <span class="text-[10px] font-medium mt-0.5">Settings</span>
-      </button>
-    </div>
-
-    <!-- Home Indicator / Nav Bar -->
-    <div id="homeIndicator" class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-600 rounded-full z-50"></div>
-  </div>
-
-  <!-- Transaction Detail Modal (Displays Full Bank SMS) -->
-  <div id="txDetailModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+  <!-- ======================================================== -->
+  <!-- MODAL 1: TRANSACTION DETAIL & FULL RAW SMS VIEWER        -->
+  <!-- ======================================================== -->
+  <div id="txDetailModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
         <h3 class="text-sm font-bold text-slate-200">Transaction Details</h3>
-        <button onclick="closeTxDetailModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+        <button onclick="closeTxDetailModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
       </div>
+      
       <div class="text-center py-2">
         <div id="modalAmount" class="text-3xl font-black text-red-400">₹0.00</div>
-        <div id="modalMerchant" class="text-sm font-bold text-slate-300 mt-1">Merchant</div>
+        <div id="modalMerchant" class="text-base font-bold text-slate-200 mt-1">Merchant</div>
         <div id="modalBadge" class="inline-block mt-2 px-2.5 py-0.5 bg-blue-900/40 text-blue-400 border border-blue-700/40 rounded-full text-[10px] font-bold">Auto-Parsed from SMS</div>
       </div>
+
       <div class="space-y-2 text-xs bg-slate-800/80 p-3 rounded-2xl">
         <div class="flex justify-between"><span class="text-slate-400">Category</span><span id="modalCategory" class="font-semibold text-slate-200">-</span></div>
         <div class="flex justify-between"><span class="text-slate-400">Bank / Source</span><span id="modalBank" class="font-semibold text-slate-200">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Account / Card</span><span id="modalAccount" class="font-semibold text-slate-200">-</span></div>
         <div class="flex justify-between"><span class="text-slate-400">Payment Mode</span><span id="modalMode" class="font-semibold text-slate-200">-</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">Date</span><span id="modalDate" class="font-semibold text-slate-200">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Date & Time</span><span id="modalDate" class="font-semibold text-slate-200">-</span></div>
       </div>
-      <div id="modalRawSMSContainer" class="space-y-1 text-xs">
-        <div class="text-[11px] font-bold text-slate-400">Original Bank Transaction SMS:</div>
-        <div id="modalRawSMS" class="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-300 leading-relaxed select-all">
+
+      <!-- FULL ORIGINAL BANK SMS INSPECTION CARD -->
+      <div class="space-y-1 text-xs">
+        <div class="flex justify-between items-center">
+          <span class="text-[11px] font-bold text-slate-300">Original Bank Transaction SMS Message:</span>
+          <button onclick="copyModalSMS()" class="text-[10px] text-blue-400 hover:underline">Copy SMS</button>
+        </div>
+        <div id="modalRawSMS" class="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-300 leading-relaxed select-all max-h-32 overflow-y-auto">
           No SMS recorded
         </div>
       </div>
-      <button onclick="closeTxDetailModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">
-        Close
+
+      <div class="flex space-x-2 pt-1">
+        <button onclick="deleteModalTransaction()" class="flex-1 py-2.5 bg-red-600/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">
+          Delete
+        </button>
+        <button onclick="closeTxDetailModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: MANUAL ADD EXPENSE MODAL                        -->
+  <!-- ======================================================== -->
+  <div id="addExpenseModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+        <h3 class="text-sm font-bold text-white">Add New Transaction</h3>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Type</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btnTypeExpense" onclick="selectFormType('Expense')" class="py-2 bg-red-600 text-white rounded-xl font-bold">Expense</button>
+            <button type="button" id="btnTypeIncome" onclick="selectFormType('Income')" class="py-2 bg-slate-800 text-slate-400 rounded-xl font-bold">Income</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Amount</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-sm font-bold text-slate-400">₹</span>
+            <input type="number" id="inputAmount" placeholder="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-blue-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Merchant / Source</label>
+          <input type="text" id="inputMerchant" placeholder="e.g. Starbucks, Amazon, Salary" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Category</label>
+          <select id="inputCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <option value="Food & Dining">Food & Dining</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Transportation & Fuel">Transportation & Fuel</option>
+            <option value="Bills & Utilities">Bills & Utilities</option>
+            <option value="Salary">Salary / Income</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Bank / Mode</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="inputBank" placeholder="e.g. HDFC Bank" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <select id="inputMode" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+              <option value="UPI">UPI</option>
+              <option value="Card">Card</option>
+              <option value="Net Banking">Net Banking</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex space-x-2 pt-2">
+        <button onclick="closeAddModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">Cancel</button>
+        <button onclick="saveManualExpense()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 transition">Save Transaction</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 3: STEP-BY-STEP INSTALLATION GUIDE (iOS & ANDROID) -->
+  <!-- ======================================================== -->
+  <div id="installModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 id="installTitle" class="text-base font-bold text-white">How to Install</h3>
+        <button onclick="closeInstallModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+      
+      <div id="installBody" class="text-xs text-slate-300 space-y-3 leading-relaxed">
+        <!-- Injected via JS -->
+      </div>
+
+      <button onclick="closeInstallModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
+        Got it!
       </button>
     </div>
   </div>
 
   <!-- Toast Notification -->
   <div id="toast" class="fixed top-8 bg-emerald-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 z-50">
-    Transaction Saved to Device!
+    Notification
   </div>
 
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT ENGINE: SYNCED DATABASE & DUAL DEVICE STATE   -->
+  <!-- ======================================================== -->
   <script>
-    let activePlatform = 'ios';
     let currencySymbol = '₹';
-    let currentFilter = 'all';
+    let currentModalIndex = null;
+    let currentFormType = 'Expense';
 
     const defaultTransactions = [
       { id: '1', amount: 450.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '1234', mode: 'UPI', date: 'Today, 2:15 PM', isAuto: true, raw: "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50." },
-      { id: '2', amount: 1299.00, type: 'Expense', merchant: 'Blinkit Grocery', category: 'Groceries', bank: 'SBI', last4: '9876', mode: 'UPI', date: 'Today, 10:30 AM', isAuto: true, raw: "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT GROCERY via UPI Ref 629482. SBI." },
+      { id: '2', amount: 1299.00, type: 'Expense', merchant: 'Blinkit Grocery', category: 'Groceries', bank: 'SBI', last4: '9876', mode: 'UPI', date: 'Today, 10:30 AM', isAuto: true, raw: "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI." },
       { id: '3', amount: 385.00, type: 'Expense', merchant: 'Uber Trip', category: 'Transportation & Fuel', bank: 'ICICI Bank', last4: '4321', mode: 'Card', date: 'Yesterday', isAuto: true, raw: "Alert: You made a payment of Rs 385.00 with Card ending 4321 at UBER TRIP." },
       { id: '4', amount: 75000.00, type: 'Income', merchant: 'Infosys Ltd (Salary)', category: 'Salary', bank: 'HDFC Bank', last4: '1234', mode: 'Net Banking', date: 'Sep 1, 2026', isAuto: true, raw: "Salary of INR 75,000.00 credited to your Account **1234 by Infosys Technologies on 01-SEP-26." }
     ];
 
-    let transactions = JSON.parse(localStorage.getItem('expenses_dual_data')) || defaultTransactions;
+    let transactions = JSON.parse(localStorage.getItem('expenses_synced_v3')) || defaultTransactions;
 
     const sampleSMS = [
       "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.",
@@ -427,84 +343,465 @@
       "Paid Rs 650.00 at SHELL PETROL PUMP using Axis Bank Debit Card ending 7741 on 04-SEP-26."
     ];
 
-    let currentParsed = null;
+    // Track active tabs for each device
+    const deviceState = {
+      ios: { tab: 'dashboard', filter: 'all', search: '' },
+      android: { tab: 'dashboard', filter: 'all', search: '' }
+    };
 
     function init() {
-      updateClock();
-      setInterval(updateClock, 1000);
-      renderDashboard();
-      renderTransactionsList();
+      updateClocks();
+      setInterval(updateClocks, 1000);
+      renderAll();
     }
 
-    function switchPlatform(p) {
-      activePlatform = p;
-      const btnIos = document.getElementById('btnSwitchIos');
-      const btnAndroid = document.getElementById('btnSwitchAndroid');
-      const iosNotch = document.getElementById('iosNotch');
-      const androidStatusBar = document.getElementById('androidStatusBar');
-      const androidQuickSim = document.getElementById('androidQuickSim');
-      const androidInboxCard = document.getElementById('androidInboxCard');
-      const iosShortcutCard = document.getElementById('iosShortcutCard');
-      const deviceFrame = document.getElementById('deviceFrame');
-      const platformBadge = document.getElementById('platformDbBadge');
+    function updateClocks() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      document.querySelectorAll('.clock-time').forEach(el => el.textContent = timeStr);
+    }
 
-      if (p === 'android') {
-        btnAndroid.classList.add('bg-blue-600', 'text-white');
-        btnAndroid.classList.remove('text-slate-400');
-        btnIos.classList.remove('bg-blue-600', 'text-white');
-        btnIos.classList.add('text-slate-400');
+    function renderAll() {
+      renderDevice('ios');
+      renderDevice('android');
+    }
 
-        iosNotch.classList.add('hidden');
-        androidStatusBar.classList.remove('hidden');
-        androidQuickSim.classList.remove('hidden');
-        androidInboxCard.classList.remove('hidden');
-        iosShortcutCard.classList.add('hidden');
-        deviceFrame.classList.remove('rounded-[48px]');
-        deviceFrame.classList.add('rounded-[36px]');
-        platformBadge.textContent = '100% On-Device SQLite (Android)';
-        showToast('Switched to Android Mode');
-      } else {
-        btnIos.classList.add('bg-blue-600', 'text-white');
-        btnIos.classList.remove('text-slate-400');
-        btnAndroid.classList.remove('bg-blue-600', 'text-white');
-        btnAndroid.classList.add('text-slate-400');
+    function setTab(device, tab) {
+      deviceState[device].tab = tab;
+      renderDevice(device);
 
-        iosNotch.classList.remove('hidden');
-        androidStatusBar.classList.add('hidden');
-        androidQuickSim.classList.add('hidden');
-        androidInboxCard.classList.add('hidden');
-        iosShortcutCard.classList.remove('hidden');
-        deviceFrame.classList.add('rounded-[48px]');
-        deviceFrame.classList.remove('rounded-[36px]');
-        platformBadge.textContent = '100% On-Device SQLite (iPhone)';
-        showToast('Switched to iPhone Mode');
+      // Update Navigation Tab UI
+      ['dashboard', 'transactions', 'sms', 'settings'].forEach(t => {
+        const btn = document.getElementById(`${device}Nav-${t}`);
+        if (!btn) return;
+        if (t === tab) {
+          btn.className = `flex flex-col items-center justify-center w-14 ${device === 'android' ? 'text-emerald-400' : 'text-blue-500'} tab-active`;
+        } else {
+          btn.className = 'flex flex-col items-center justify-center w-14 text-slate-400';
+        }
+      });
+    }
+
+    function renderDevice(device) {
+      const container = document.getElementById(`${device}ScreenContainer`);
+      const tab = deviceState[device].tab;
+
+      if (tab === 'dashboard') {
+        container.innerHTML = getDashboardHTML(device);
+      } else if (tab === 'transactions') {
+        container.innerHTML = getTransactionsHTML(device);
+      } else if (tab === 'sms') {
+        container.innerHTML = getSmsHTML(device);
+      } else if (tab === 'settings') {
+        container.innerHTML = getSettingsHTML(device);
       }
     }
 
-    function updateClock() {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-      document.getElementById('clock').textContent = timeStr;
-      document.getElementById('androidClock').textContent = timeStr;
-    }
+    // --- HTML BUILDERS ---
 
-    function switchTab(tab) {
-      ['Dashboard', 'Transactions', 'SMS', 'Settings'].forEach(t => {
-        document.getElementById('tab' + t).classList.add('hidden');
-        document.getElementById('nav' + t).classList.remove('tab-active', 'text-blue-500');
-        document.getElementById('nav' + t).classList.add('text-slate-400');
+    function getDashboardHTML(device) {
+      let spent = 0;
+      let income = 0;
+      const catTotals = {};
+
+      transactions.forEach(t => {
+        if (t.type === 'Expense') {
+          spent += t.amount;
+          catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+        } else {
+          income += t.amount;
+        }
       });
 
-      const activeName = tab.charAt(0).toUpperCase() + tab.slice(1);
-      document.getElementById('tab' + activeName).classList.remove('hidden');
-      document.getElementById('nav' + activeName).classList.add('tab-active', 'text-blue-500');
-      document.getElementById('nav' + activeName).classList.remove('text-slate-400');
+      const net = income - spent;
+      const accentGrad = device === 'android' ? 'from-emerald-900/60 to-teal-900/60 border-emerald-500/30' : 'from-blue-900/60 to-indigo-900/60 border-blue-500/30';
+      const badgeColor = device === 'android' ? 'text-emerald-400' : 'text-blue-400';
+
+      return `
+        <!-- Top App Title -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider ${badgeColor}">100% On-Device • SQLite</span>
+            <h2 class="text-xl font-black text-white">Expense Tracker</h2>
+          </div>
+          <button onclick="setTab('${device}', 'sms')" class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-full text-[11px] font-bold text-slate-300 hover:text-white transition">
+            ✨ Bank SMS
+          </button>
+        </div>
+
+        <!-- Android Special Trigger Banner -->
+        ${device === 'android' ? `
+          <div class="bg-gradient-to-r from-emerald-950/80 to-teal-950/80 border border-emerald-500/30 p-2.5 rounded-2xl flex items-center justify-between">
+            <div class="text-[11px]">
+              <span class="font-bold text-emerald-400">⚡ Test Android SMS Listener</span>
+              <p class="text-[10px] text-slate-400">Simulate incoming bank alert in background</p>
+            </div>
+            <button onclick="triggerAndroidIncomingSMS()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold active:scale-95 transition shadow">
+              Send SMS
+            </button>
+          </div>
+        ` : `
+          <div class="bg-gradient-to-r from-blue-950/80 to-indigo-950/80 border border-blue-500/30 p-2.5 rounded-2xl flex items-center justify-between">
+            <div class="text-[11px]">
+              <span class="font-bold text-blue-400">🍎 Apple Shortcuts Ready</span>
+              <p class="text-[10px] text-slate-400">Auto-logs bank SMS via iOS AppIntent</p>
+            </div>
+            <button onclick="setTab('ios', 'sms')" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold active:scale-95 transition shadow">
+              Parse SMS
+            </button>
+          </div>
+        `}
+
+        <!-- Net Savings Main Card -->
+        <div class="bg-gradient-to-br ${accentGrad} border p-4 rounded-3xl space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-slate-400 font-medium">Net Monthly Balance</span>
+            <span class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded-full font-semibold text-slate-300">September 2026</span>
+          </div>
+          <div class="text-2xl font-black text-white">${currencySymbol}${net.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80 text-xs">
+            <div>
+              <span class="text-[10px] text-slate-400">Total Spent</span>
+              <div class="font-bold text-red-400">${currencySymbol}${spent.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400">Total Income</span>
+              <div class="font-bold text-emerald-400">${currencySymbol}${income.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="setTab('${device}', 'sms')" class="py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-2xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+            <span>💬</span><span>Bank SMS Reader</span>
+          </button>
+          <button onclick="showAddModal()" class="py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-2xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+            <span>+</span><span>Add Expense</span>
+          </button>
+        </div>
+
+        <!-- Category Spend Progress -->
+        <div class="bg-slate-800/80 border border-slate-700/60 p-3.5 rounded-2xl space-y-2">
+          <div class="flex justify-between items-center text-xs font-bold text-slate-300">
+            <span>Top Categories</span>
+            <span class="text-[10px] text-slate-400">${Object.keys(catTotals).length} categories</span>
+          </div>
+          <div class="space-y-1.5">
+            ${Object.entries(catTotals).slice(0, 3).map(([cat, amt]) => {
+              const pct = spent > 0 ? (amt / spent * 100).toFixed(0) : 0;
+              return `
+                <div class="text-xs">
+                  <div class="flex justify-between py-0.5">
+                    <span class="text-slate-300 text-[11px]">${cat}</span>
+                    <span class="font-bold text-slate-200">${currencySymbol}${Math.round(amt)} <span class="text-[10px] text-slate-400 font-normal">(${pct}%)</span></span>
+                  </div>
+                  <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-blue-500 h-full rounded-full" style="width: ${pct}%"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="space-y-2 pt-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Transactions</span>
+            <button onclick="setTab('${device}', 'transactions')" class="text-xs font-semibold text-blue-400 hover:underline">View All</button>
+          </div>
+          <div class="space-y-2">
+            ${transactions.slice(0, 3).map((t, idx) => getTxRowHTML(t, idx, device)).join('')}
+          </div>
+        </div>
+      `;
     }
 
-    function simulateIncomingBankSMS() {
+    function getTransactionsHTML(device) {
+      const q = deviceState[device].search.toLowerCase();
+      const filter = deviceState[device].filter;
+
+      const filtered = transactions.filter(t => {
+        const matchesFilter = filter === 'all' || t.type.toLowerCase() === filter;
+        const matchesQ = !q || t.merchant.toLowerCase().includes(q) || t.bank.toLowerCase().includes(q) || (t.raw || '').toLowerCase().includes(q);
+        return matchesFilter && matchesQ;
+      });
+
+      return `
+        <div class="pt-1">
+          <h2 class="text-xl font-black text-white">All Transactions</h2>
+          <p class="text-xs text-slate-400">Tap any item to view full original bank SMS</p>
+        </div>
+
+        <!-- Search Input -->
+        <input type="text" oninput="onSearchInput('${device}', this.value)" value="${deviceState[device].search}" placeholder="Search merchant, bank, or SMS keyword..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500">
+
+        <!-- Filter Chips -->
+        <div class="flex space-x-2 text-xs">
+          <button onclick="onFilterSelect('${device}', 'all')" class="px-3 py-1 rounded-full font-semibold ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}">All</button>
+          <button onclick="onFilterSelect('${device}', 'expense')" class="px-3 py-1 rounded-full font-semibold ${filter === 'expense' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}">Expenses</button>
+          <button onclick="onFilterSelect('${device}', 'income')" class="px-3 py-1 rounded-full font-semibold ${filter === 'income' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}">Income</button>
+        </div>
+
+        <div class="text-[11px] text-slate-400 font-medium">${filtered.length} entries found</div>
+
+        <!-- List -->
+        <div class="space-y-2 pb-6">
+          ${filtered.length === 0 ? '<div class="text-center py-8 text-xs text-slate-500">No transactions found</div>' : filtered.map((t, idx) => getTxRowHTML(t, idx, device)).join('')}
+        </div>
+      `;
+    }
+
+    function getSmsHTML(device) {
+      return `
+        <div class="pt-1">
+          <h2 class="text-xl font-black text-white">Bank SMS Reader</h2>
+          <p class="text-xs text-slate-400">Extracts Amount, Merchant, Bank, Card, and Type</p>
+        </div>
+
+        ${device === 'android' ? `
+          <!-- Android 1-Click Inbox Import -->
+          <div class="bg-emerald-950/60 border border-emerald-500/40 p-3 rounded-2xl space-y-2">
+            <div class="text-xs font-bold text-emerald-400">🤖 Android SMS Inbox Scanner</div>
+            <p class="text-[11px] text-slate-300">Scan phone's SMS inbox with 1-click and batch-import past bank transactions.</p>
+            <button onclick="simulateScanInbox()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition">
+              Scan & Import Past Bank SMS
+            </button>
+          </div>
+        ` : `
+          <!-- iOS Shortcuts Automation Guide -->
+          <div class="bg-blue-950/60 border border-blue-500/40 p-3 rounded-2xl space-y-1.5">
+            <div class="text-xs font-bold text-blue-400">🍎 iOS Shortcuts Automation</div>
+            <p class="text-[11px] text-slate-300 leading-relaxed">Apple Shortcuts forwards bank messages matching keywords to this app automatically.</p>
+          </div>
+        `}
+
+        <!-- SMS Paste Box -->
+        <div class="bg-slate-800/90 border border-slate-700 p-3 rounded-2xl space-y-2">
+          <div class="flex justify-between items-center text-xs font-bold text-slate-300">
+            <span>Paste Bank Notification</span>
+            <button onclick="clearSmsInput('${device}')" class="text-red-400 text-[11px] hover:underline">Clear</button>
+          </div>
+          <textarea id="${device}SmsInput" rows="3" oninput="onSmsTextChange('${device}', this.value)" placeholder="Paste any bank SMS here (e.g. 'Rs 450 debited to Starbucks...')" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"></textarea>
+        </div>
+
+        <!-- Sample Bank Chips -->
+        <div class="space-y-1.5">
+          <div class="text-[11px] font-bold text-slate-400">Try Real Bank Templates:</div>
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="applySample('${device}', 0)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-400 rounded-lg text-[11px] font-semibold">💳 HDFC Card</button>
+            <button onclick="applySample('${device}', 1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-400 rounded-lg text-[11px] font-semibold">⚡ SBI UPI</button>
+            <button onclick="applySample('${device}', 2)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-400 rounded-lg text-[11px] font-semibold">🏦 Chase Bank</button>
+            <button onclick="applySample('${device}', 3)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 rounded-lg text-[11px] font-semibold">💵 Salary</button>
+            <button onclick="applySample('${device}', 4)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-400 rounded-lg text-[11px] font-semibold">🚗 Shell Fuel</button>
+          </div>
+        </div>
+
+        <!-- Live Parsed Result Card -->
+        <div id="${device}ParsedCard" class="hidden bg-slate-800 border border-slate-700 p-3.5 rounded-2xl space-y-2.5">
+          <div class="flex justify-between items-center border-b border-slate-700 pb-1.5">
+            <span class="text-xs font-bold text-emerald-400">✓ Parsed Successfully</span>
+            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-full font-bold">100% Match</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <span class="text-[10px] text-slate-400">AMOUNT</span>
+              <div id="${device}ParsedAmount" class="text-lg font-black text-red-400">₹0.00</div>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400">TYPE</span>
+              <div id="${device}ParsedType" class="text-sm font-bold text-slate-200">Expense</div>
+            </div>
+          </div>
+
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">Merchant</span><span id="${device}ParsedMerchant" class="font-semibold text-slate-200">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Category</span><span id="${device}ParsedCategory" class="font-semibold text-blue-400">-</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Bank</span><span id="${device}ParsedBank" class="font-semibold text-slate-200">-</span></div>
+          </div>
+
+          <button onclick="commitParsed('${device}')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow">
+            Save to On-Device Database
+          </button>
+        </div>
+      `;
+    }
+
+    function getSettingsHTML(device) {
+      return `
+        <div class="pt-1">
+          <h2 class="text-xl font-black text-white">Settings & Privacy</h2>
+          <p class="text-xs text-slate-400">100% Local Device Storage</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 space-y-3 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-slate-300">Currency Symbol</span>
+            <select onchange="changeCurrency(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-1 focus:outline-none">
+              <option value="₹" ${currencySymbol === '₹' ? 'selected' : ''}>INR (₹)</option>
+              <option value="$" ${currencySymbol === '$' ? 'selected' : ''}>USD ($)</option>
+              <option value="€" ${currencySymbol === '€' ? 'selected' : ''}>EUR (€)</option>
+              <option value="£" ${currencySymbol === '£' ? 'selected' : ''}>GBP (£)</option>
+            </select>
+          </div>
+          <div class="border-t border-slate-700/80 pt-2 flex justify-between">
+            <span class="text-slate-300">Database Engine</span>
+            <span class="text-emerald-400 font-bold">SQLite (Encrypted)</span>
+          </div>
+          <div class="border-t border-slate-700/80 pt-2 flex justify-between">
+            <span class="text-slate-300">External Cloud</span>
+            <span class="text-slate-400">Disabled (0% Server)</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <button onclick="exportCSV()" class="w-full py-2.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition">
+            Export Local Data (CSV)
+          </button>
+          <button onclick="exportJSON()" class="w-full py-2.5 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-xl text-xs font-bold hover:bg-purple-600 hover:text-white transition">
+            Backup Local JSON
+          </button>
+          <button onclick="resetData()" class="w-full py-2.5 bg-red-600/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">
+            Reset Demo Data
+          </button>
+        </div>
+      `;
+    }
+
+    function getTxRowHTML(t, idx, device) {
+      const isIncome = t.type === 'Income';
+      const icon = isIncome ? '↓' : '↑';
+      const colorClass = isIncome ? 'text-emerald-400' : 'text-red-400';
+      const bgClass = isIncome ? 'bg-emerald-500/15 text-emerald-400' : 'bg-blue-500/15 text-blue-400';
+
+      return `
+        <div onclick="viewTransactionDetails(${idx})" class="flex items-center justify-between p-2.5 bg-slate-800/80 border border-slate-700/50 hover:bg-slate-750 rounded-2xl cursor-pointer transition">
+          <div class="flex items-center space-x-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-xl ${bgClass} flex items-center justify-center font-bold text-xs">
+              ${icon}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs font-bold text-white truncate">${t.merchant}</span>
+                ${t.isAuto ? '<span class="text-[9px] bg-blue-900/60 text-blue-300 px-1 py-0.2 rounded font-bold">SMS</span>' : ''}
+              </div>
+              <div class="text-[10px] text-slate-400 truncate">${t.category} • ${t.date}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs font-bold ${colorClass}">
+              ${isIncome ? '+' : '-'}${currencySymbol}${t.amount.toFixed(2)}
+            </div>
+            <div class="text-[9px] text-slate-500">${t.bank}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- INTERACTIVE ACTIONS ---
+
+    function onSearchInput(device, val) {
+      deviceState[device].search = val;
+      renderDevice(device);
+    }
+
+    function onFilterSelect(device, filter) {
+      deviceState[device].filter = filter;
+      renderDevice(device);
+    }
+
+    let parsedTemp = {};
+
+    function onSmsTextChange(device, text) {
+      const card = document.getElementById(`${device}ParsedCard`);
+      if (!text || !text.trim()) {
+        if (card) card.classList.add('hidden');
+        return;
+      }
+
+      // Regex Parse
+      const amtMatch = text.match(/(?:Rs\.?|INR|\$|€|debited by|credited by)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+      if (!amtMatch) {
+        if (card) card.classList.add('hidden');
+        return;
+      }
+
+      const amount = parseFloat(amtMatch[1].replace(/,/g, ''));
+      const lower = text.toLowerCase();
+      const isCredit = lower.includes('credited') || lower.includes('deposited') || lower.includes('salary') || lower.includes('refund');
+      const type = isCredit ? 'Income' : 'Expense';
+
+      let bank = 'Bank Alert';
+      if (/hdfc/i.test(text)) bank = 'HDFC Bank';
+      else if (/sbi/i.test(text)) bank = 'SBI';
+      else if (/icici/i.test(text)) bank = 'ICICI Bank';
+      else if (/chase/i.test(text)) bank = 'Chase';
+      else if (/axis/i.test(text)) bank = 'Axis Bank';
+
+      let merchant = "General Store";
+      if (/starbucks/i.test(text)) merchant = "Starbucks Coffee";
+      else if (/blinkit/i.test(text)) merchant = "Blinkit Grocery";
+      else if (/uber/i.test(text)) merchant = "Uber Ride";
+      else if (/salary|infosys/i.test(text)) merchant = "Infosys Ltd (Salary)";
+      else if (/shell/i.test(text)) merchant = "Shell Petrol Pump";
+
+      let category = "General";
+      if (/starbucks|food|dining/i.test(text)) category = "Food & Dining";
+      else if (/blinkit|grocery/i.test(text)) category = "Groceries";
+      else if (/uber|petrol|fuel|shell/i.test(text)) category = "Transportation & Fuel";
+      else if (/salary/i.test(text)) category = "Salary";
+
+      parsedTemp[device] = {
+        id: Date.now().toString(),
+        amount: amount,
+        type: type,
+        merchant: merchant,
+        category: category,
+        bank: bank,
+        last4: '1234',
+        mode: lower.includes('upi') ? 'UPI' : 'Card',
+        date: 'Just now',
+        isAuto: true,
+        raw: text
+      };
+
+      document.getElementById(`${device}ParsedAmount`).textContent = `${currencySymbol}${amount.toFixed(2)}`;
+      document.getElementById(`${device}ParsedType`).textContent = type;
+      document.getElementById(`${device}ParsedMerchant`).textContent = merchant;
+      document.getElementById(`${device}ParsedCategory`).textContent = category;
+      document.getElementById(`${device}ParsedBank`).textContent = bank;
+      card.classList.remove('hidden');
+    }
+
+    function applySample(device, idx) {
+      const textarea = document.getElementById(`${device}SmsInput`);
+      if (textarea) {
+        textarea.value = sampleSMS[idx];
+        onSmsTextChange(device, sampleSMS[idx]);
+      }
+    }
+
+    function clearSmsInput(device) {
+      const textarea = document.getElementById(`${device}SmsInput`);
+      if (textarea) textarea.value = '';
+      const card = document.getElementById(`${device}ParsedCard`);
+      if (card) card.classList.add('hidden');
+    }
+
+    function commitParsed(device) {
+      if (!parsedTemp[device]) return;
+      transactions.unshift(parsedTemp[device]);
+      saveTransactions();
+      clearSmsInput(device);
+      showToast("Bank Transaction Logged to SQLite!");
+      setTab(device, 'dashboard');
+    }
+
+    function triggerAndroidIncomingSMS() {
       const incoming = "Dear Customer, Rs.550.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 14,690.50.";
       
-      // Auto-parse directly
       const newTx = {
         id: Date.now().toString(),
         amount: 550.00,
@@ -520,269 +817,187 @@
       };
 
       transactions.unshift(newTx);
-      localStorage.setItem('expenses_dual_data', JSON.stringify(transactions));
-      renderDashboard();
-      renderTransactionsList();
+      saveTransactions();
 
-      // Show floating notification
-      const banner = document.getElementById('androidNotificationBanner');
-      document.getElementById('notifBody').textContent = `Auto-Expense Logged: ₹550.00 at Starbucks Coffee`;
+      const banner = document.getElementById('androidNotifBanner');
+      document.getElementById('androidNotifText').textContent = "Auto-Expense Logged: ₹550.00 at STARBUCKS";
       banner.classList.remove('hidden');
 
       setTimeout(() => {
         banner.classList.add('hidden');
       }, 4000);
+
+      showToast("Android Background SmsReceiver logged ₹550.00!");
     }
 
-    function scanAndroidInboxSim() {
-      const dummyBatch = [
-        { id: 'b1', amount: 890.00, type: 'Expense', merchant: 'Shell Petrol', category: 'Transportation & Fuel', bank: 'HDFC Bank', last4: '1234', mode: 'Card', date: 'Yesterday', isAuto: true, raw: "Rs 890.00 spent on Card ending 1234 at SHELL FUEL on 04-SEP." },
-        { id: 'b2', amount: 340.00, type: 'Expense', merchant: 'Swiggy Food', category: 'Food & Dining', bank: 'SBI', last4: '9876', mode: 'UPI', date: '2 days ago', isAuto: true, raw: "A/c 9876 debited by Rs 340.00 to SWIGGY via UPI." }
+    function simulateScanInbox() {
+      const items = [
+        { id: 'sc1', amount: 890.00, type: 'Expense', merchant: 'Shell Petrol', category: 'Transportation & Fuel', bank: 'HDFC Bank', last4: '1234', mode: 'Card', date: 'Yesterday', isAuto: true, raw: "Rs 890.00 spent on Card ending 1234 at SHELL FUEL on 04-SEP." },
+        { id: 'sc2', amount: 340.00, type: 'Expense', merchant: 'Swiggy Food', category: 'Food & Dining', bank: 'SBI', last4: '9876', mode: 'UPI', date: '2 days ago', isAuto: true, raw: "A/c 9876 debited by Rs 340.00 to SWIGGY via UPI Ref 49832." }
       ];
 
-      dummyBatch.forEach(item => transactions.unshift(item));
-      localStorage.setItem('expenses_dual_data', JSON.stringify(transactions));
-      renderDashboard();
-      renderTransactionsList();
+      items.forEach(it => transactions.unshift(it));
+      saveTransactions();
       showToast("Inbox Scanned: 2 Bank SMS Imported!");
-      switchTab('dashboard');
+      setTab('android', 'dashboard');
     }
 
-    function renderDashboard() {
-      let spent = 0;
-      let income = 0;
-      const catTotals = {};
-
-      transactions.forEach(t => {
-        if (t.type === 'Expense') {
-          spent += t.amount;
-          catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
-        } else {
-          income += t.amount;
-        }
-      });
-
-      document.getElementById('statTotalSpent').textContent = `${currencySymbol}${spent.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-      document.getElementById('statTotalIncome').textContent = `${currencySymbol}${income.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-      document.getElementById('statNetSavings').textContent = `${currencySymbol}${(income - spent).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-      document.getElementById('donutCenterAmount').textContent = `${currencySymbol}${Math.round(spent)}`;
-
-      // Render recent list (max 4)
-      const listContainer = document.getElementById('recentTransactionsList');
-      listContainer.innerHTML = '';
-      transactions.slice(0, 4).forEach((t, idx) => {
-        listContainer.appendChild(createTransactionRow(t, idx));
-      });
-
-      // Render Category Legends
-      const legends = document.getElementById('categoryLegends');
-      legends.innerHTML = '';
-      const topCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 4);
-      topCats.forEach(([cat, amt]) => {
-        const div = document.createElement('div');
-        div.className = 'flex justify-between items-center p-2 rounded-xl bg-slate-900/60 border border-slate-700/40';
-        div.innerHTML = `<span class="truncate text-slate-300">${cat}</span><span class="font-bold text-slate-100">${currencySymbol}${Math.round(amt)}</span>`;
-        legends.appendChild(div);
-      });
-    }
-
-    function createTransactionRow(t, index) {
-      const isIncome = t.type === 'Income';
-      const div = document.createElement('div');
-      div.className = 'flex items-center justify-between p-3 rounded-2xl bg-slate-800/80 border border-slate-700/50 hover:bg-slate-750 transition cursor-pointer';
-      div.onclick = () => openTransactionDetail(index);
-
-      let iconBg = isIncome ? 'bg-emerald-500/15 text-emerald-400' : 'bg-blue-500/15 text-blue-400';
-      if (t.category.includes('Food')) iconBg = 'bg-amber-500/15 text-amber-400';
-      if (t.category.includes('Transport')) iconBg = 'bg-cyan-500/15 text-cyan-400';
-
-      div.innerHTML = `
-        <div class="flex items-center space-x-3 min-w-0">
-          <div class="w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center font-bold text-sm">
-            ${isIncome ? '↓' : '↑'}
-          </div>
-          <div class="min-w-0">
-            <div class="flex items-center space-x-1.5">
-              <span class="text-xs font-bold text-slate-200 truncate">${t.merchant}</span>
-              ${t.isAuto ? '<span class="text-[9px] bg-blue-900/60 text-blue-300 px-1.5 py-0.2 rounded font-bold">SMS</span>' : ''}
-            </div>
-            <div class="text-[11px] text-slate-400 truncate">${t.category} • ${t.date}</div>
-          </div>
-        </div>
-        <div class="text-right">
-          <div class="text-xs font-bold ${isIncome ? 'text-emerald-400' : 'text-red-400'}">
-            ${isIncome ? '+' : '-'}${currencySymbol}${t.amount.toFixed(2)}
-          </div>
-          <div class="text-[10px] text-slate-500">${t.bank}</div>
-        </div>
-      `;
-      return div;
-    }
-
-    function renderTransactionsList() {
-      const list = document.getElementById('fullTransactionsList');
-      const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
-      list.innerHTML = '';
-
-      const filtered = transactions.filter(t => {
-        const matchesType = currentFilter === 'all' || t.type.toLowerCase() === currentFilter;
-        const matchesQ = !q || t.merchant.toLowerCase().includes(q) || t.bank.toLowerCase().includes(q) || (t.raw || '').toLowerCase().includes(q);
-        return matchesType && matchesQ;
-      });
-
-      if (filtered.length === 0) {
-        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">No transactions found</div>';
-        return;
-      }
-
-      filtered.forEach((t, i) => {
-        list.appendChild(createTransactionRow(t, i));
-      });
-    }
-
-    function openTransactionDetail(index) {
-      const t = transactions[index];
+    // --- DETAIL MODAL ---
+    function viewTransactionDetails(idx) {
+      currentModalIndex = idx;
+      const t = transactions[idx];
       if (!t) return;
 
       document.getElementById('modalAmount').textContent = `${t.type === 'Income' ? '+' : '-'}${currencySymbol}${t.amount.toFixed(2)}`;
       document.getElementById('modalAmount').className = `text-3xl font-black ${t.type === 'Income' ? 'text-emerald-400' : 'text-red-400'}`;
       document.getElementById('modalMerchant').textContent = t.merchant;
       document.getElementById('modalCategory').textContent = t.category;
-      document.getElementById('modalBank').textContent = `${t.bank} ${t.last4 ? '(••' + t.last4 + ')' : ''}`;
+      document.getElementById('modalBank').textContent = t.bank;
+      document.getElementById('modalAccount').textContent = t.last4 ? `Ending in ••${t.last4}` : 'N/A';
       document.getElementById('modalMode').textContent = t.mode;
       document.getElementById('modalDate').textContent = t.date;
-      document.getElementById('modalRawSMS').textContent = t.raw && t.raw.length > 0 ? t.raw : "Transaction added manually (no SMS raw body)";
-      document.getElementById('modalBadge').textContent = t.isAuto ? 'Auto-Parsed from Bank SMS' : 'Manual Entry';
+      document.getElementById('modalRawSMS').textContent = t.raw && t.raw.trim().length > 0 ? t.raw : "Manual entry (no raw SMS text body).";
 
       document.getElementById('txDetailModal').classList.remove('hidden');
     }
 
     function closeTxDetailModal() {
       document.getElementById('txDetailModal').classList.add('hidden');
+      currentModalIndex = null;
     }
 
-    function parseLiveSMS() {
-      const text = document.getElementById('smsInput').value.trim();
-      const card = document.getElementById('smsOutputCard');
-      if (!text) {
-        card.classList.add('hidden');
+    function copyModalSMS() {
+      const text = document.getElementById('modalRawSMS').textContent;
+      navigator.clipboard.writeText(text);
+      showToast("SMS copied to clipboard!");
+    }
+
+    function deleteModalTransaction() {
+      if (currentModalIndex !== null) {
+        transactions.splice(currentModalIndex, 1);
+        saveTransactions();
+        closeTxDetailModal();
+        showToast("Transaction deleted!");
+      }
+    }
+
+    // --- MANUAL ADD MODAL ---
+    function showAddModal() {
+      document.getElementById('inputAmount').value = '';
+      document.getElementById('inputMerchant').value = '';
+      document.getElementById('inputBank').value = 'Primary Bank';
+      document.getElementById('addExpenseModal').classList.remove('hidden');
+    }
+
+    function closeAddModal() {
+      document.getElementById('addExpenseModal').classList.add('hidden');
+    }
+
+    function selectFormType(type) {
+      currentFormType = type;
+      const btnExp = document.getElementById('btnTypeExpense');
+      const btnInc = document.getElementById('btnTypeIncome');
+      if (type === 'Expense') {
+        btnExp.className = 'py-2 bg-red-600 text-white rounded-xl font-bold';
+        btnInc.className = 'py-2 bg-slate-800 text-slate-400 rounded-xl font-bold';
+      } else {
+        btnInc.className = 'py-2 bg-emerald-600 text-white rounded-xl font-bold';
+        btnExp.className = 'py-2 bg-slate-800 text-slate-400 rounded-xl font-bold';
+      }
+    }
+
+    function saveManualExpense() {
+      const amount = parseFloat(document.getElementById('inputAmount').value);
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
         return;
       }
 
-      const lower = text.toLowerCase();
-      let type = (lower.includes('credited') || lower.includes('deposited') || lower.includes('salary') || lower.includes('refund')) ? 'Income' : 'Expense';
+      const merchant = document.getElementById('inputMerchant').value.trim() || 'General Expense';
+      const category = document.getElementById('inputCategory').value;
+      const bank = document.getElementById('inputBank').value.trim() || 'Cash';
+      const mode = document.getElementById('inputMode').value;
 
-      // Amount regex
-      const amtMatch = text.match(/(?:Rs\.?|INR|\$|€|debited by|credited by)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-      let amount = 0;
-      if (amtMatch) {
-        amount = parseFloat(amtMatch[1].replace(/,/g, ''));
-      }
-
-      if (amount <= 0) {
-        card.classList.add('hidden');
-        return;
-      }
-
-      // Bank
-      let bank = 'Bank Transaction';
-      if (/hdfc/i.test(text)) bank = 'HDFC Bank';
-      else if (/sbi/i.test(text)) bank = 'SBI';
-      else if (/icici/i.test(text)) bank = 'ICICI Bank';
-      else if (/chase/i.test(text)) bank = 'Chase';
-      else if (/axis/i.test(text)) bank = 'Axis Bank';
-
-      // Last 4
-      const last4Match = text.match(/(?:ending in|ending with|ending|a\/c|card)\s*(?:no\.?)?\s*[:\-]?\s*(?:[xX\*]+)?([0-9]{4})\b/i);
-      const last4 = last4Match ? last4Match[1] : '';
-
-      // Merchant
-      let merchant = "General Store";
-      if (/starbucks/i.test(text)) merchant = "Starbucks Coffee";
-      else if (/blinkit/i.test(text)) merchant = "Blinkit Grocery";
-      else if (/swiggy/i.test(text)) merchant = "Swiggy Food";
-      else if (/uber/i.test(text)) merchant = "Uber Trip";
-      else if (/salary|infosys/i.test(text)) merchant = "Infosys Ltd (Salary)";
-      else if (/shell/i.test(text)) merchant = "Shell Petrol Pump";
-
-      // Category
-      let category = "General";
-      if (/starbucks|swiggy|dining|food/i.test(text)) category = "Food & Dining";
-      else if (/blinkit|grocery|walmart/i.test(text)) category = "Groceries";
-      else if (/uber|petrol|fuel|shell/i.test(text)) category = "Transportation & Fuel";
-      else if (/salary/i.test(text)) category = "Salary";
-
-      currentParsed = {
+      const newTx = {
         id: Date.now().toString(),
         amount: amount,
-        type: type,
+        type: currentFormType,
         merchant: merchant,
         category: category,
         bank: bank,
-        last4: last4,
-        mode: lower.includes('upi') ? 'UPI' : (lower.includes('card') ? 'Card' : 'Net Banking'),
+        last4: '',
+        mode: mode,
         date: 'Just now',
-        isAuto: true,
-        raw: text
+        isAuto: false,
+        raw: ''
       };
 
-      document.getElementById('parsedAmount').textContent = `${currencySymbol}${amount.toFixed(2)}`;
-      document.getElementById('parsedType').textContent = type;
-      document.getElementById('parsedMerchant').textContent = merchant;
-      document.getElementById('parsedCategory').textContent = category;
-      document.getElementById('parsedAccount').textContent = `${bank} ${last4 ? '(••' + last4 + ')' : ''}`;
-      document.getElementById('parsedPaymentMode').textContent = currentParsed.mode;
-
-      card.classList.remove('hidden');
+      transactions.unshift(newTx);
+      saveTransactions();
+      closeAddModal();
+      showToast("New Transaction Saved!");
     }
 
-    function commitParsedTransaction() {
-      if (!currentParsed) return;
-      transactions.unshift(currentParsed);
-      localStorage.setItem('expenses_dual_data', JSON.stringify(transactions));
-      clearSMSInput();
-      showToast("Bank Transaction Logged Locally!");
-      switchTab('dashboard');
+    // --- INSTALLATION MODAL ---
+    function openInstallModal(platform) {
+      const modal = document.getElementById('installModal');
+      const title = document.getElementById('installTitle');
+      const body = document.getElementById('installBody');
+
+      if (platform === 'android') {
+        title.innerHTML = '🤖 How to Install on Android';
+        body.innerHTML = `
+          <div class="space-y-2">
+            <div class="p-3 bg-emerald-950/60 border border-emerald-500/30 rounded-xl">
+              <span class="font-bold text-emerald-400">Step 1: Download the APK</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">The GitHub Actions cloud workflow produces <code>app-release.apk</code> on every push. Download it directly onto your Android phone.</p>
+            </div>
+            <div class="p-3 bg-slate-800 border border-slate-700 rounded-xl">
+              <span class="font-bold text-white">Step 2: Tap to Install</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">Tap the downloaded APK file. If Android warns <em>"Install unknown apps"</em>, toggle <strong>Allow from this source</strong>.</p>
+            </div>
+            <div class="p-3 bg-slate-800 border border-slate-700 rounded-xl">
+              <span class="font-bold text-white">Step 3: Grant SMS Permission</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">Open the app and tap <strong>"Grant SMS Access"</strong> so the background <code>SmsReceiver</code> can auto-read incoming bank alerts in real-time.</p>
+            </div>
+          </div>
+        `;
+      } else {
+        title.innerHTML = '🍎 How to Install on iPhone';
+        body.innerHTML = `
+          <div class="space-y-2">
+            <div class="p-3 bg-blue-950/60 border border-blue-500/30 rounded-xl">
+              <span class="font-bold text-blue-400">Method A: Free Sideloading (No Mac Required)</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">Use <strong>Sideloadly</strong> or <strong>AltStore</strong> on Windows. Connect your iPhone via USB, select the compiled <code>.ipa</code> build, and it installs directly onto your iPhone with your free Apple ID.</p>
+            </div>
+            <div class="p-3 bg-slate-800 border border-slate-700 rounded-xl">
+              <span class="font-bold text-white">Method B: Xcode on Mac</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">Open <code>c:\\expnese</code> in Xcode on a Mac, connect your iPhone, and click <strong>Run (Cmd + R)</strong>.</p>
+            </div>
+            <div class="p-3 bg-slate-800 border border-slate-700 rounded-xl">
+              <span class="font-bold text-white">Method C: Apple TestFlight</span>
+              <p class="text-[11px] text-slate-300 mt-0.5">If you have an Apple Developer account, upload the build to TestFlight and install via the TestFlight app link.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      modal.classList.remove('hidden');
     }
 
-    function clearSMSInput() {
-      document.getElementById('smsInput').value = '';
-      document.getElementById('smsOutputCard').classList.add('hidden');
-      currentParsed = null;
+    function closeInstallModal() {
+      document.getElementById('installModal').classList.add('hidden');
     }
 
-    function loadSampleSMS(idx) {
-      document.getElementById('smsInput').value = sampleSMS[idx];
-      parseLiveSMS();
-    }
-
-    function setFilter(f) {
-      currentFilter = f;
-      ['all', 'expense', 'income'].forEach(t => {
-        const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
-        if (t === f) {
-          btn.className = 'px-3 py-1 bg-blue-600 text-white rounded-full font-semibold';
-        } else {
-          btn.className = 'px-3 py-1 bg-slate-800 text-slate-300 rounded-full';
-        }
-      });
-      renderTransactionsList();
+    function saveTransactions() {
+      localStorage.setItem('expenses_synced_v3', JSON.stringify(transactions));
+      renderAll();
     }
 
     function changeCurrency(val) {
       currencySymbol = val;
-      renderDashboard();
-      renderTransactionsList();
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.remove('opacity-0', '-translate-y-4');
-      toast.classList.add('opacity-100', 'translate-y-0');
-      setTimeout(() => {
-        toast.classList.add('opacity-0', '-translate-y-4');
-      }, 2000);
+      renderAll();
+      showToast(`Currency changed to ${val}`);
     }
 
     function exportCSV() {
@@ -794,17 +1009,35 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'DualPlatform_Expenses.csv';
+      a.download = 'Expenses_Backup.csv';
       a.click();
-      showToast("CSV Exported locally!");
+      showToast("CSV exported to device!");
+    }
+
+    function exportJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", "expenses_backup.json");
+      a.click();
+      showToast("JSON backup downloaded!");
     }
 
     function resetData() {
-      localStorage.removeItem('expenses_dual_data');
+      localStorage.removeItem('expenses_synced_v3');
       transactions = [...defaultTransactions];
-      renderDashboard();
-      renderTransactionsList();
+      saveTransactions();
       showToast("Demo Data Reset");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0', '-translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-4');
+      }, 2400);
     }
 
     init();

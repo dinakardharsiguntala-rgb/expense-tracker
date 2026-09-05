@@ -110,3 +110,4 @@ class SmsReceiver : BroadcastReceiver() {
         manager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }
+

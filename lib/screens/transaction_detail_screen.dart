@@ -200,3 +200,4 @@ class TransactionDetailScreen extends StatelessWidget {
     );
   }
 }
+

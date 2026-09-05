@@ -263,3 +263,4 @@ class LocalDatabaseService {
     db.close();
   }
 }
+
