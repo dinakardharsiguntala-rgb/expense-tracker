@@ -41,7 +41,7 @@ public struct SpendingChartView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
                 .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
         )
     }
@@ -67,7 +67,6 @@ public struct SpendingChartView: View {
                         innerRadius: .ratio(0.65),
                         angularInset: 2.0
                     )
-                    .cornerRadius(5)
                     .foregroundStyle(share.color)
                 }
                 .frame(height: 190)

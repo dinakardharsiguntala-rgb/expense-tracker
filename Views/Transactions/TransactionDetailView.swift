@@ -33,7 +33,7 @@ public struct TransactionDetailView: View {
             }
             .padding(16)
         }
-        .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+        .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Transaction Details")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(
@@ -83,7 +83,7 @@ public struct TransactionDetailView: View {
         .padding(.vertical, 20)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
         )
     }
 
@@ -132,7 +132,7 @@ public struct TransactionDetailView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
         )
     }
 
@@ -155,7 +155,7 @@ public struct TransactionDetailView: View {
                 .foregroundColor(.primary)
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(UIColor.tertiarySystemGroupedBackground))
+                .background(Color.appTertiaryBackground)
                 .cornerRadius(10)
 
             Text("Stored securely on your iPhone. Never uploaded to any server.")
@@ -165,7 +165,7 @@ public struct TransactionDetailView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
         )
     }
 

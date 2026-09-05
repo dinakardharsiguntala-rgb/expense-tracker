@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @main
 public struct ExpenseTrackerApp: App {
@@ -26,7 +29,7 @@ public struct ExpenseTrackerApp: App {
     public init() {
         let context = ModelContext(sharedModelContainer)
         seedInitialDataIfNeeded(context: context)
-        syncAutoParsedFromExtension(context: context)
+        Self.syncAutoParsedFromExtension(context: context)
     }
 
     public var body: some Scene {
@@ -56,7 +59,7 @@ public struct ExpenseTrackerApp: App {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     let context = ModelContext(sharedModelContainer)
-                    syncAutoParsedFromExtension(context: context)
+                    Self.syncAutoParsedFromExtension(context: context)
                     checkClipboardForBankSMS()
                 }
             }
@@ -90,7 +93,7 @@ public struct ExpenseTrackerApp: App {
 
     // MARK: - Background SMS Extension Sync
 
-    private func syncAutoParsedFromExtension(context: ModelContext) {
+    private static func syncAutoParsedFromExtension(context: ModelContext) {
         let pending = SharedExpenseDatabase.shared.fetchAndClearPendingRecords()
         guard !pending.isEmpty else { return }
 

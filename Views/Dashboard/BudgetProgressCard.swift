@@ -65,7 +65,7 @@ public struct BudgetProgressCard: View {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 6)
-                            .fill(Color(UIColor.systemGray5))
+                            .fill(Color.appGray5)
                             .frame(height: 10)
 
                         RoundedRectangle(cornerRadius: 6)
@@ -115,7 +115,7 @@ public struct BudgetProgressCard: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
                 .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
         )
     }

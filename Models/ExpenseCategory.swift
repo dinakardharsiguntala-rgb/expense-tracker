@@ -1,6 +1,9 @@
 import Foundation
 import SwiftData
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @Model
 public final class ExpenseCategory {
@@ -83,6 +86,7 @@ extension Color {
     }
 
     func toHex() -> String {
+        #if canImport(UIKit)
         guard let components = UIColor(self).cgColor.components, components.count >= 3 else {
             return "#888888"
         }
@@ -90,5 +94,8 @@ extension Color {
         let g = Float(components[1])
         let b = Float(components[2])
         return String(format: "#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255))
+        #else
+        return "#888888"
+        #endif
     }
 }

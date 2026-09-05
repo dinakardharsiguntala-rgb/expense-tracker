@@ -51,7 +51,7 @@ public struct QuickSMSInputView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 20)
             }
-            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .background(Color.appBackground.ignoresSafeArea())
             .navigationTitle("Bank SMS Reader")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -126,7 +126,7 @@ public struct QuickSMSInputView: View {
             TextEditor(text: $smsText)
                 .frame(minHeight: 100)
                 .padding(8)
-                .background(Color(UIColor.secondarySystemGroupedBackground))
+                .background(Color.appSecondaryBackground)
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
@@ -157,7 +157,7 @@ public struct QuickSMSInputView: View {
                                 .fontWeight(.medium)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
-                                .background(Color(UIColor.secondarySystemGroupedBackground))
+                                .background(Color.appSecondaryBackground)
                                 .foregroundColor(.primary)
                                 .cornerRadius(20)
                                 .overlay(
@@ -260,7 +260,7 @@ public struct QuickSMSInputView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(Color(UIColor.tertiarySystemGroupedBackground))
+                .background(Color.appTertiaryBackground)
                 .cornerRadius(10)
             }
 
@@ -284,7 +284,7 @@ public struct QuickSMSInputView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
                 .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 3)
         )
     }
@@ -339,7 +339,7 @@ public struct QuickSMSInputView: View {
             .padding(14)
             .background(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    .fill(Color.appSecondaryBackground)
             )
         }
     }

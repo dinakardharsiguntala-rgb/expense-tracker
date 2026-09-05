@@ -55,7 +55,7 @@ public struct StatCard: View {
         .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
+                .fill(Color.appSecondaryBackground)
                 .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
         )
     }

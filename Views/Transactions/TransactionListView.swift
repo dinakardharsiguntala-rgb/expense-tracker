@@ -59,7 +59,7 @@ public struct TransactionListView: View {
                     }
                 }
             }
-            .background(Color(UIColor.systemGroupedBackground))
+            .background(Color.appBackground)
             .navigationTitle("Transactions")
             .navigationBarTitleDisplayMode(.large)
             .searchable(text: $viewModel.searchText, prompt: "Search merchant, note, or bank")
@@ -154,7 +154,7 @@ public struct TransactionListView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .background(Color.appSecondaryBackground)
     }
 
     private func filterChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
@@ -164,7 +164,7 @@ public struct TransactionListView: View {
                 .fontWeight(isSelected ? .bold : .medium)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isSelected ? Color.blue : Color(UIColor.tertiarySystemGroupedBackground))
+                .background(isSelected ? Color.blue : Color.appTertiaryBackground)
                 .foregroundColor(isSelected ? .white : .primary)
                 .clipShape(Capsule())
         }

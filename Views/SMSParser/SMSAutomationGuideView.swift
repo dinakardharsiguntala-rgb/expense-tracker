@@ -108,7 +108,7 @@ public struct SMSAutomationGuideView: View {
                             .padding(14)
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                                    .fill(Color.appSecondaryBackground)
                             )
                         }
                     }
@@ -122,12 +122,12 @@ public struct SMSAutomationGuideView: View {
                             .foregroundColor(.secondary)
                     }
                     .padding(12)
-                    .background(Color(UIColor.secondarySystemGroupedBackground))
+                    .background(Color.appSecondaryBackground)
                     .cornerRadius(12)
                 }
                 .padding(16)
             }
-            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .background(Color.appBackground.ignoresSafeArea())
             .navigationTitle("SMS Automation Guide")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

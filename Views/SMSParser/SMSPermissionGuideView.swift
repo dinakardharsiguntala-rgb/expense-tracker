@@ -72,7 +72,7 @@ public struct SMSPermissionGuideView: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 18)
-                            .fill(Color(UIColor.secondarySystemGroupedBackground))
+                            .fill(Color.appSecondaryBackground)
                     )
 
                     Text("How to Enable in iOS Settings:")
@@ -115,7 +115,7 @@ public struct SMSPermissionGuideView: View {
                             .padding(14)
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                                    .fill(Color.appSecondaryBackground)
                             )
                         }
                     }
@@ -142,7 +142,7 @@ public struct SMSPermissionGuideView: View {
                 }
                 .padding(16)
             }
-            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .background(Color.appBackground.ignoresSafeArea())
             .navigationTitle("Automatic SMS Access")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -153,3 +153,4 @@ public struct SMSPermissionGuideView: View {
         }
     }
 }
+

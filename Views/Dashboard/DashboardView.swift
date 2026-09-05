@@ -55,7 +55,7 @@ public struct DashboardView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 32)
             }
-            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .background(Color.appBackground.ignoresSafeArea())
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -122,7 +122,7 @@ public struct DashboardView: View {
             .pickerStyle(.menu)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(Color(UIColor.secondarySystemGroupedBackground))
+            .background(Color.appSecondaryBackground)
             .cornerRadius(10)
         }
         .padding(.top, 8)
@@ -168,7 +168,7 @@ public struct DashboardView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(Color(UIColor.secondarySystemGroupedBackground))
+                .background(Color.appSecondaryBackground)
                 .foregroundColor(.primary)
                 .cornerRadius(14)
                 .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
@@ -236,7 +236,7 @@ public struct DashboardView: View {
                 .padding(.vertical, 24)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color(UIColor.secondarySystemGroupedBackground))
+                        .fill(Color.appSecondaryBackground)
                 )
             } else {
                 VStack(spacing: 0) {
@@ -255,7 +255,7 @@ public struct DashboardView: View {
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color(UIColor.secondarySystemGroupedBackground))
+                        .fill(Color.appSecondaryBackground)
                         .shadow(color: Color.black.opacity(0.03), radius: 6, x: 0, y: 3)
                 )
             }

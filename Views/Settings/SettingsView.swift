@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -150,6 +153,7 @@ public struct SettingsView: View {
     }
 }
 
+#if canImport(UIKit)
 /// UIActivityViewController wrapper for SwiftUI
 public struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
@@ -160,3 +164,11 @@ public struct ShareSheet: UIViewControllerRepresentable {
 
     public func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+#else
+public struct ShareSheet: View {
+    let activityItems: [Any]
+    public var body: some View {
+        Text("Sharing not supported on this platform")
+    }
+}
+#endif
