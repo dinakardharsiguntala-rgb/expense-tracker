@@ -267,11 +267,89 @@
     let viewingItem = null;
     let detectedClipboardText = null;
 
+    let selectedMonthFilter = 'all';
+
+    const monthFullNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthShortNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function extractDateFromSMS(text) {
+      if (!text) return getTodayISO();
+      const months = {
+        jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+        jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+      };
+
+      // 1. DD-MMM-YY or DD-MMM-YYYY (e.g. 05-SEP-26, 18-AUG-26, 04-Sep-2026)
+      const m1 = text.match(/\b(\d{1,2})[-/]([a-z]{3})[-/](\d{2,4})\b/i);
+      if (m1) {
+        const day = m1[1].padStart(2, '0');
+        const mon = months[m1[2].toLowerCase().substring(0, 3)] || '01';
+        let yr = m1[3];
+        if (yr.length === 2) yr = '20' + yr;
+        return `${yr}-${mon}-${day}`;
+      }
+
+      // 2. DD-MM-YY or DD/MM/YYYY or DD-MM-YYYY
+      const m2 = text.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b/);
+      if (m2) {
+        const day = m2[1].padStart(2, '0');
+        const mon = m2[2].padStart(2, '0');
+        let yr = m2[3];
+        if (yr.length === 2) yr = '20' + yr;
+        return `${yr}-${mon}-${day}`;
+      }
+
+      // 3. MMM DD (e.g. Sep 5 or Sep 05, 2026)
+      const m3 = text.match(/\b([a-z]{3})\s+(\d{1,2})(?:,?\s*(\d{2,4}))?\b/i);
+      if (m3 && months[m3[1].toLowerCase()]) {
+        const mon = months[m3[1].toLowerCase()];
+        const day = m3[2].padStart(2, '0');
+        let yr = m3[3] || new Date().getFullYear().toString();
+        if (yr.length === 2) yr = '20' + yr;
+        return `${yr}-${mon}-${day}`;
+      }
+
+      return getTodayISO();
+    }
+
+    function getTodayISO() {
+      const now = new Date();
+      const yr = now.getFullYear();
+      const mon = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${yr}-${mon}-${day}`;
+    }
+
+    function getMonthKey(dateStr) {
+      if (!dateStr || dateStr.length < 7) return getTodayISO().substring(0, 7);
+      if (/^\d{4}-\d{2}/.test(dateStr)) return dateStr.substring(0, 7);
+      return getTodayISO().substring(0, 7);
+    }
+
+    function getMonthLabel(monthKey) {
+      if (!monthKey || !monthKey.includes('-')) return 'Recent';
+      const [yr, mon] = monthKey.split('-');
+      const idx = parseInt(mon, 10) - 1;
+      return `${monthFullNames[idx] || mon} ${yr}`;
+    }
+
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return 'Recent';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const [yr, mon, day] = dateStr.split('-');
+        const idx = parseInt(mon, 10) - 1;
+        return `${day} ${monthShortNames[idx] || mon} ${yr}`;
+      }
+      return dateStr;
+    }
+
     const initialData = [
-      { id: '1', amount: 450.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '1234', mode: 'UPI', date: 'Today, 2:15 PM', isAuto: true, raw: 'Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.' },
-      { id: '2', amount: 1299.00, type: 'Expense', merchant: 'Blinkit Grocery', category: 'Groceries', bank: 'SBI', last4: '9876', mode: 'UPI', date: 'Today, 10:30 AM', isAuto: true, raw: 'Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.' },
-      { id: '3', amount: 385.00, type: 'Expense', merchant: 'Uber Trip', category: 'Transportation', bank: 'ICICI Bank', last4: '4321', mode: 'Card', date: 'Yesterday, 8:45 PM', isAuto: true, raw: 'Alert: You made a payment of Rs 385.00 with Card ending 4321 at UBER TRIP.' },
-      { id: '4', amount: 75000.00, type: 'Income', merchant: 'Infosys Ltd (Salary)', category: 'Salary', bank: 'HDFC Bank', last4: '1234', mode: 'NetBanking', date: 'Sep 1, 2026', isAuto: true, raw: 'Salary of INR 75,000.00 credited to your Account **1234 by Infosys Technologies on 01-SEP-26.' }
+      { id: '1', amount: 450.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '1234', mode: 'UPI', date: '2026-09-05', isAuto: true, raw: 'Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.' },
+      { id: '2', amount: 1299.00, type: 'Expense', merchant: 'Blinkit Grocery', category: 'Groceries', bank: 'SBI', last4: '9876', mode: 'UPI', date: '2026-09-05', isAuto: true, raw: 'Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.' },
+      { id: '3', amount: 850.00, type: 'Expense', merchant: 'Zomato Dining', category: 'Food & Dining', bank: 'Axis Bank', last4: '3210', mode: 'UPI', date: '2026-08-25', isAuto: true, raw: 'INR 850.00 debited from Axis Bank A/c 3210 on 25-08-26 at ZOMATO.' },
+      { id: '4', amount: 2400.00, type: 'Expense', merchant: 'Electricity Bill', category: 'Utilities & Bills', bank: 'SBI', last4: '9876', mode: 'NetBanking', date: '2026-08-10', isAuto: true, raw: 'Txn of INR 2400.00 on 10-AUG-26 to BESCOM.' },
+      { id: '5', amount: 1500.00, type: 'Expense', merchant: 'Fuel Station', category: 'Transportation', bank: 'HDFC Bank', last4: '1234', mode: 'Card', date: '2026-07-20', isAuto: true, raw: 'Alert: Rs 1500.00 spent on Card 1234 at SHELL on 20-07-26.' },
+      { id: '6', amount: 75000.00, type: 'Income', merchant: 'Infosys Ltd (Salary)', category: 'Salary', bank: 'HDFC Bank', last4: '1234', mode: 'NetBanking', date: '2026-09-01', isAuto: true, raw: 'Salary of INR 75,000.00 credited to your Account **1234 on 01-SEP-26.' }
     ];
 
     let transactions = JSON.parse(localStorage.getItem('expenses_pwa_records_v2')) || initialData;
@@ -384,19 +462,84 @@
       `;
     }
 
-    // --- TAB 2: EXPENSES LIST ---
+    // --- TAB 2: EXPENSES LIST (WITH MONTH-WISE BREAKDOWN & FILTERS) ---
+    function setMonthFilter(m) {
+      selectedMonthFilter = m;
+      render();
+    }
+
     function renderExpenses(container) {
+      // Sort transactions chronologically descending (newest date first)
+      transactions.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      // Group by Month Key (YYYY-MM)
+      const monthsMap = {};
+      transactions.forEach(t => {
+        const mKey = getMonthKey(t.date);
+        if (!monthsMap[mKey]) monthsMap[mKey] = [];
+        monthsMap[mKey].push(t);
+      });
+
+      const sortedMonthKeys = Object.keys(monthsMap).sort().reverse();
+      const displayMonthKeys = selectedMonthFilter === 'all' ? sortedMonthKeys : [selectedMonthFilter];
+
       container.innerHTML = `
-        <div class="space-y-3">
+        <div class="space-y-4">
           <div class="flex justify-between items-center">
-            <h2 class="text-lg font-extrabold text-white">All Transactions</h2>
-            <span class="text-xs text-slate-400 font-medium">${transactions.length} records</span>
+            <div>
+              <h2 class="text-lg font-extrabold text-white">All Transactions</h2>
+              <p class="text-[11px] text-slate-400">Grouped by month from bank SMS dates</p>
+            </div>
+            <button onclick="openAddModal()" class="px-3 py-1 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-xl text-xs font-bold transition">
+              + Add
+            </button>
           </div>
 
-          <div class="space-y-2">
+          <!-- Month Selector Pills -->
+          <div class="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <button onclick="setMonthFilter('all')" class="px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition ${selectedMonthFilter === 'all' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-slate-800/80 text-slate-400 hover:text-white'}">
+              All Time (${transactions.length})
+            </button>
+            ${sortedMonthKeys.map(mKey => {
+              const mSpent = monthsMap[mKey].filter(x => x.type === 'Expense').reduce((acc, x) => acc + x.amount, 0);
+              const isSel = selectedMonthFilter === mKey;
+              return `
+                <button onclick="setMonthFilter('${mKey}')" class="px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition ${isSel ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-slate-800/80 text-slate-400 hover:text-white'}">
+                  ${getMonthLabel(mKey)} (${currencySymbol}${mSpent.toFixed(0)})
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Month-Wise Grouped Transactions -->
+          <div class="space-y-5">
             ${transactions.length === 0 ? `
               <div class="p-8 text-center text-slate-500 text-xs">No transactions recorded yet.</div>
-            ` : transactions.map(t => getTransactionRowHTML(t)).join('')}
+            ` : displayMonthKeys.map(mKey => {
+              const txns = monthsMap[mKey] || [];
+              const monthSpent = txns.filter(x => x.type === 'Expense').reduce((acc, x) => acc + x.amount, 0);
+              const monthIncome = txns.filter(x => x.type === 'Income').reduce((acc, x) => acc + x.amount, 0);
+
+              return `
+                <div class="space-y-2">
+                  <div class="bg-slate-950/80 border border-slate-800 px-3.5 py-2 rounded-xl flex justify-between items-center shadow-sm">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-sm">📅</span>
+                      <span class="text-xs font-bold text-white uppercase tracking-wider">${getMonthLabel(mKey)}</span>
+                      <span class="text-[10px] text-slate-400">(${txns.length} txns)</span>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-xs font-bold text-rose-400">-${currencySymbol}${monthSpent.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                      ${monthIncome > 0 ? `<span class="text-[10px] ml-1.5 font-bold text-emerald-400">(+${currencySymbol}${monthIncome.toFixed(0)})</span>` : ''}
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    ${txns.map(t => getTransactionRowHTML(t)).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -404,6 +547,7 @@
 
     function getTransactionRowHTML(t) {
       const isExp = t.type === 'Expense';
+      const formattedDate = formatDisplayDate(t.date);
       return `
         <div onclick="openDetailModal('${t.id}')" class="bg-slate-900/90 border border-slate-800/90 p-3.5 rounded-2xl flex items-center justify-between active:scale-98 hover:border-slate-700 cursor-pointer transition">
           <div class="flex items-center space-x-3 min-w-0">
@@ -415,7 +559,7 @@
                 <p class="text-xs font-bold text-white truncate">${t.merchant}</p>
                 ${t.isAuto ? '<span class="text-[9px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1 rounded font-bold">SMS</span>' : ''}
               </div>
-              <p class="text-[10px] text-slate-400 truncate">${t.date} • ${t.bank || t.category}</p>
+              <p class="text-[10px] text-slate-400 truncate">${formattedDate} • ${t.bank || t.category}</p>
             </div>
           </div>
           <div class="text-right shrink-0">
@@ -499,7 +643,7 @@
               </button>
               <button onclick="loadSampleSMS(3)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
                 <span class="text-[10px] text-amber-400 font-bold uppercase">Bulk 3-in-1 Test (Multiple SMS)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Loads 3 past transactions together to test multi-SMS batch import...</p>
+                <p class="text-[11px] text-slate-300 truncate mt-0.5">Loads 3 past SMS (Sep, Aug, Jul) to test automatic month-wise grouping!</p>
               </button>
             </div>
           </div>
@@ -509,9 +653,9 @@
 
     const sampleAlerts = [
       "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.",
-      "Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. Avl Bal INR 4,320.00 - SBI",
-      "Chase Alert: You made a $42.50 purchase with Card ending in 4321 at UBER on Sep 5.",
-      "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.\n\nYour A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.\n\nINR 850.00 debited from Axis Bank A/c 3210 on 05-09-26 at ZOMATO. Avail Bal: INR 8,100."
+      "Your A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI Ref 629482. Avl Bal INR 4,320.00 - SBI",
+      "INR 850.00 debited from Axis Bank A/c 3210 on 25-JUL-26 at ZOMATO. Avail Bal: INR 8,100.",
+      "Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI.\n\nYour A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI.\n\nINR 850.00 debited from Axis Bank A/c 3210 on 25-JUL-26 at ZOMATO."
     ];
 
     function loadSampleSMS(idx) {
@@ -629,6 +773,8 @@
       const cardMatch = clean.match(/(?:card|a\/c|account|xx|\*\*)[^\d]*(\d{4})/i);
       if (cardMatch) last4 = cardMatch[1];
 
+      const date = extractDateFromSMS(clean);
+
       return {
         amount,
         type,
@@ -637,6 +783,7 @@
         bank,
         last4,
         mode,
+        date,
         raw: clean
       };
     }
@@ -667,7 +814,7 @@
               bank: r.bank,
               last4: r.last4,
               mode: r.mode,
-              date: 'Imported SMS',
+              date: r.date || getTodayISO(),
               isAuto: true,
               raw: r.raw
             });
@@ -712,7 +859,7 @@
           bank: r.bank,
           last4: r.last4,
           mode: r.mode,
-          date: parsedItems.length > 1 ? 'Imported SMS' : 'Just Now',
+          date: r.date || getTodayISO(),
           isAuto: true,
           raw: r.raw
         });
@@ -746,7 +893,7 @@
               bank: res.bank,
               last4: res.last4,
               mode: res.mode,
-              date: 'Just Now',
+              date: res.date || getTodayISO(),
               isAuto: true,
               raw: sms
             };
@@ -799,7 +946,7 @@
           bank: res.bank,
           last4: res.last4,
           mode: res.mode,
-          date: 'Just Now',
+          date: res.date || getTodayISO(),
           isAuto: true,
           raw: detectedClipboardText
         });
@@ -820,14 +967,20 @@
     function renderAnalytics(container) {
       let spent = 0;
       const catTotals = {};
+      const monthsMap = {};
+
       transactions.forEach(t => {
         if (t.type === 'Expense') {
           spent += t.amount;
           catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+          const mKey = getMonthKey(t.date);
+          if (!monthsMap[mKey]) monthsMap[mKey] = [];
+          monthsMap[mKey].push(t);
         }
       });
 
       const categories = Object.keys(catTotals).sort((a, b) => catTotals[b] - catTotals[a]);
+      const sortedMonthKeys = Object.keys(monthsMap).sort().reverse();
 
       container.innerHTML = `
         <div class="space-y-4">
@@ -836,8 +989,31 @@
             <p class="text-xs text-slate-400 mt-0.5">Category breakdown from your on-device records</p>
           </div>
 
+          <!-- Monthly Spending Trend Card -->
           <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
-            <span class="text-xs text-slate-400 font-semibold">Total Category Expenses</span>
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Monthly Spending Breakdown</span>
+            <div class="space-y-2.5 pt-1">
+              ${sortedMonthKeys.map(mKey => {
+                const mSpent = (monthsMap[mKey] || []).filter(x => x.type === 'Expense').reduce((acc, x) => acc + x.amount, 0);
+                const maxSpent = Math.max(...sortedMonthKeys.map(k => (monthsMap[k] || []).filter(x => x.type === 'Expense').reduce((acc, x) => acc + x.amount, 0)), 1);
+                const pct = Math.round((mSpent / maxSpent) * 100);
+                return `
+                  <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                      <span class="text-white">📅 ${getMonthLabel(mKey)}</span>
+                      <span class="text-rose-400">${currencySymbol}${mSpent.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full bg-indigo-500 rounded-full" style="width: ${pct}%"></div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Category Expenses</span>
             <div class="text-2xl font-black text-white">${currencySymbol}${spent.toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
 
             <div class="space-y-3 pt-2">
