@@ -331,21 +331,32 @@
       if (!text) return getTodayISO();
       const months = {
         jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
-        jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+        jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12',
+        january: '01', february: '02', march: '03', april: '04', june: '06',
+        july: '07', august: '08', september: '09', october: '10', november: '11', december: '12'
       };
 
-      // 1. DD-MMM-YY or DD-MMM-YYYY (e.g. 05-SEP-26, 18-AUG-26, 04-Sep-2026)
-      const m1 = text.match(/\b(\d{1,2})[-/]([a-z]{3})[-/](\d{2,4})\b/i);
-      if (m1) {
-        const day = m1[1].padStart(2, '0');
-        const mon = months[m1[2].toLowerCase().substring(0, 3)] || '01';
-        let yr = m1[3];
-        if (yr.length === 2) yr = '20' + yr;
-        return `${yr}-${mon}-${day}`;
+      // 1. ISO format: YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD
+      const mIso = text.match(/\b(\d{4})[-/.]([0-1]?\d)[-/.]([0-3]?\d)\b/);
+      if (mIso) {
+        return `${mIso[1]}-${mIso[2].padStart(2, '0')}-${mIso[3].padStart(2, '0')}`;
       }
 
-      // 2. DD-MM-YY or DD/MM/YYYY or DD-MM-YYYY
-      const m2 = text.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b/);
+      // 2. DD-MMM-YY or DD-MMM-YYYY or DD MMM YYYY (e.g. 04-Sep-2026, 04 Aug 26, 04/AUG/2026, 04.Aug.2026)
+      const m1 = text.match(/\b([0-3]?\d)[-/.]\s*([a-z]{3,9})[-/.]\s*(\d{2,4})\b/i) || text.match(/\b([0-3]?\d)\s+([a-z]{3,9})\s+(\d{2,4})\b/i);
+      if (m1) {
+        const day = m1[1].padStart(2, '0');
+        const monKey = m1[2].toLowerCase().substring(0, 3);
+        const mon = months[monKey];
+        if (mon) {
+          let yr = m1[3];
+          if (yr.length === 2) yr = '20' + yr;
+          return `${yr}-${mon}-${day}`;
+        }
+      }
+
+      // 3. DD-MM-YY or DD/MM/YYYY or DD.MM.YYYY
+      const m2 = text.match(/\b([0-3]?\d)[-/.](\d{1,2})[-/.](\d{2,4})\b/);
       if (m2) {
         const day = m2[1].padStart(2, '0');
         const mon = m2[2].padStart(2, '0');
@@ -354,14 +365,17 @@
         return `${yr}-${mon}-${day}`;
       }
 
-      // 3. MMM DD (e.g. Sep 5 or Sep 05, 2026)
-      const m3 = text.match(/\b([a-z]{3})\s+(\d{1,2})(?:,?\s*(\d{2,4}))?\b/i);
-      if (m3 && months[m3[1].toLowerCase()]) {
-        const mon = months[m3[1].toLowerCase()];
-        const day = m3[2].padStart(2, '0');
-        let yr = m3[3] || new Date().getFullYear().toString();
-        if (yr.length === 2) yr = '20' + yr;
-        return `${yr}-${mon}-${day}`;
+      // 4. MMM DD, YYYY (e.g. Aug 04, 2026 or Sep 5)
+      const m3 = text.match(/\b([a-z]{3,9})\s+([0-3]?\d)(?:,?\s*(\d{2,4}))?\b/i);
+      if (m3) {
+        const monKey = m3[1].toLowerCase().substring(0, 3);
+        const mon = months[monKey];
+        if (mon) {
+          const day = m3[2].padStart(2, '0');
+          let yr = m3[3] || new Date().getFullYear().toString();
+          if (yr.length === 2) yr = '20' + yr;
+          return `${yr}-${mon}-${day}`;
+        }
       }
 
       return getTodayISO();
@@ -667,38 +681,41 @@
             </div>
           </div>
 
-          <!-- Universal Bank & Credit Card Statement Importer Card -->
+          <!-- 100% Dynamic Bank & Credit Card Statement Importer Card -->
           <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-xl">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2.5">
-                <span class="text-2xl">📂</span>
-                <div>
-                  <h3 class="text-xs font-bold text-white">Universal Statement Parser (PDF / CSV)</h3>
-                  <p class="text-[10px] text-indigo-300">Auto-detects Credit Cards & Savings Accounts</p>
-                </div>
-              </div>
-              <div class="flex gap-1.5 flex-wrap justify-end">
-                <button onclick="loadICICISampleStatement()" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm flex items-center space-x-1">
-                  <span>💳</span>
-                  <span>Credit Card Demo</span>
-                </button>
-                <button onclick="loadSavingsSampleStatement()" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm flex items-center space-x-1">
-                  <span>🏦</span>
-                  <span>Savings A/c Demo</span>
-                </button>
+            <div class="flex items-center space-x-2.5">
+              <span class="text-2xl">📂</span>
+              <div>
+                <h3 class="text-xs font-bold text-white">Dynamic Bank Statement Importer</h3>
+                <p class="text-[10px] text-indigo-300">100% On-Device & Private • All Banks & Cards</p>
               </div>
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed">
-              Dynamically reads statements from <strong>ICICI, HDFC, SBI, Axis, Kotak</strong>: handles <strong>Credit Cards</strong> (Coral, Regalia, SimplyCLICK) and <strong>Savings / Current A/cs</strong> with <strong>password-protected PDFs</strong> and CSVs!
+              Upload your actual statement file (<strong>.PDF</strong> or <strong>.CSV</strong>) or paste statement text. The app dynamically detects whether it is a <strong>Credit Card</strong> or <strong>Savings Account</strong>, categorizes each transaction, and syncs past months with zero cloud transfer.
             </p>
 
             <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
 
-            <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-              <span>Choose Bank Statement (.PDF or .CSV)</span>
-            </button>
+            <div class="flex flex-col gap-2">
+              <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Upload Statement (.PDF or .CSV)</span>
+              </button>
+
+              <button onclick="toggleStatementPasteBox()" class="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-[11px] font-semibold transition flex items-center justify-center space-x-1.5 border border-slate-700">
+                <span>📝</span>
+                <span id="pasteToggleLabel">Or Paste Statement Text</span>
+              </button>
+            </div>
+
+            <!-- Optional Direct Statement Text Paste Area -->
+            <div id="statementPasteSection" class="hidden space-y-2 pt-1">
+              <textarea id="statementTextInput" rows="4" placeholder="Paste statement text or CSV rows here..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
+              <button onclick="parsePastedStatement()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
+                ⚡ Parse Pasted Statement
+              </button>
+            </div>
           </div>
 
           <!-- Shortcuts Auto-Sync Guide Card -->
@@ -775,8 +792,7 @@
 
 
     // --- UNIVERSAL DYNAMIC BANK & CREDIT CARD STATEMENT IMPORTER ---
-    let pendingPdfBuffer = null;
-    let pendingPdfFilename = '';
+    let pendingPdfFile = null;
 
     if (window.pdfjsLib) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -787,14 +803,10 @@
       if (!file) return;
 
       if (file.name.toLowerCase().endsWith('.pdf')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          pendingPdfBuffer = e.target.result;
-          pendingPdfFilename = file.name;
-          processPdfStatement(pendingPdfBuffer, '');
-        };
-        reader.readAsArrayBuffer(file);
+        pendingPdfFile = file;
+        processPdfStatement(file, '');
       } else {
+        pendingPdfFile = null;
         const reader = new FileReader();
         reader.onload = function(e) {
           const text = e.target.result;
@@ -805,33 +817,45 @@
       event.target.value = '';
     }
 
-    async function processPdfStatement(buffer, password) {
+    async function processPdfStatement(fileObj, password) {
       if (!window.pdfjsLib) {
         showToast('PDF Engine loading... please try again in a moment');
         return;
       }
 
       try {
-        const loadingTask = pdfjsLib.getDocument({ data: buffer, password: password || undefined });
+        const buf = await fileObj.arrayBuffer();
+        if (!buf || buf.byteLength === 0) {
+          showToast('Uploaded PDF file is empty (0 bytes).');
+          return;
+        }
+
+        // Pass typed array Uint8Array to pdfjsLib to avoid detached buffer issues
+        const loadingTask = pdfjsLib.getDocument({
+          data: new Uint8Array(buf),
+          password: password || undefined
+        });
+
         const pdf = await loadingTask.promise;
         closePdfPasswordModal();
-        showToast(`⚡ Decrypting ${pdf.numPages} statement pages on-device...`);
+        showToast(`⚡ Reading ${pdf.numPages} page(s) on-device...`);
 
         let extractedText = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          
+          if (!content.items || content.items.length === 0) continue;
+
           // Reconstruct rows by grouping text items by vertical Y coordinate (~4px bucket)
           // and sorting columns horizontally left-to-right by X coordinate
           const sortedItems = content.items.slice().sort((a, b) => {
-            const yA = a.transform ? a.transform[5] : 0;
-            const yB = b.transform ? b.transform[5] : 0;
+            const yA = (a.transform && a.transform[5] !== undefined) ? a.transform[5] : 0;
+            const yB = (b.transform && b.transform[5] !== undefined) ? b.transform[5] : 0;
             const bucketA = Math.round(yA / 4);
             const bucketB = Math.round(yB / 4);
             if (bucketA !== bucketB) return bucketB - bucketA; // Top to bottom
-            const xA = a.transform ? a.transform[4] : 0;
-            const xB = b.transform ? b.transform[4] : 0;
+            const xA = (a.transform && a.transform[4] !== undefined) ? a.transform[4] : 0;
+            const xB = (b.transform && b.transform[4] !== undefined) ? b.transform[4] : 0;
             return xA - xB; // Left to right
           });
 
@@ -842,7 +866,7 @@
           for (const item of sortedItems) {
             const str = (item.str || '').trim();
             if (!str) continue;
-            const y = item.transform ? item.transform[5] : 0;
+            const y = (item.transform && item.transform[5] !== undefined) ? item.transform[5] : 0;
             const bucket = Math.round(y / 4);
 
             if (currentBucket === null || bucket !== currentBucket) {
@@ -858,15 +882,24 @@
             pageLines.push(currentLine.join(' '));
           }
 
+          if (pageLines.length === 0 && content.items.length > 0) {
+            pageLines.push(content.items.map(it => it.str).join(' '));
+          }
+
           extractedText += pageLines.join('\n') + '\n';
         }
 
-        importDynamicBankStatement(extractedText, pendingPdfFilename || 'Bank_Statement.pdf');
+        if (!extractedText.trim()) {
+          showToast('Could not extract text. If this is a scanned PDF, please use CSV or paste text.');
+          return;
+        }
+
+        importDynamicBankStatement(extractedText, fileObj.name || 'Bank_Statement.pdf');
       } catch (err) {
         if (err.name === 'PasswordException' || (err.message && err.message.toLowerCase().includes('password'))) {
           openPdfPasswordModal();
         } else {
-          showToast('Could not decrypt this PDF statement. Check file.');
+          showToast('Could not decrypt this PDF statement: ' + (err.message || 'Check password'));
           console.error(err);
         }
       }
@@ -888,55 +921,34 @@
         showToast('Please enter your statement password.');
         return;
       }
-      if (pendingPdfBuffer) {
-        processPdfStatement(pendingPdfBuffer, pwd);
+      if (pendingPdfFile) {
+        processPdfStatement(pendingPdfFile, pwd);
       } else {
         closePdfPasswordModal();
-        showToast('⚡ Decrypted HDFC Bank PDF with password!');
-        importDynamicBankStatement(sampleCSVStatement, 'HDFC_Password_Protected_Statement.pdf');
+        showToast('Please select your statement file again.');
       }
     }
 
-    // --- SAMPLE STATEMENTS FOR 1-TAP DEMOS ---
-    const sampleCSVStatement = `Date,Narration,Withdrawal Amt,Deposit Amt,Balance
-05/09/2026,UPI-STARBUCKS-starbucks@hdfcbank,450.00,,15240.50
-05/09/2026,UPI-BLINKIT-blinkit@icici,1299.00,,13941.50
-01/09/2026,SALARY-INFOSYS TECHNOLOGIES-AUG26,,75000.00,88941.50
-25/08/2026,POS-ZOMATO RESTAURANT-MUMBAI,850.00,,13941.50
-10/08/2026,NETBANK-BESCOM ELECTRICITY BILL,2400.00,,14791.50
-20/07/2026,CARD PURCHASE SHELL FUEL STATION,1500.00,,17191.50`;
-
-    const iciciSampleStatementText = `ICICI Bank Credit Cards - Coral
-6528XXXXXXXX4009
-MR DINAKAR LUKESH DARSIGUNTALA
-STATEMENT DATE: September 2, 2026
-04/08/2026 13921126192 SWIGGYFOOD 4 230.00
-07/08/2026 13931750699 BBPS Payment received 0 23,746.69 CR
-07/08/2026 13931753349 INFINITY PAYMENT RECEIVED, THANK YOU 0 230.00 CR
-09/08/2026 13952204095 SWIGGYFOOD 8 447.00
-15/08/2026 13961234567 RELIANCE DIGITAL 12 4,999.00
-20/08/2026 13978901234 BLINKIT GROCERY 10 1,299.00`;
-
-    const savingsSampleStatementText = `HDFC BANK LIMITED
-ACCOUNT STATEMENT FOR SAVINGS ACCOUNT NO: XXXXXXXX1234
-Period: 01/08/2026 to 05/09/2026
-01/08/2026 SALARY CREDIT ACME TECHNOLOGIES 0.00 85,000.00 125,000.00
-05/08/2026 UPI/STARBUCKS/12345/MUMBAI 450.00 0.00 124,550.00
-10/08/2026 NETBANK-BESCOM ELECTRICITY 2,400.00 0.00 122,150.00
-15/08/2026 UPI-SENT TO RAHUL SHARMA 1,500.00 0.00 120,650.00
-20/08/2026 UPI-RECEIVED FROM PRIYA SINGH 0.00 3,000.00 123,650.00
-28/08/2026 CARD PURCHASE SHELL FUEL STATION 2,100.00 0.00 121,550.00`;
-
-    function loadICICISampleStatement() {
-      importDynamicBankStatement(iciciSampleStatementText, 'ICICI_Coral_Credit_Card.pdf');
+    function toggleStatementPasteBox() {
+      const box = document.getElementById('statementPasteSection');
+      const label = document.getElementById('pasteToggleLabel');
+      if (box.classList.contains('hidden')) {
+        box.classList.remove('hidden');
+        label.innerText = 'Hide Paste Box';
+        document.getElementById('statementTextInput').focus();
+      } else {
+        box.classList.add('hidden');
+        label.innerText = 'Or Paste Statement Text';
+      }
     }
 
-    function loadSavingsSampleStatement() {
-      importDynamicBankStatement(savingsSampleStatementText, 'HDFC_Savings_Account_Statement.pdf');
-    }
-
-    function loadSampleCSVStatement() {
-      importDynamicBankStatement(sampleCSVStatement, 'HDFC_Sample_Statement.csv');
+    function parsePastedStatement() {
+      const text = document.getElementById('statementTextInput').value.trim();
+      if (!text) {
+        showToast('Please paste some statement text or CSV rows first.');
+        return;
+      }
+      importDynamicBankStatement(text, 'Pasted_Statement.txt');
     }
 
     function cleanBankNarration(raw) {
@@ -1007,7 +1019,7 @@ Period: 01/08/2026 to 05/09/2026
       return null;
     }
 
-    // --- UNIVERSAL DYNAMIC STATEMENT PARSER FOR ALL BANKS & ACCOUNTS ---
+    // --- 100% DYNAMIC STATEMENT PARSER (ZERO HARDCODED DATA) ---
     function importDynamicBankStatement(rawText, filename) {
       if (!rawText || !rawText.trim()) {
         showToast('Statement file or text is empty.');
@@ -1032,18 +1044,21 @@ Period: 01/08/2026 to 05/09/2026
       else if (/\bindusind\b/i.test(sampleScan + ' ' + filename)) bankName = 'IndusInd Bank';
       else if (/\bpnb|punjab national\b/i.test(sampleScan + ' ' + filename)) bankName = 'PNB';
       else if (/\bcanara\b/i.test(sampleScan + ' ' + filename)) bankName = 'Canara Bank';
+      else if (/\bbaroda|bob\b/i.test(sampleScan + ' ' + filename)) bankName = 'Bank of Baroda';
+      else if (/\bidfc\b/i.test(sampleScan + ' ' + filename)) bankName = 'IDFC FIRST';
+      else if (/\byes\s+bank\b/i.test(sampleScan + ' ' + filename)) bankName = 'Yes Bank';
 
       // 2. Detect Account Type (Credit Card vs Savings / Current A/c)
       let isCreditCard = false;
-      let last4 = '1234';
+      let last4 = '';
 
       const cardMatch = sampleScan.match(/\b(?:\d{4}[X\*\-]{4,10}(\d{4})|[X\*\-]{4,12}(\d{4}))\b/i);
       if (cardMatch) {
-        last4 = cardMatch[1] || cardMatch[2] || '4009';
+        last4 = cardMatch[1] || cardMatch[2] || '';
         isCreditCard = true;
       }
 
-      if (/\b(credit card|coral|regalia|infinia|millennia|simplyclick|simplysave|magnus|total amount due|minimum amount due|reward points|credit limit)\b/i.test(sampleScan) || /credit.*card|card/i.test(filename)) {
+      if (/\b(credit card|card statement|coral|regalia|infinia|millennia|simplyclick|simplysave|magnus|total amount due|minimum amount due|reward points|credit limit)\b/i.test(sampleScan) || /credit.*card|card/i.test(filename)) {
         isCreditCard = true;
       } else if (/\b(savings|current|sb a\/c|saving bank|account statement|available balance|closing balance)\b/i.test(sampleScan)) {
         isCreditCard = false;
@@ -1054,9 +1069,10 @@ Period: 01/08/2026 to 05/09/2026
         last4 = acctMatch[1];
       }
 
-      const accountBadge = isCreditCard ? `💳 ${bankName} Card (${last4})` : `🏦 ${bankName} Savings A/c (${last4})`;
+      const accountBadge = isCreditCard 
+        ? `💳 ${bankName} Card${last4 ? ' (' + last4 + ')' : ''}` 
+        : `🏦 ${bankName} Savings A/c${last4 ? ' (' + last4 + ')' : ''}`;
 
-      // Helper for building transaction record
       function createRecord(rawDate, rawDesc, amt, isCr, originalLine) {
         const parsedDate = extractDateFromSMS(rawDate);
         let clean = (rawDesc || '').trim();
@@ -1065,7 +1081,6 @@ Period: 01/08/2026 to 05/09/2026
         let category = 'Other';
         let mode = isCreditCard ? 'Card' : 'NetBanking';
 
-        // Check for P2P transfers
         const p2p = extractP2PTransfer(clean, isCr);
         if (p2p) {
           merchant = p2p.merchant;
@@ -1092,8 +1107,8 @@ Period: 01/08/2026 to 05/09/2026
           type: isCr ? 'Income' : 'Expense',
           merchant,
           category,
-          bank: isCreditCard ? `${bankName} Card (${last4})` : `${bankName} (${last4})`,
-          last4,
+          bank: isCreditCard ? `${bankName} Card${last4 ? ' (' + last4 + ')' : ''}` : `${bankName}${last4 ? ' (' + last4 + ')' : ''}`,
+          last4: last4 || 'XXXX',
           mode,
           date: parsedDate,
           isAuto: true,
@@ -1102,12 +1117,11 @@ Period: 01/08/2026 to 05/09/2026
       }
 
       const parsedRecords = [];
-      const DATE_REGEX_STR = '(?:\d{1,2}[-/](?:[a-zA-Z]{3}|\d{1,2})[-/]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3}\s+\d{2,4})';
+      const DATE_REGEX_STR = '(?:\d{1,2}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3,9}\s+\d{2,4}|\d{4}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{1,2}|[a-zA-Z]{3,9}\s+\d{1,2},?\s+\d{2,4})';
       const DATE_REGEX = new RegExp(DATE_REGEX_STR, 'i');
 
-      // --- METHOD A: Scan line-by-line ---
       for (const line of lines) {
-        if (/^(statement date|opening balance|closing balance|total amount due|minimum amount due|credit limit|page \d+)/i.test(line)) {
+        if (/^(statement date|opening balance|closing balance|total amount due|minimum amount due|credit limit|payment due date|rewards summary|page \d+)/i.test(line)) {
           continue;
         }
 
@@ -1143,8 +1157,7 @@ Period: 01/08/2026 to 05/09/2026
 
         // Space-delimited line matching:
         // Pattern 1: Savings Account with 3 amounts at end (Debit, Credit, Balance)
-        // e.g.: "01/08/2026 SALARY CREDIT ACME TECHNOLOGIES 0.00 85,000.00 125,000.00"
-        const m3 = line.match(new RegExp('^(' + DATE_REGEX_STR + ')\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})$', 'i'));
+        const m3 = line.match(new RegExp('^\\s*(' + DATE_REGEX_STR + ')(?:\\s+' + DATE_REGEX_STR + ')?\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})$', 'i'));
         if (m3) {
           const rawDate = m3[1];
           const rawDesc = m3[2].trim();
@@ -1159,8 +1172,7 @@ Period: 01/08/2026 to 05/09/2026
         }
 
         // Pattern 2: Savings Account with 2 amounts at end (Amount [CR/DR] Balance)
-        // e.g.: "10/08/2026 BESCOM BILL 2,400.00 122,150.00" or "... 3,000.00 CR 123,650.00"
-        const m2 = line.match(new RegExp('^(' + DATE_REGEX_STR + ')\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr)?\\s+([\\d,]+\\.\\d{2})$', 'i'));
+        const m2 = line.match(new RegExp('^\\s*(' + DATE_REGEX_STR + ')(?:\\s+' + DATE_REGEX_STR + ')?\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr)?\\s+([\\d,]+\\.\\d{2})$', 'i'));
         if (m2) {
           const rawDate = m2[1];
           const rawDesc = m2[2].trim();
@@ -1175,18 +1187,15 @@ Period: 01/08/2026 to 05/09/2026
           continue;
         }
 
-        // Pattern 3: Credit Card or Single Amount lines
-        // e.g.: "04/08/2026 13921126192 SWIGGYFOOD 4 230.00"
-        // or "07/08/2026 13931750699 BBPS Payment received 0 23,746.69 CR"
-        const m1 = line.match(new RegExp('^(' + DATE_REGEX_STR + ')\\s+(?:[\\d:]{5,15}\\s+)?(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr|C|D)?$', 'i'));
+        // Pattern 3: Credit Card or Single Amount lines (handles optional 2nd date and ref/auth code)
+        const m1 = line.match(new RegExp('^\\s*(' + DATE_REGEX_STR + ')(?:\\s+' + DATE_REGEX_STR + ')?\\s+(?:[\\d:]{5,20}\\s+)?(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr|C|D)?(?:\\s+[\\d,]+\\.\\d{2})?$', 'i'));
         if (m1) {
           const rawDate = m1[1];
           let rawDesc = m1[2].trim();
           const amt = parseFloat(m1[3].replace(/,/g, ''));
           const flag = (m1[4] || '').toUpperCase();
 
-          // Remove reward points suffix e.g. "SWIGGYFOOD 4" -> "SWIGGYFOOD"
-          rawDesc = rawDesc.replace(/\s+\d{1,3}$/, '');
+          rawDesc = rawDesc.replace(/\s+\d{1,3}$/, ''); // Remove trailing reward points digit
 
           let isCr = (flag === 'CR' || flag === 'C') || /payment received|infinity payment|bbps|refund|cashback/i.test(rawDesc);
           if (flag === 'DR' || flag === 'D') isCr = false;
@@ -1198,7 +1207,7 @@ Period: 01/08/2026 to 05/09/2026
         }
       }
 
-      // --- METHOD B: If line parsing missed, fallback to CSV header detection ---
+      // Fallback: CSV Header column mapping
       if (parsedRecords.length === 0) {
         let headerIdx = -1;
         let dateCol = -1, descCol = -1, debitCol = -1, creditCol = -1, amtCol = -1;
