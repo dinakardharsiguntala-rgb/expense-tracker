@@ -2597,9 +2597,23 @@ Example:
       if (!clean) return null;
       clean = clean.trim();
 
-      // 1. Credit vs Debit
-      const isCredit = /\b(credited|credit|deposited|received|refund|salary)\b/i.test(clean);
-      const type = isCredit ? 'Income' : 'Expense';
+      // 1. Credit vs Debit (Rock-Solid for Send Money & Beneficiary Credits)
+      let isDebit = /\b(debited|debit|spent|paid|sent|withdrawn|purchase\s+with|transfer(?:red)?\s+to)\b/i.test(clean);
+      let isCredit = /\b(credited|credit|deposited|received|refund|salary)\b/i.test(clean);
+
+      // Resolve conflict when user is debited but message mentions beneficiary credit (e.g. debited ... credited to A/c)
+      if (isDebit && isCredit) {
+        if (/debited.*credited\s+to|debited.*towards|sent.*to/i.test(clean)) {
+          isCredit = false; // User sent money -> Always an EXPENSE
+        } else if (/refund.*credited|reversal.*credited/i.test(clean)) {
+          isDebit = false;
+        } else if (clean.toLowerCase().indexOf('debited') < clean.toLowerCase().indexOf('credited')) {
+          isCredit = false;
+        } else {
+          isDebit = false;
+        }
+      }
+      const type = (isCredit && !isDebit) ? 'Income' : 'Expense';
 
       // 2. Extract transaction amount (ignoring balance)
       let amount = null;
@@ -2690,7 +2704,7 @@ Example:
           'upi', 'via', 'on', 'using', 'ref', 'a/c', 'account', 'for', 'at', 'bank',
           'avl', 'bal', 'inr', 'rs', 'phonepe', 'gpay', 'paytm', 'customer', 'user',
           'info', 'acct', 'xx', 'towards', 'transfer', 'trf', 'from', 'your', 'through',
-          'neft', 'imps', 'rtgs', 'no', 'linked', 'ac', 'in', 'with', 'using', 'pay'
+          'neft', 'imps', 'rtgs', 'no', 'linked', 'ac', 'in', 'with', 'using', 'pay', 'available', 'balance', 'p2a', 'p2p', 'dr', 'cr', 'usin'
         ]);
 
         function cleanName(raw) {
@@ -2709,14 +2723,23 @@ Example:
           return null;
         }
 
-        // Pattern B1: UPI Info pattern (e.g. Info: UPI/RAHUL SHARMA/rahul@okaxis)
-        const upiMatch = clean.match(/\bUPI\/(?:[\w\d]+\/)?([A-Za-z\s]{2,25})[/@]/i);
+        // Pattern B1: Enhanced UPI Info & Slash pattern (e.g. Info: UPI/32541/Priya or UPI/P2A/32541/Ramesh)
+        const upiMatch = clean.match(/\bUPI\/(?:[A-Za-z0-9]+\/)+([A-Za-z\s]{2,25})/i);
         if (upiMatch) {
           const name = cleanName(upiMatch[1]);
-          if (name && !/customer|user|account|payment/i.test(name)) {
+          if (name && !/customer|user|account|payment|balance/i.test(name)) {
             merchant = isCredit ? `Received from ${name}` : `Sent to ${name}`;
             category = 'Personal Transfer';
             mode = upiApp ? `${upiApp} UPI` : 'UPI';
+          }
+        }
+
+        // Pattern B1.5: Credited to Beneficiary Account (e.g. credited to A/c no. XX5678)
+        if (merchant === 'Bank Transaction' && !isCredit) {
+          const mBenAcct = clean.match(/credited\s+to\s+(?:A\/c\s+no\.?\s*)?([X\*\d]{4,12})/i);
+          if (mBenAcct) {
+            merchant = `Sent to A/c ${mBenAcct[1]}`;
+            category = 'Personal Transfer';
           }
         }
 
