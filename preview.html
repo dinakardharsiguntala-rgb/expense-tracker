@@ -200,13 +200,58 @@
     <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
-          <span class="text-2xl">🍎</span>
+          <span class="text-2xl">🏦</span>
           <div>
-            <h3 class="text-base font-bold text-white">Apple Shortcuts Automation</h3>
-            <p class="text-[10px] text-emerald-400 font-medium">Auto-records Send & Receive Money instantly</p>
+            <h3 class="text-base font-bold text-white">Apple Shortcuts Bank Sender Guide</h3>
+            <p class="text-[10px] text-emerald-400 font-medium">Select your bank to see exact SMS sender names & routes</p>
           </div>
         </div>
         <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <!-- Bank Selector Dropdown -->
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-indigo-500/40 space-y-2">
+        <label class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider block">
+          1. Select Your Bank (To get exact sender codes):
+        </label>
+        <select id="bankSenderPicker" onchange="onBankSenderSelected(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-indigo-400">
+          <option value="ICICI" selected>ICICI Bank (ICICIT, ICICIB, ICICBK)</option>
+          <option value="HDFC">HDFC Bank (HDFCBK, HDFCB)</option>
+          <option value="SBI">State Bank of India (SBIINB, SBIBNK)</option>
+          <option value="AXIS">Axis Bank (AXISBK, AXISB)</option>
+          <option value="KOTAK">Kotak Mahindra Bank (KOTAKB, KOTAKM)</option>
+          <option value="IDFC">IDFC FIRST Bank (IDFCFB, IDFCB)</option>
+          <option value="INDUS">IndusInd Bank (INDUSB, INDUS)</option>
+          <option value="YES">Yes Bank (YESBNK, YESB)</option>
+          <option value="BOB">Bank of Baroda (BOBTXN, BOB)</option>
+          <option value="CANARA">Canara Bank (CANBNK, CANARA)</option>
+          <option value="PNB">Punjab National Bank (PNBSMS, PNB)</option>
+          <option value="UNION">Union Bank (UNIONB, UNIONBK)</option>
+          <option value="FEDERAL">Federal Bank (FEDBNK, FEDERAL)</option>
+          <option value="RBL">RBL Bank (RBLBNK)</option>
+          <option value="AU">AU Small Finance Bank (AUBANK)</option>
+        </select>
+
+        <!-- Dynamic Sender Info Card -->
+        <div id="dynamicBankInfoCard" class="bg-indigo-950/60 border border-indigo-500/30 p-3 rounded-xl text-xs space-y-2 mt-2">
+          <div class="flex items-center justify-between">
+            <span id="selectedBankTitle" class="font-bold text-white text-xs">ICICI Bank</span>
+            <span class="text-[10px] bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full font-semibold">DLT Verified</span>
+          </div>
+          <p class="text-[11px] text-slate-300">
+            In Apple Shortcuts ➔ <strong>Sender</strong> field, search & select:
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-0.5" id="bankSenderBadges">
+            <span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">ICICIT</span>
+            <span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">ICICIB</span>
+            <span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">ICICBK</span>
+          </div>
+          <div class="p-2 bg-slate-950/80 rounded-lg border border-slate-800 text-[10px] text-slate-300 space-y-1">
+            <p>• <strong>-T Suffix (e.g. ICICIT-T):</strong> Transactional route (debits, credits, UPI, card swipes)</p>
+            <p>• <strong>-S Suffix (e.g. ICICIT-S):</strong> Service route (account alerts, salary notifications)</p>
+            <p class="text-emerald-400 font-semibold mt-0.5">👉 In "Message Contains": <span class="underline">LEAVE BLANK</span> so all transactions are read automatically!</p>
+          </div>
+        </div>
       </div>
 
       <!-- Quick Action Bar -->
@@ -268,7 +313,17 @@
 
       <!-- Live Simulator Suite -->
       <div class="pt-2 border-t border-slate-800 space-y-2">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Live Simulators (Test Now):</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Live Simulators (Test Bank SMS Now):</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="simulateBankSenderSMS(document.getElementById('bankSenderPicker').value, 'T')" class="py-2 px-2 bg-indigo-600/25 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/40 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+            <span>⚡</span>
+            <span>Test: Bank Sender (-T)</span>
+          </button>
+          <button onclick="simulateBankSenderSMS(document.getElementById('bankSenderPicker').value, 'S')" class="py-2 px-2 bg-purple-600/25 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+            <span>📨</span>
+            <span>Test: Service SMS (-S)</span>
+          </button>
+        </div>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="simulateSendMoney()" class="py-2 px-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
             <span>💸</span>
@@ -279,10 +334,6 @@
             <span>Test: Receive Money</span>
           </button>
         </div>
-        <button onclick="simulateCardDebit()" class="w-full py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
-          <span>💳</span>
-          <span>Test: Starbucks Card Swipe</span>
-        </button>
       </div>
 
       <button onclick="closeShortcutsModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
@@ -437,6 +488,91 @@
     </div>
   </div>
 
+    <!-- Quick Edit / Add Missing Details Modal -->
+  <div id="quickEditModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-5 space-y-3.5 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">✏️</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Add / Edit Transaction Details</h3>
+            <p class="text-[10px] text-slate-400 font-medium">Add merchant or change category, then continue</p>
+          </div>
+        </div>
+        <button onclick="closeQuickEditModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <input type="hidden" id="quickEditId">
+
+      <div class="space-y-2.5">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400">Merchant / Recipient Name</label>
+          <input type="text" id="quickEditMerchant" placeholder="e.g. Ramesh Kumar, Chai Stall, Groceries" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-medium mt-1">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400">Amount</label>
+            <input type="number" step="any" id="quickEditAmount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-bold mt-1">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400">Type</label>
+            <select id="quickEditType" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 mt-1">
+              <option value="Expense">Expense (-)</option>
+              <option value="Income">Income (+)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400">Category</label>
+            <select id="quickEditCategory" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 mt-1">
+              <option value="Food & Dining">Food & Dining</option>
+              <option value="Groceries">Groceries</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Utilities & Bills">Utilities & Bills</option>
+              <option value="Personal Transfer">Personal Transfer</option>
+              <option value="Salary">Salary</option>
+              <option value="Card Payment">Card Payment</option>
+              <option value="Banking & Payments">Banking & Payments</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400">Payment Mode</label>
+            <select id="quickEditMode" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 mt-1">
+              <option value="UPI">UPI</option>
+              <option value="PhonePe UPI">PhonePe UPI</option>
+              <option value="GPay UPI">GPay UPI</option>
+              <option value="Paytm UPI">Paytm UPI</option>
+              <option value="CRED UPI">CRED UPI</option>
+              <option value="Card">Card</option>
+              <option value="NetBanking">NetBanking</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400">Bank / Route Info</label>
+          <input type="text" id="quickEditBank" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500 mt-1" placeholder="e.g. ICICI Bank (1234)">
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2 border-t border-slate-800">
+        <button onclick="closeQuickEditModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+          Skip / Keep As Is
+        </button>
+        <button onclick="saveQuickEditTransaction()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-600/30 flex items-center justify-center space-x-1">
+          <span>💾</span>
+          <span>Save & Continue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Centered Alert / Popup Modal (Always in the middle of screen) -->
   <div id="centerAlertModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-4">
@@ -449,9 +585,13 @@
           <!-- Injected message text -->
         </p>
       </div>
-      <div class="pt-2">
-        <button onclick="closeCenterAlert()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
+      <div id="centerAlertActions" class="pt-2 flex flex-col gap-2">
+        <button id="btnCenterAlertPrimary" onclick="closeCenterAlert()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
           OK, Got It
+        </button>
+        <button id="btnCenterAlertSecondary" onclick="onCenterAlertSecondaryClick()" class="hidden w-full py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-blue-300 border border-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5">
+          <span>✏️</span>
+          <span id="centerAlertSecondaryText">Add Missing Details</span>
         </button>
       </div>
     </div>
@@ -598,6 +738,230 @@
     let toastTimeout = null;
     let centerAlertTimeout = null;
 
+        // --- COMPREHENSIVE INDIAN BANK SENDER DIRECTORY & ROUTE RECOGNITION ---
+    const BANK_SENDER_DIRECTORY = {
+      'ICICI': {
+        name: 'ICICI Bank',
+        headers: ['ICICIT', 'ICICIB', 'ICICBK', 'ICICI'],
+        sampleAccount: '1234',
+        routes: ['ICICIT-T', 'ICICIT-S', 'ICICIB-T', 'ICICIB-S', 'ICICBK-T', 'ICICBK-S'],
+        desc: 'ICICIT-T (Transactional Route) • ICICIT-S (Service Route)'
+      },
+      'HDFC': {
+        name: 'HDFC Bank',
+        headers: ['HDFCBK', 'HDFCB', 'HDFC'],
+        sampleAccount: '4321',
+        routes: ['HDFCBK-T', 'HDFCBK-S', 'HDFCB-T', 'HDFCB-S'],
+        desc: 'HDFCBK-T (Transactional Route) • HDFCBK-S (Service Route)'
+      },
+      'SBI': {
+        name: 'State Bank of India (SBI)',
+        headers: ['SBIINB', 'SBIBNK', 'SBIPSG', 'SBI'],
+        sampleAccount: '9876',
+        routes: ['SBIINB-T', 'SBIINB-S', 'SBIBNK-T', 'SBIBNK-S'],
+        desc: 'SBIINB-T (Transactional Route) • SBIINB-S (Service Route)'
+      },
+      'AXIS': {
+        name: 'Axis Bank',
+        headers: ['AXISBK', 'AXISB', 'AXIS'],
+        sampleAccount: '5432',
+        routes: ['AXISBK-T', 'AXISBK-S', 'AXISB-T', 'AXISB-S'],
+        desc: 'AXISBK-T (Transactional Route) • AXISBK-S (Service Route)'
+      },
+      'KOTAK': {
+        name: 'Kotak Mahindra Bank',
+        headers: ['KOTAKB', 'KOTAKM', 'KOTAK'],
+        sampleAccount: '6789',
+        routes: ['KOTAKB-T', 'KOTAKB-S', 'KOTAKM-T', 'KOTAKM-S'],
+        desc: 'KOTAKB-T (Transactional Route) • KOTAKB-S (Service Route)'
+      },
+      'IDFC': {
+        name: 'IDFC FIRST Bank',
+        headers: ['IDFCFB', 'IDFCB', 'IDFC'],
+        sampleAccount: '2468',
+        routes: ['IDFCFB-T', 'IDFCFB-S', 'IDFCB-T', 'IDFCB-S'],
+        desc: 'IDFCFB-T (Transactional Route) • IDFCFB-S (Service Route)'
+      },
+      'INDUS': {
+        name: 'IndusInd Bank',
+        headers: ['INDUSB', 'INDUS'],
+        sampleAccount: '1357',
+        routes: ['INDUSB-T', 'INDUSB-S', 'INDUS-T', 'INDUS-S'],
+        desc: 'INDUSB-T (Transactional Route) • INDUSB-S (Service Route)'
+      },
+      'YES': {
+        name: 'Yes Bank',
+        headers: ['YESBNK', 'YESB'],
+        sampleAccount: '3579',
+        routes: ['YESBNK-T', 'YESBNK-S', 'YESB-T', 'YESB-S'],
+        desc: 'YESBNK-T (Transactional Route) • YESBNK-S (Service Route)'
+      },
+      'BOB': {
+        name: 'Bank of Baroda',
+        headers: ['BOBTXN', 'BOB'],
+        sampleAccount: '8642',
+        routes: ['BOBTXN-T', 'BOBTXN-S', 'BOB-T', 'BOB-S'],
+        desc: 'BOBTXN-T (Transactional Route) • BOBTXN-S (Service Route)'
+      },
+      'CANARA': {
+        name: 'Canara Bank',
+        headers: ['CANBNK', 'CANARA'],
+        sampleAccount: '9753',
+        routes: ['CANBNK-T', 'CANBNK-S', 'CANARA-T', 'CANARA-S'],
+        desc: 'CANBNK-T (Transactional Route) • CANBNK-S (Service Route)'
+      },
+      'PNB': {
+        name: 'Punjab National Bank',
+        headers: ['PNBSMS', 'PNB'],
+        sampleAccount: '7531',
+        routes: ['PNBSMS-T', 'PNBSMS-S', 'PNB-T', 'PNB-S'],
+        desc: 'PNBSMS-T (Transactional Route) • PNBSMS-S (Service Route)'
+      },
+      'UNION': {
+        name: 'Union Bank',
+        headers: ['UNIONB', 'UNIONBK'],
+        sampleAccount: '4680',
+        routes: ['UNIONB-T', 'UNIONB-S', 'UNIONBK-T', 'UNIONBK-S'],
+        desc: 'UNIONB-T (Transactional Route) • UNIONB-S (Service Route)'
+      },
+      'FEDERAL': {
+        name: 'Federal Bank',
+        headers: ['FEDBNK', 'FEDERAL'],
+        sampleAccount: '5791',
+        routes: ['FEDBNK-T', 'FEDBNK-S'],
+        desc: 'FEDBNK-T (Transactional Route) • FEDBNK-S (Service Route)'
+      },
+      'RBL': {
+        name: 'RBL Bank',
+        headers: ['RBLBNK'],
+        sampleAccount: '6802',
+        routes: ['RBLBNK-T', 'RBLBNK-S'],
+        desc: 'RBLBNK-T (Transactional Route) • RBLBNK-S (Service Route)'
+      },
+      'AU': {
+        name: 'AU Small Finance Bank',
+        headers: ['AUBANK'],
+        sampleAccount: '7913',
+        routes: ['AUBANK-T', 'AUBANK-S'],
+        desc: 'AUBANK-T (Transactional Route) • AUBANK-S (Service Route)'
+      }
+    };
+
+    const HEADER_TO_BANK_NAME = {};
+    for (const [key, val] of Object.entries(BANK_SENDER_DIRECTORY)) {
+      for (const h of val.headers) {
+        HEADER_TO_BANK_NAME[h.toUpperCase()] = val.name;
+      }
+    }
+
+    const DLT_SENDER_REGEX = /\b(?:[A-Za-z]{2}-)?(ICICIT|ICICIB|ICICBK|HDFCBK|HDFCB|SBIINB|SBIBNK|SBIPSG|AXISBK|AXISB|KOTAKB|KOTAKM|IDFCFB|IDFCB|INDUSB|INDUS|YESBNK|YESB|BOBTXN|CANBNK|PNBSMS|UNIONB|UNIONBK|FEDBNK|RBLBNK|AUBANK)(?:-([TSP]))?\b/i;
+
+    function detectBankSenderAndRoute(text, senderParam = '') {
+      const combined = ((senderParam || '') + ' ' + (text || '')).trim();
+      const m = combined.match(DLT_SENDER_REGEX);
+      if (m) {
+        const code = m[1].toUpperCase();
+        const suffix = (m[2] || '').toUpperCase();
+        const bankName = HEADER_TO_BANK_NAME[code] || 'Bank';
+        const route = suffix === 'T' ? 'Transactional Route (-T)' : (suffix === 'S' ? 'Service Route (-S)' : (suffix === 'P' ? 'Promotional Route (-P)' : ''));
+        return {
+          bank: bankName,
+          header: code + (suffix ? '-' + suffix : ''),
+          code,
+          suffix,
+          route
+        };
+      }
+
+      for (const [key, val] of Object.entries(BANK_SENDER_DIRECTORY)) {
+        for (const h of val.headers) {
+          if (new RegExp('\\b' + h + '\\b', 'i').test(combined)) {
+            return { bank: val.name, header: h, code: h, suffix: '', route: '' };
+          }
+        }
+      }
+
+      return { bank: 'Bank', header: '', code: '', suffix: '', route: '' };
+    }
+
+    let secondaryAlertActionCallback = null;
+
+    function onCenterAlertSecondaryClick() {
+      closeCenterAlert();
+      if (typeof secondaryAlertActionCallback === 'function') {
+        secondaryAlertActionCallback();
+      }
+    }
+
+    function showCenterAlertWithAction(title, msg, type = 'info', actionText = 'Add Missing Details', onAction = null) {
+      secondaryAlertActionCallback = onAction;
+      const secBtn = document.getElementById('btnCenterAlertSecondary');
+      const secText = document.getElementById('centerAlertSecondaryText');
+      const priBtn = document.getElementById('btnCenterAlertPrimary');
+
+      if (secBtn && secText) {
+        secText.textContent = actionText;
+        secBtn.classList.remove('hidden');
+      }
+      if (priBtn) {
+        priBtn.textContent = 'Continue Reading';
+      }
+
+      showCenterAlert(title, msg, type, 0);
+    }
+
+    function openQuickEditModal(transactionId) {
+      const t = transactions.find(x => x.id === transactionId);
+      if (!t) return;
+
+      document.getElementById('quickEditId').value = t.id;
+      document.getElementById('quickEditMerchant').value = t.merchant || '';
+      document.getElementById('quickEditAmount').value = t.amount;
+      document.getElementById('quickEditType').value = t.type;
+      document.getElementById('quickEditCategory').value = t.category || 'Banking & Payments';
+      document.getElementById('quickEditMode').value = t.mode || 'UPI';
+      document.getElementById('quickEditBank').value = t.bank || '';
+
+      document.getElementById('quickEditModal').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('quickEditMerchant').focus();
+        document.getElementById('quickEditMerchant').select();
+      }, 100);
+    }
+
+    function closeQuickEditModal() {
+      document.getElementById('quickEditModal').classList.add('hidden');
+    }
+
+    function saveQuickEditTransaction() {
+      const id = document.getElementById('quickEditId').value;
+      const t = transactions.find(x => x.id === id);
+      if (!t) {
+        closeQuickEditModal();
+        return;
+      }
+
+      const m = document.getElementById('quickEditMerchant').value.trim();
+      const a = parseFloat(document.getElementById('quickEditAmount').value);
+      const typ = document.getElementById('quickEditType').value;
+      const c = document.getElementById('quickEditCategory').value;
+      const mod = document.getElementById('quickEditMode').value;
+      const b = document.getElementById('quickEditBank').value.trim();
+
+      if (m) t.merchant = m;
+      if (!isNaN(a) && a > 0) t.amount = a;
+      t.type = typ;
+      t.category = c;
+      t.mode = mod;
+      if (b) t.bank = b;
+      t.isMissingDetails = false;
+
+      saveState();
+      closeQuickEditModal();
+      render();
+      showToast('✅ Details saved! Ready for next message.');
+    }
+
     function showCenterAlert(title, msg, type = 'info', autoDismissSeconds = 0) {
       if (centerAlertTimeout) clearTimeout(centerAlertTimeout);
       const modal = document.getElementById('centerAlertModal');
@@ -627,6 +991,10 @@
         iconEl.className = `w-14 h-14 rounded-2xl ${iconBg} border flex items-center justify-center text-3xl mx-auto shadow-inner`;
       }
 
+      const secBtn = document.getElementById('btnCenterAlertSecondary');
+      const priBtn = document.getElementById('btnCenterAlertPrimary');
+      if (secBtn && !secondaryAlertActionCallback) secBtn.classList.add('hidden');
+      if (priBtn && !secondaryAlertActionCallback) priBtn.textContent = 'OK, Got It';
       modal.classList.remove('hidden');
 
       if (autoDismissSeconds > 0) {
@@ -897,6 +1265,7 @@
               <div class="flex items-center space-x-1.5">
                 <p class="text-xs font-bold text-white truncate">${t.merchant}</p>
                 ${t.isAuto ? '<span class="text-[9px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1 rounded font-bold">SMS</span>' : ''}
+                ${t.isMissingDetails ? `<button onclick="event.stopPropagation(); openQuickEditModal('${t.id}')" class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 rounded font-semibold hover:bg-amber-500 hover:text-black">✏️ Edit</button>` : ''}
               </div>
               <p class="text-[10px] text-slate-400 truncate">${formattedDate} • ${t.bank || t.category}</p>
             </div>
@@ -1235,6 +1604,10 @@ Example:
 
     function openPdfPasswordModal() {
       const modal = document.getElementById('pdfPasswordModal');
+      const secBtn = document.getElementById('btnCenterAlertSecondary');
+      const priBtn = document.getElementById('btnCenterAlertPrimary');
+      if (secBtn && !secondaryAlertActionCallback) secBtn.classList.add('hidden');
+      if (priBtn && !secondaryAlertActionCallback) priBtn.textContent = 'OK, Got It';
       modal.classList.remove('hidden');
       const errEl = document.getElementById('pdfPasswordError');
       if (errEl) errEl.classList.add('hidden');
@@ -1308,6 +1681,65 @@ Example:
           'success',
           4
         );
+        switchTab('expenses');
+      }
+    }
+
+        function onBankSenderSelected(bankKey) {
+      const b = BANK_SENDER_DIRECTORY[bankKey] || BANK_SENDER_DIRECTORY['ICICI'];
+      document.getElementById('selectedBankTitle').textContent = b.name;
+
+      const badgesContainer = document.getElementById('bankSenderBadges');
+      badgesContainer.innerHTML = b.headers.map(h => 
+        `<span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">${h}</span>`
+      ).join('');
+    }
+
+    function simulateBankSenderSMS(bankKey, routeSuffix = 'T') {
+      const b = BANK_SENDER_DIRECTORY[bankKey] || BANK_SENDER_DIRECTORY['ICICI'];
+      const header = b.headers[0] + '-' + routeSuffix;
+      const isDebit = routeSuffix === 'T';
+      const amt = isDebit ? '850.00' : '25,000.00';
+      const actionWord = isDebit ? 'debited by' : 'credited with';
+
+      const sample = `${header}: Dear Customer, your A/c ${b.sampleAccount} has been ${actionWord} INR ${amt} on ${formatDisplayDate(getTodayISO())}. Avl Bal: INR 45,210.00`;
+      
+      const res = parseBankSMSText(sample, header);
+      if (res && res.amount) {
+        const newRec = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          amount: res.amount,
+          type: res.type,
+          merchant: res.merchant,
+          category: res.category,
+          bank: res.bank,
+          last4: res.last4,
+          mode: res.mode,
+          date: res.date || getTodayISO(),
+          isAuto: true,
+          isMissingDetails: res.isMissingDetails || false,
+          raw: sample
+        };
+        transactions.unshift(newRec);
+        saveState();
+        closeShortcutsModal();
+
+        if (res.isMissingDetails) {
+          showCenterAlertWithAction(
+            `SMS Recorded (${b.name})!`,
+            `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong> from <strong>${header}</strong> (${res.route}).<br><p class="text-[11px] text-amber-300 mt-1">Only bank sender was in the SMS. You can add recipient name manually or continue reading messages.</p>`,
+            'info',
+            '✏️ Add Details Manually',
+            () => openQuickEditModal(newRec.id)
+          );
+        } else {
+          showCenterAlert(
+            `SMS Recorded (${b.name})!`,
+            `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong> from <strong>${header}</strong>`,
+            'success',
+            4
+          );
+        }
         switchTab('expenses');
       }
     }
@@ -1719,7 +2151,7 @@ Example:
     }
 
     // --- ROCK-SOLID ON-DEVICE SMS PARSER (MULTI-UPI APPS & BANKS) ---
-    function parseBankSMSText(clean) {
+    function parseBankSMSText(clean, senderParam = '') {
       if (!clean) return null;
       clean = clean.trim();
 
@@ -1886,20 +2318,45 @@ Example:
         category = 'Income';
       }
 
-      // 4. Bank name (ignoring VPAs like @okaxis)
+      // 4. Detect Bank and TRAI DLT Route (-T Transactional or -S Service)
+      const detectedSender = detectBankSenderAndRoute(clean, senderParam);
+      let bank = detectedSender.bank;
+      let route = detectedSender.route;
+      let header = detectedSender.header;
+
+      // Fallback to text patterns if no DLT header found
       const cleanNoVpa = clean.replace(/@\w+/g, ' ');
-      let bank = 'Bank';
-      if (/\bhdfc\b/i.test(cleanNoVpa)) bank = 'HDFC Bank';
-      else if (/\bsbi|state bank\b/i.test(cleanNoVpa)) bank = 'SBI';
-      else if (/\bicici\b/i.test(cleanNoVpa)) bank = 'ICICI Bank';
-      else if (/\baxis\b/i.test(cleanNoVpa)) bank = 'Axis Bank';
-      else if (/\bkotak\b/i.test(cleanNoVpa)) bank = 'Kotak Bank';
-      else if (/\bchase\b/i.test(cleanNoVpa)) bank = 'Chase';
+      if (bank === 'Bank') {
+        if (/\bhdfc\b/i.test(cleanNoVpa)) bank = 'HDFC Bank';
+        else if (/\bsbi|state bank\b/i.test(cleanNoVpa)) bank = 'SBI';
+        else if (/\bicici\b/i.test(cleanNoVpa)) bank = 'ICICI Bank';
+        else if (/\baxis\b/i.test(cleanNoVpa)) bank = 'Axis Bank';
+        else if (/\bkotak\b/i.test(cleanNoVpa)) bank = 'Kotak Bank';
+        else if (/\bidfc\b/i.test(cleanNoVpa)) bank = 'IDFC FIRST';
+        else if (/\bindusind\b/i.test(cleanNoVpa)) bank = 'IndusInd Bank';
+        else if (/\byes bank\b/i.test(cleanNoVpa)) bank = 'Yes Bank';
+        else if (/\bbaroda|bob\b/i.test(cleanNoVpa)) bank = 'Bank of Baroda';
+        else if (/\bcanara\b/i.test(cleanNoVpa)) bank = 'Canara Bank';
+        else if (/\bpnb\b/i.test(cleanNoVpa)) bank = 'PNB';
+        else if (/\bunion bank\b/i.test(cleanNoVpa)) bank = 'Union Bank';
+        else if (/\bfederal\b/i.test(cleanNoVpa)) bank = 'Federal Bank';
+        else if (/\brbl\b/i.test(cleanNoVpa)) bank = 'RBL Bank';
+        else if (/\bau bank|aubank\b/i.test(cleanNoVpa)) bank = 'AU Small Finance';
+        else if (/\bchase\b/i.test(cleanNoVpa)) bank = 'Chase';
+      }
 
       // 5. Last 4 digits
       let last4 = '';
       const cardMatch = clean.match(/(?:card|a\/c|account|ac|xx|\*\*)[^\d]*(\d{4})/i);
       if (cardMatch) last4 = cardMatch[1];
+
+      // 6. When ONLY Bank Name is in the message (e.g. ICICIT-S or HDFCBK-T without explicit merchant)
+      let isMissingDetails = false;
+      if (merchant === 'Bank Transaction' || merchant === 'Account Deposit') {
+        isMissingDetails = true;
+        merchant = isCredit ? `${bank} Deposit` : `${bank} Payment`;
+        category = isCredit ? 'Income' : 'Banking & Payments';
+      }
 
       const date = extractDateFromSMS(clean);
 
@@ -1909,9 +2366,13 @@ Example:
         merchant,
         category,
         bank: last4 ? `${bank} (${last4})` : bank,
+        bankName: bank,
         last4,
         mode,
         date,
+        route,
+        header,
+        isMissingDetails,
         raw: clean
       };
     }
@@ -2014,8 +2475,8 @@ Example:
 
         const params = new URLSearchParams(rawQuery);
         let sms = params.get('sms') || params.get('text') || params.get('body') || params.get('msg');
+        let sender = params.get('sender') || params.get('from') || '';
         if (sms) {
-          // Safe decode preventing URIError from bare % or +
           try {
             sms = decodeURIComponent(sms.replace(/\+/g, ' '));
           } catch (e1) {
@@ -2026,6 +2487,7 @@ Example:
             }
           }
           sms = sms.trim();
+          if (sender) sender = decodeURIComponent(sender.replace(/\+/g, ' ')).trim();
 
           if (/^\[shortcut input\]$/i.test(sms) || sms === '[Shortcut Input]') {
             showCenterAlert('Shortcuts Setup Notice', 'In Apple Shortcuts, tap the blue token <strong>"Shortcut Input"</strong> above the keyboard instead of typing the words literally.', 'warning');
@@ -2033,7 +2495,7 @@ Example:
             return;
           }
 
-          const res = parseBankSMSText(sms);
+          const res = parseBankSMSText(sms, sender);
           if (res && res.amount && !isNaN(res.amount)) {
             const newRec = {
               id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
@@ -2046,16 +2508,31 @@ Example:
               mode: res.mode,
               date: res.date || getTodayISO(),
               isAuto: true,
-              raw: sms
+              isMissingDetails: res.isMissingDetails || false,
+              raw: (sender ? `[${sender}] ` : '') + sms
             };
             transactions.unshift(newRec);
             saveState();
-            showCenterAlert(
-              'SMS Recorded!',
-              `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong><br><span class="text-xs text-slate-300">(${res.merchant} • ${res.mode})</span>`,
-              'success',
-              4
-            );
+
+            const routeBadge = res.route ? ` • <span class="text-indigo-400 font-medium">${res.route}</span>` : '';
+            const senderTag = res.header ? `<strong>${res.header}</strong>` : `<strong>${res.bank}</strong>`;
+
+            if (res.isMissingDetails) {
+              showCenterAlertWithAction(
+                `SMS Recorded (${res.bank})!`,
+                `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong> from ${senderTag}${routeBadge}.<br><p class="text-[11px] text-amber-300 mt-1">Recipient name was not in the SMS. You can add details manually or continue reading messages.</p>`,
+                'info',
+                '✏️ Add Details Manually',
+                () => openQuickEditModal(newRec.id)
+              );
+            } else {
+              showCenterAlert(
+                'SMS Recorded!',
+                `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong><br><span class="text-xs text-slate-300">(${res.merchant} • ${res.mode}${routeBadge})</span>`,
+                'success',
+                4
+              );
+            }
             window.history.replaceState({}, document.title, window.location.pathname);
             switchTab('expenses');
           } else {
