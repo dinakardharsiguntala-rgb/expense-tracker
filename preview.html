@@ -3036,7 +3036,7 @@ Example:
         syncAutoLogToggles();
         if (navigator.clipboard && navigator.clipboard.readText) {
           const text = await navigator.clipboard.readText();
-          if (text && text.length > 20 && /debited|credited|spent|inr|rs\./i.test(text)) {
+          if (text && text.length >= 10 && /debited|credited|spent|inr|rs|₹|paid|sent|withdrawn|transferred/i.test(text)) {
             if (text !== detectedClipboardText) {
               const res = parseBankSMSText(text);
               if (res && res.amount) {
