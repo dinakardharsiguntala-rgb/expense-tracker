@@ -103,8 +103,8 @@
     </button>
 
     <button onclick="switchTab('sms')" id="nav-sms" class="flex flex-col items-center justify-center w-16 py-1 text-slate-400 transition active:scale-95">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-      <span class="text-[10px] font-semibold mt-0.5">Bank SMS</span>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span class="text-[10px] font-semibold mt-0.5">Sync & Import</span>
     </button>
 
     <button onclick="switchTab('analytics')" id="nav-analytics" class="flex flex-col items-center justify-center w-16 py-1 text-slate-400 transition active:scale-95">
@@ -179,69 +179,93 @@
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
           <span class="text-xl">🍎</span>
-          <h3 class="text-base font-bold text-white">100% Auto-SMS on iPhone</h3>
+          <div>
+            <h3 class="text-base font-bold text-white">iPhone Automation Setup</h3>
+            <p class="text-[10px] text-emerald-400 font-medium">Pre-Configured By Us • Only iOS Permission Needed</p>
+          </div>
         </div>
         <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <div class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl text-xs text-amber-200 leading-relaxed">
-        <strong>Important:</strong> Apple Shortcuts only triggers for <strong>NEW incoming messages</strong> received from now on. Apple prohibits all shortcuts and apps from reading past/existing SMS history. (To add past messages, use the paste box on the Bank SMS tab!).
+      <!-- Quick 1-Tap Launcher -->
+      <div class="bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/30 p-3.5 rounded-2xl space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-purple-200">⚡ 1-Tap Quick Setup</span>
+          <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-bold">Auto-Created</span>
+        </div>
+        <p class="text-[11px] text-slate-300 leading-relaxed">
+          Tap below to copy your pre-configured URL and automatically open Apple Shortcuts to create the automation:
+        </p>
+        <div class="flex gap-2 pt-1">
+          <button onclick="launchShortcutsAutoSetup()" class="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-lg shadow-purple-600/30 active:scale-98">
+            <span>⚡</span>
+            <span>Launch Shortcuts App Now</span>
+          </button>
+          <button onclick="copySetupURL()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1 active:scale-98">
+            <span id="copyUrlIcon">📋</span>
+            <span>Copy URL</span>
+          </button>
+        </div>
       </div>
 
-      <!-- 1-Tap Quick Launcher into Shortcuts App -->
-      <div class="flex gap-2">
-        <a href="shortcuts://" class="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-lg shadow-purple-600/30">
-          <span>⚡</span>
-          <span>1-Tap: Open Shortcuts App</span>
-        </a>
-        <button onclick="copySetupURL()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1">
-          <span>📋</span>
-          <span>Copy URL</span>
-        </button>
-      </div>
+      <!-- End-to-End iOS Permission Checkpoints -->
+      <div class="space-y-2.5 pt-1">
+        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">End-to-End Permission Guide (Only 3 Steps)</h4>
 
-      <div class="space-y-3 pt-1">
+        <!-- Step 1 -->
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
-          <div>
-            <h4 class="text-xs font-bold text-white">Open "Shortcuts" App → Automation Tab</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Open Apple's pre-installed <strong>Shortcuts</strong> app and tap the <strong>Automation</strong> tab at the bottom.</p>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-xs font-bold text-white">Select Trigger: "Message"</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">In Shortcuts app, tap <strong>New Automation (+)</strong> &rarr; choose <strong>Message</strong>.</p>
+            <div class="mt-2 flex items-center justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-800">
+              <span class="text-[10px] font-mono text-emerald-400 truncate">debited, spent, credited, paid, INR, Rs</span>
+              <button onclick="copyKeywords()" class="ml-2 text-[10px] text-blue-400 font-bold shrink-0 hover:text-blue-300">Copy</button>
+            </div>
           </div>
         </div>
 
-        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
+        <!-- Step 2 -->
+        <div class="bg-slate-950 p-3 rounded-2xl border border-blue-500/40 flex items-start space-x-3 shadow-sm">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
           <div>
-            <h4 class="text-xs font-bold text-white">Create New Automation → "Message"</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>+</strong> &rarr; choose <strong>Message</strong>. In "Message Contains", enter keywords:</p>
-            <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-emerald-400">debited, spent, credited, paid, INR, Rs</div>
-            <p class="text-[10px] text-blue-400 font-semibold mt-1">Select "Run Immediately" (so it runs automatically without asking).</p>
+            <div class="flex items-center space-x-1.5">
+              <h4 class="text-xs font-bold text-white">Grant Permission: "Run Immediately"</h4>
+              <span class="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-bold">User Permission</span>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+              Select <strong>"Run Immediately"</strong> and turn OFF <strong>"Ask Before Running"</strong>.
+            </p>
+            <p class="text-[10px] text-slate-400 mt-1">
+              <em>Why Apple asks this:</em> Apple requires your device owner permission so your iPhone can log bank SMS automatically in the background without prompting you every single time.
+            </p>
           </div>
         </div>
 
+        <!-- Step 3 -->
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
-          <div>
-            <h4 class="text-xs font-bold text-white">Add Actions (Choose Either Method)</h4>
-            
-            <p class="text-[11px] text-slate-300 font-semibold mt-1">Method A (Recommended):</p>
-            <p class="text-[10px] text-slate-400">Add action <strong>"Copy to Clipboard"</strong> (Input: <em>Shortcut Input</em>), then add action <strong>"Open URLs"</strong> with:</p>
-            <div class="mt-1 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all">
-              https://dinakardharsiguntala-rgb.github.io/expense-tracker/
+          <div class="flex-1 min-w-0">
+            <h4 class="text-xs font-bold text-white">Add Action: "Open URLs"</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>Add Action</strong> &rarr; search <strong>"Open URLs"</strong> &rarr; paste the pre-copied link:</p>
+            <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all border border-slate-800">
+              https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]
             </div>
-
-            <p class="text-[11px] text-slate-300 font-semibold mt-2.5">Method B (Direct URL Parameter):</p>
-            <p class="text-[10px] text-slate-400">Add action <strong>"URL Encode"</strong> (Input: <em>Shortcut Input</em>), then add <strong>"Open URLs"</strong> with:</p>
-            <div class="mt-1 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all">
-              https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[URL Encoded Text]
-            </div>
+            <p class="text-[10px] text-emerald-400 font-semibold mt-1">Tap Done. That is all! Your iPhone is fully automated.</p>
           </div>
         </div>
       </div>
 
-      <button onclick="closeShortcutsModal()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
-        Got It!
-      </button>
+      <!-- Test Simulation Button -->
+      <div class="pt-2 border-t border-slate-800 space-y-2">
+        <button onclick="simulateShortcutTest()" class="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 active:scale-98">
+          <span>🧪</span>
+          <span>Test Shortcut Automation (Simulate Live SMS)</span>
+        </button>
+        <button onclick="closeShortcutsModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 
@@ -274,36 +298,48 @@
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
           <span class="text-xl">🔒</span>
-          <h3 class="text-base font-bold text-white">Password-Protected Bank PDF</h3>
+          <div>
+            <h3 class="text-base font-bold text-white">Password-Protected Bank Statement</h3>
+            <p class="text-[10px] text-emerald-400 font-medium">100% On-Device Decryption • Zero Data Uploaded</p>
+          </div>
         </div>
         <button onclick="closePdfPasswordModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
       <p class="text-xs text-slate-300 leading-relaxed">
-        Your bank protected this statement with a password. Enter your password to decrypt and parse it completely on your device (it never leaves your phone):
+        Your bank protected this PDF with a password. Enter your password below to decrypt and parse it locally on your phone:
       </p>
 
-      <div class="space-y-1.5">
+      <div class="space-y-2">
         <label class="text-[11px] font-medium text-slate-400">Statement Password</label>
         <div class="relative">
-          <input type="text" id="pdfPasswordInput" placeholder="Enter bank PDF password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-mono">
+          <input type="password" id="pdfPasswordInput" placeholder="Enter bank PDF password" onkeydown="if(event.key==='Enter') submitPdfPassword()" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-3 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-mono">
+          <button type="button" onclick="togglePdfPasswordVisibility()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-white text-sm focus:outline-none p-1">
+            <span id="pwdEyeIcon">👁️</span>
+          </button>
+        </div>
+        <div id="pdfPasswordError" class="hidden text-xs text-rose-400 font-semibold flex items-center space-x-1">
+          <span>❌</span>
+          <span id="pdfPasswordErrorText">Incorrect password. Please try again.</span>
         </div>
       </div>
 
       <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1 text-[11px] text-slate-400">
-        <p class="font-semibold text-slate-300">💡 Common Bank Password Formats:</p>
-        <p>• <strong>HDFC:</strong> Customer ID or PAN (e.g. ABCDE1234F)</p>
-        <p>• <strong>SBI:</strong> 11-digit Account number (or last 5 digits + DOB)</p>
-        <p>• <strong>ICICI:</strong> First 4 letters of name in lowercase + DDMM</p>
-        <p>• <strong>Axis:</strong> First 4 letters of name + Customer ID</p>
+        <p class="font-semibold text-slate-300">💡 Common Bank Password Formats in India:</p>
+        <p>• <strong>HDFC:</strong> Customer ID or PAN (in ALL CAPS, e.g. ABCDE1234F)</p>
+        <p>• <strong>SBI:</strong> 11-digit Account Number OR Last 5 digits + DOB (DDMMYYYY)</p>
+        <p>• <strong>ICICI:</strong> First 4 letters of name in lowercase + DDMM of birth (e.g. dina1508)</p>
+        <p>• <strong>Axis:</strong> First 4 letters of name in CAPS + Customer ID or DDMMYYYY</p>
+        <p>• <strong>Kotak:</strong> CRN Number or Date of Birth (DDMMYYYY)</p>
       </div>
 
       <div class="flex gap-2 pt-1">
         <button onclick="closePdfPasswordModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
           Cancel
         </button>
-        <button onclick="submitPdfPassword()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
-          Decrypt & Import
+        <button id="btnSubmitPdfPassword" onclick="submitPdfPassword()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-1">
+          <span>🔓</span>
+          <span>Decrypt & Import</span>
         </button>
       </div>
     </div>
@@ -446,8 +482,22 @@
       }, 2400);
     }
 
-    function switchTab(tab) {
-      currentTab = tab;
+    let syncSubTab = 'sms';
+
+    function setSyncSubTab(subTab) {
+      syncSubTab = subTab;
+      render();
+    }
+
+    function switchTab(tab, subTab) {
+      if (tab === 'statements' || tab === 'statement') {
+        currentTab = 'sms';
+        syncSubTab = 'statements';
+        tab = 'sms';
+      } else {
+        currentTab = tab;
+        if (subTab) syncSubTab = subTab;
+      }
       ['dashboard', 'expenses', 'sms', 'analytics', 'settings'].forEach(t => {
         const btn = document.getElementById('nav-' + t);
         if (btn) {
@@ -672,58 +722,165 @@
       `;
     }
 
-    // --- TAB 3: BANK SMS PARSER & IPHONE SHORTCUTS ---
+    // --- TAB 3: SYNC & IMPORT (SMS AUTO-SYNC + BANK STATEMENTS) ---
     function renderSMS(container) {
       container.innerHTML = `
         <div class="space-y-4">
           <div>
-            <h2 class="text-lg font-extrabold text-white">Sync Bank SMS</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Auto-record expenses & P2P transfers directly to your mobile database</p>
+            <h2 class="text-lg font-extrabold text-white">Sync & Import</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time iPhone Shortcuts auto-sync or Bank Statement import</p>
           </div>
 
-          <!-- Shortcuts Auto-Sync Guide Card (Highlighted) -->
-          <div class="bg-gradient-to-br from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 p-4 rounded-2xl space-y-2.5 shadow-lg">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <span class="text-xl">🍎</span>
-                <span class="text-xs font-bold text-white">Real-Time iPhone SMS Automation</span>
+          <!-- Top Sub-Tab Segmented Control -->
+          <div class="grid grid-cols-2 gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-2xl shadow-inner">
+            <button onclick="setSyncSubTab('sms')" class="py-2 px-3 text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 ${syncSubTab === 'sms' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-white'}">
+              <span>📱</span>
+              <span>SMS Auto-Sync</span>
+            </button>
+            <button onclick="setSyncSubTab('statements')" class="py-2 px-3 text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 ${syncSubTab === 'statements' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'}">
+              <span>📄</span>
+              <span>Bank Statements</span>
+            </button>
+          </div>
+
+          ${syncSubTab === 'sms' ? renderSMSSubTabContent() : renderStatementsSubTabContent()}
+        </div>
+      `;
+    }
+
+    function renderSMSSubTabContent() {
+      return `
+        <!-- iPhone Shortcuts Auto-Sync Card (Pre-Configured) -->
+        <div class="bg-gradient-to-br from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-lg">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-xl">🍎</span>
+              <div>
+                <span class="text-xs font-bold text-white">1-Tap iPhone Shortcuts Setup</span>
+                <span class="block text-[10px] text-purple-300">Pre-Created • You only grant iOS permissions</span>
               </div>
-              <button onclick="openShortcutsModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition">
-                Setup Shortcut
-              </button>
             </div>
-            <p class="text-[11px] text-slate-300 leading-relaxed">
-              Whenever a bank SMS arrives on your iPhone, Apple Shortcuts automatically opens your PWA link and saves the transaction <strong>directly to your mobile database</strong> with zero cloud servers!
+            <button onclick="launchShortcutsAutoSetup()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-[11px] font-bold transition shadow-md shadow-indigo-600/30 flex items-center space-x-1">
+              <span>⚡</span>
+              <span>Auto-Setup</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            When your bank sends an SMS, Apple Shortcuts automatically triggers your private PWA link and saves it straight to your phone's database.
+          </p>
+          <div class="flex gap-2 pt-0.5">
+            <button onclick="openShortcutsModal()" class="flex-1 py-2 bg-slate-900/80 hover:bg-slate-800 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-semibold transition">
+              📖 View Permission Guide
+            </button>
+            <button onclick="simulateShortcutTest()" class="py-2 px-3 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-xs font-semibold transition flex items-center space-x-1">
+              <span>🧪</span>
+              <span>Test Live</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Direct Paste Box -->
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold text-slate-200">Paste Bank or UPI SMS</label>
+            <button onclick="clearSMSInput()" class="text-[11px] text-slate-400 hover:text-white">Clear</button>
+          </div>
+
+          <textarea id="smsInput" rows="5" placeholder="Paste single or multiple bank SMS messages here...
+
+Handles:
+• Sent money (P2P UPI to friends & family)
+• Received money (UPI / Refund / Deposit)
+• Purchases (Swiggy, Zomato, Starbucks, Groceries)
+• Salary & Bank credits" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
+          
+          <div class="flex gap-2">
+            <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+              <span>📋</span>
+              <span>Paste Clipboard</span>
+            </button>
+            <button onclick="parseAndLogSMS()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-1.5">
+              <span>⚡</span>
+              <span>Parse & Save to Mobile</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Privacy & Database Notice -->
+        <div class="bg-slate-900/70 border border-slate-800/80 p-3.5 rounded-2xl flex items-center space-x-3 text-xs text-slate-400">
+          <span class="text-lg">🔒</span>
+          <span class="leading-relaxed">
+            <strong>100% Private On-Device:</strong> SMS messages are parsed locally using JavaScript regex. No cloud servers, no databases, zero remote tracking.
+          </span>
+        </div>
+      `;
+    }
+
+    function renderStatementsSubTabContent() {
+      return `
+        <!-- Universal Dynamic Statement Importer Card -->
+        <div class="bg-gradient-to-br from-indigo-950/70 to-slate-900 border border-indigo-500/40 p-4 rounded-2xl space-y-3.5 shadow-xl">
+          <div class="flex items-center space-x-2.5">
+            <span class="text-2xl">📂</span>
+            <div>
+              <h3 class="text-sm font-bold text-white">Dynamic Bank Statement Importer</h3>
+              <p class="text-[10px] text-indigo-300">Universal Engine • Credit Cards & Savings Accounts</p>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Import monthly statements (.PDF or .CSV) from any bank or credit card. Decrypted and parsed 100% on this mobile device without sending any data anywhere.
+          </p>
+
+          <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
+
+          <div class="flex flex-col gap-2">
+            <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>Upload Statement (.PDF or .CSV)</span>
+            </button>
+
+            <button onclick="toggleStatementPasteBox()" class="w-full py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-300 rounded-xl text-[11px] font-semibold transition flex items-center justify-center space-x-1.5 border border-slate-700">
+              <span>📝</span>
+              <span id="pasteToggleLabel">Or Paste Statement Text</span>
+            </button>
+          </div>
+
+          <div id="statementPasteSection" class="hidden space-y-2 pt-1">
+            <textarea id="statementTextInput" rows="4" placeholder="Paste copied statement rows or CSV lines here...
+Example:
+04/08/2026 Starbucks Coffee 450.00 DR 12,450.00
+05/08/2026 Salary Credit 75,000.00 CR 87,450.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
+            <button onclick="parsePastedStatement()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 active:scale-98 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-600/30">
+              ⚡ Parse Statement into Mobile
+            </button>
+          </div>
+
+          <!-- Password-Protected PDF Support Notice -->
+          <div class="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/20 space-y-1 text-[11px]">
+            <div class="flex items-center space-x-1.5 text-indigo-300 font-bold">
+              <span>🔒</span>
+              <span>Password-Protected PDFs Supported</span>
+            </div>
+            <p class="text-slate-400 leading-relaxed">
+              If your bank PDF is locked with a password, our engine prompts for your password, decrypts in-memory on your mobile phone, and extracts transactions with zero data loss.
             </p>
           </div>
 
-          <!-- Direct Paste Box -->
-          <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
-            <div class="flex justify-between items-center">
-              <label class="text-xs font-bold text-slate-200">Paste Bank or UPI SMS</label>
-              <button onclick="clearSMSInput()" class="text-[11px] text-slate-400 hover:text-white">Clear</button>
+          <!-- Supported Banks Badges -->
+          <div class="space-y-1.5 pt-1">
+            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Dynamic Bank & Card Coverage:</span>
+            <div class="flex flex-wrap gap-1 text-[10px]">
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">ICICI Bank</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">HDFC Bank</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">SBI</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">Axis Bank</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">Kotak</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">Amex</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">IndusInd</span>
+              <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">PNB / BoB</span>
+              <span class="px-2 py-0.5 bg-blue-900/40 text-blue-300 rounded-md border border-blue-500/30">All Indian Banks</span>
             </div>
-
-            <textarea id="smsInput" rows="5" placeholder="Paste single or multiple bank SMS messages here...\n\nHandles:\n• Sent money (P2P UPI)\n• Received money (UPI / Refund)\n• Merchant purchases (Food, Groceries, Fuel, Shopping)\n• Salary & Account credits" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
-            
-            <div class="flex gap-2">
-              <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
-                <span>📋</span>
-                <span>Paste Clipboard</span>
-              </button>
-              <button onclick="parseAndLogSMS()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-1.5">
-                <span>⚡</span>
-                <span>Parse & Save to Mobile</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Privacy & Database Notice -->
-          <div class="bg-slate-900/70 border border-slate-800/80 p-3.5 rounded-2xl flex items-center space-x-3 text-xs text-slate-400">
-            <span class="text-lg">🔒</span>
-            <span class="leading-relaxed">
-              <strong>100% Private On-Device:</strong> Your SMS messages are parsed locally on your phone using JavaScript regex. No data ever leaves your device.
-            </span>
           </div>
         </div>
       `;
@@ -738,13 +895,12 @@
         const text = await navigator.clipboard.readText();
         if (text) {
           document.getElementById('smsInput').value = text;
-          showToast('Pasted from clipboard! Tap "Parse & Import"');
+          showToast('Pasted from clipboard! Tap "Parse & Save"');
         }
       } catch (err) {
         showToast('Please tap inside the box and choose Paste');
       }
     }
-
 
     // --- UNIVERSAL DYNAMIC BANK & CREDIT CARD STATEMENT IMPORTER ---
     let pendingPdfFile = null;
@@ -778,10 +934,17 @@
         return;
       }
 
+      const btn = document.getElementById('btnSubmitPdfPassword');
+      if (btn) {
+        btn.innerHTML = '<span class="animate-spin inline-block mr-1">⏳</span> Decrypting...';
+        btn.disabled = true;
+      }
+
       try {
         const buf = await fileObj.arrayBuffer();
         if (!buf || buf.byteLength === 0) {
           showToast('Uploaded PDF file is empty (0 bytes).');
+          if (btn) { btn.innerHTML = '<span>🔓</span><span>Decrypt & Import</span>'; btn.disabled = false; }
           return;
         }
 
@@ -801,8 +964,8 @@
           const content = await page.getTextContent();
           if (!content.items || content.items.length === 0) continue;
 
-          // Reconstruct rows by grouping text items by vertical Y coordinate (~4px bucket)
-          // and sorting columns horizontally left-to-right by X coordinate
+          // Group text items into rows by vertical Y coordinate (~4px bucket)
+          // and sort columns horizontally left-to-right by X coordinate
           const sortedItems = content.items.slice().sort((a, b) => {
             const yA = (a.transform && a.transform[5] !== undefined) ? a.transform[5] : 0;
             const yB = (b.transform && b.transform[5] !== undefined) ? b.transform[5] : 0;
@@ -841,7 +1004,9 @@
             pageLines.push(content.items.map(it => it.str).join(' '));
           }
 
-          extractedText += pageLines.join('\n') + '\n';
+          extractedText += pageLines.join('
+') + '
+';
         }
 
         if (!extractedText.trim()) {
@@ -853,17 +1018,46 @@
       } catch (err) {
         if (err.name === 'PasswordException' || (err.message && err.message.toLowerCase().includes('password'))) {
           openPdfPasswordModal();
+          const errEl = document.getElementById('pdfPasswordError');
+          const errText = document.getElementById('pdfPasswordErrorText');
+          if (password) {
+            if (errText) errText.textContent = 'Incorrect password. Please verify bank format and try again.';
+            if (errEl) errEl.classList.remove('hidden');
+          } else {
+            if (errEl) errEl.classList.add('hidden');
+          }
         } else {
-          showToast('Could not decrypt this PDF statement: ' + (err.message || 'Check password'));
+          showToast('Could not decrypt this PDF: ' + (err.message || 'Check password'));
           console.error(err);
+        }
+      } finally {
+        if (btn) {
+          btn.innerHTML = '<span>🔓</span><span>Decrypt & Import</span>';
+          btn.disabled = false;
         }
       }
     }
 
+    function togglePdfPasswordVisibility() {
+      const input = document.getElementById('pdfPasswordInput');
+      const icon = document.getElementById('pwdEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = '🔒';
+      } else {
+        input.type = 'password';
+        icon.textContent = '👁️';
+      }
+    }
+
     function openPdfPasswordModal() {
-      document.getElementById('pdfPasswordModal').classList.remove('hidden');
-      document.getElementById('pdfPasswordInput').value = '';
-      setTimeout(() => document.getElementById('pdfPasswordInput').focus(), 150);
+      const modal = document.getElementById('pdfPasswordModal');
+      modal.classList.remove('hidden');
+      const errEl = document.getElementById('pdfPasswordError');
+      if (errEl) errEl.classList.add('hidden');
+      const input = document.getElementById('pdfPasswordInput');
+      input.value = '';
+      setTimeout(() => input.focus(), 150);
     }
 
     function closePdfPasswordModal() {
@@ -881,6 +1075,53 @@
       } else {
         closePdfPasswordModal();
         showToast('Please select your statement file again.');
+      }
+    }
+
+    function launchShortcutsAutoSetup() {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const targetUrl = baseUrl + '?sms=';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(targetUrl).then(() => {
+          showToast('✅ Shortcut URL copied! Opening iOS Shortcuts...');
+        }).catch(() => {});
+      }
+      openShortcutsModal();
+      setTimeout(() => {
+        window.location.href = 'shortcuts://create-automation';
+      }, 500);
+    }
+
+    function copyKeywords() {
+      const kw = 'debited, spent, credited, paid, INR, Rs';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(kw).then(() => {
+          showToast('Keywords copied to clipboard!');
+        });
+      }
+    }
+
+    function simulateShortcutTest() {
+      const sample = 'HDFC Bank: Rs 649.00 debited from A/c **4321 on ' + formatDisplayDate(getTodayISO()) + ' towards transfer to Swiggy via UPI. Avl Bal: Rs 42,350.00';
+      const res = parseBankSMSText(sample);
+      if (res && res.amount) {
+        transactions.unshift({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          amount: res.amount,
+          type: res.type,
+          merchant: res.merchant,
+          category: res.category,
+          bank: res.bank,
+          last4: res.last4,
+          mode: res.mode,
+          date: res.date || getTodayISO(),
+          isAuto: true,
+          raw: 'Simulated Shortcut: ' + sample
+        });
+        saveState();
+        closeShortcutsModal();
+        showToast(`⚡ Saved to Mobile: ${currencySymbol}${res.amount.toFixed(2)} (${res.merchant})`);
+        switchTab('expenses');
       }
     }
 
@@ -1674,40 +1915,20 @@
             </button>
           </div>
 
-          <!-- Dynamic Bank & Credit Card Statement Importer Card -->
-          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-xl">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-2xl">📂</span>
-              <div>
+          <!-- Bank Statement Importer Quick Access in Settings -->
+          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-2.5 shadow-xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-xl">📂</span>
                 <h3 class="text-xs font-bold text-white">Dynamic Bank Statement Importer</h3>
-                <p class="text-[10px] text-indigo-300">Upload PDF/CSV statements directly to mobile database</p>
               </div>
+              <button onclick="switchTab('statements')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition">
+                Open Importer
+              </button>
             </div>
-
             <p class="text-[11px] text-slate-300 leading-relaxed">
-              Upload monthly statements (.PDF or .CSV) from any bank or credit card. Decrypted and parsed 100% on this mobile device.
+              Upload PDF statements (password-protected or regular) or CSVs from any bank or credit card. Decrypted and parsed 100% on this mobile device.
             </p>
-
-            <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
-
-            <div class="flex flex-col gap-2">
-              <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-md shadow-indigo-600/30">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                <span>Upload Statement (.PDF or .CSV)</span>
-              </button>
-
-              <button onclick="toggleStatementPasteBox()" class="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-[11px] font-semibold transition flex items-center justify-center space-x-1.5 border border-slate-700">
-                <span>📝</span>
-                <span id="pasteToggleLabel">Or Paste Statement Text</span>
-              </button>
-            </div>
-
-            <div id="statementPasteSection" class="hidden space-y-2 pt-1">
-              <textarea id="statementTextInput" rows="4" placeholder="Paste statement text or CSV rows here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
-              <button onclick="parsePastedStatement()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
-                ⚡ Parse Statement into Mobile
-              </button>
-            </div>
           </div>
 
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
