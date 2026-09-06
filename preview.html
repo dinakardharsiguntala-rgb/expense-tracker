@@ -1186,6 +1186,21 @@
             </div>
           </div>
 
+          <!-- Instant 1-Tap Clipboard Auto-Logger Bar -->
+          <div class="bg-gradient-to-r from-emerald-950/80 via-teal-950/80 to-slate-900 border border-emerald-500/40 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-lg">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <span class="text-xl shrink-0">⚡</span>
+              <div class="min-w-0">
+                <span class="text-xs font-bold text-white block truncate">Auto-Log Copied Bank SMS</span>
+                <span class="text-[10px] text-emerald-300 block truncate">Copy any bank SMS & tap button to log instantly</span>
+              </div>
+            </div>
+            <button onclick="quickReadClipboardNow()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1 shadow-md shadow-emerald-600/30 shrink-0">
+              <span>📋</span>
+              <span>1-Tap Log</span>
+            </button>
+          </div>
+
           <!-- Quick Action Bar -->
           <div class="flex gap-2">
             <button onclick="switchTab('sms')" class="flex-1 py-2.5 px-3 bg-slate-900 border border-slate-800 hover:border-slate-700 active:scale-98 rounded-2xl flex items-center justify-center space-x-2 transition">
@@ -1972,10 +1987,9 @@ Example:
 
     function openShortcutsAppDirect() {
       copySetupURL();
-      showToast('⚡ Launching Apple Shortcuts App...');
-      setTimeout(() => {
-        window.location.href = 'shortcuts://create-automation';
-      }, 250);
+      showToast('⚡ Opening Apple Shortcuts App...');
+      // Direct call ensures iOS Safari doesn't block it as an async popup
+      window.location.href = 'shortcuts://';
     }
 
     function installICloudShortcut() {
@@ -2983,6 +2997,17 @@ Example:
     window.addEventListener('pageshow', checkURLParameters);
 
     // --- AUTOMATIC CLIPBOARD DETECTION & ZERO-CLICK AUTO-LOGGER ---
+    let hasCheckedClipboardThisSession = false;
+    window.addEventListener('focus', () => { hasCheckedClipboardThisSession = false; });
+    window.addEventListener('pageshow', () => { hasCheckedClipboardThisSession = false; });
+
+    document.addEventListener('pointerdown', () => {
+      if (autoLogClipboard && !hasCheckedClipboardThisSession) {
+        hasCheckedClipboardThisSession = true;
+        checkClipboardOnResume();
+      }
+    }, { passive: true });
+
     async function checkClipboardOnResume() {
       try {
         syncAutoLogToggles();
