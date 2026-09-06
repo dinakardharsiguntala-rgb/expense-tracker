@@ -196,32 +196,32 @@
   </div>
 
   <!-- iOS Shortcuts Instructions Modal -->
-  <div id="shortcutsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
+  <div id="shortcutsModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
-          <span class="text-xl">🍎</span>
+          <span class="text-2xl">🍎</span>
           <div>
-            <h3 class="text-base font-bold text-white">iPhone Automation Setup</h3>
-            <p class="text-[10px] text-emerald-400 font-medium">Pre-Configured By Us • Only iOS Permission Needed</p>
+            <h3 class="text-base font-bold text-white">Apple Shortcuts Automation</h3>
+            <p class="text-[10px] text-emerald-400 font-medium">Auto-records Send & Receive Money instantly</p>
           </div>
         </div>
         <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <!-- Quick 1-Tap Launcher -->
-      <div class="bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/30 p-3.5 rounded-2xl space-y-2">
+      <!-- Quick Action Bar -->
+      <div class="bg-gradient-to-r from-purple-950/70 to-indigo-950/70 border border-purple-500/40 p-3.5 rounded-2xl space-y-2">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-purple-200">⚡ 1-Tap Quick Setup</span>
-          <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-bold">Auto-Created</span>
+          <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-bold">Recommended</span>
         </div>
         <p class="text-[11px] text-slate-300 leading-relaxed">
-          Tap below to copy your pre-configured URL and automatically open Apple Shortcuts to create the automation:
+          Tap below to copy your personal URL and open the Shortcuts app on your iPhone:
         </p>
         <div class="flex gap-2 pt-1">
           <button onclick="launchShortcutsAutoSetup()" class="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-lg shadow-purple-600/30 active:scale-98">
             <span>⚡</span>
-            <span>Launch Shortcuts App Now</span>
+            <span>Launch Shortcuts App</span>
           </button>
           <button onclick="copySetupURL()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1 active:scale-98">
             <span id="copyUrlIcon">📋</span>
@@ -230,76 +230,68 @@
         </div>
       </div>
 
-      <!-- End-to-End iOS Permission Checkpoints -->
+      <!-- Instructions: The 2 Best Ways -->
       <div class="space-y-3 pt-1">
-        <div class="bg-rose-950/50 border border-rose-500/50 p-3 rounded-xl text-xs text-rose-200 leading-relaxed">
-          <strong>⚠️ Critical Apple Rule:</strong> In Apple Shortcuts, the "Message Contains" field only accepts <strong>ONE SINGLE WORD</strong> (e.g. <code>debited</code>). Do NOT separate multiple words with commas, or Apple Shortcuts will wait for the entire phrase and will NEVER run!
+        <div class="bg-emerald-950/50 border border-emerald-500/40 p-3 rounded-2xl text-xs space-y-1">
+          <p class="font-bold text-emerald-300 flex items-center space-x-1.5">
+            <span>🎯</span>
+            <span>THE BEST WAY (Catches Send & Receive Money):</span>
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            In Apple Shortcuts ➔ <strong>Automation</strong> ➔ <strong>+</strong> ➔ <strong>Message</strong>:
+          </p>
+          <p class="text-slate-200 pt-1">
+            1. In <strong>Sender</strong>: Select your bank or UPI app (HDFC, SBI, ICICI, Axis, Paytm, PhonePe).<br>
+            2. In <strong>Message Contains</strong>: <span class="text-amber-300 font-bold underline">LEAVE BLANK</span> (do not type anything)!<br>
+            3. Select <strong>Run Immediately</strong> (turn off "Notify When Run").<br>
+            4. Add action <strong>URL Encode</strong> (Shortcut Input) ➔ Add action <strong>Open URLs</strong>:
+          </p>
+          <div class="font-mono text-[10px] text-blue-300 bg-slate-950 p-2 rounded-lg break-all select-all mt-1">
+            https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[URL Encoded Text]
+          </div>
+          <p class="text-[10px] text-emerald-400 mt-1 font-semibold">
+            ✨ Leaving "Message Contains" blank ensures 100% of SMS from your bank (whether you Sent money, Received money, or swiped card) trigger automatically!
+          </p>
         </div>
 
-        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">3-Step Setup (Only 2 Minutes)</h4>
-
-        <!-- Step 1 -->
-        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
-          <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-bold text-white">Create Automation ➔ Message</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">In Shortcuts app, tap <strong>Automation</strong> tab ➔ tap <strong>+</strong> ➔ choose <strong>Message</strong>.</p>
-            <div class="mt-2 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[11px] text-slate-300 space-y-1">
-              <p>• In <strong>Message Contains</strong>: enter only <code>debited</code></p>
-              <p class="text-[10px] text-slate-400"><em>(Or leave it blank if selecting your Bank name under Sender)</em></p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="bg-slate-950 p-3 rounded-2xl border border-blue-500/40 flex items-start space-x-3 shadow-sm">
-          <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
-          <div>
-            <div class="flex items-center space-x-1.5">
-              <h4 class="text-xs font-bold text-white">Select "Run Immediately"</h4>
-              <span class="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-bold">Required iOS Permission</span>
-            </div>
-            <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
-              Select <strong>"Run Immediately"</strong> and turn OFF <strong>"Notify When Run"</strong>.
-            </p>
-            <p class="text-[10px] text-slate-400 mt-1">
-              This gives Apple permission to log your expenses automatically in the background without asking every time.
-            </p>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
-          <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-bold text-white">Add Action ➔ "Open URLs"</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>Next</strong> ➔ search for action <strong>"Open URLs"</strong>.</p>
-            <div class="mt-2 p-2.5 bg-slate-900 rounded-xl border border-slate-800 space-y-1 text-[11px]">
-              <p class="text-slate-300">1. Paste your private URL:</p>
-              <div class="font-mono text-blue-300 break-all select-all text-[10px] bg-slate-950 p-1.5 rounded">
-                https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=
-              </div>
-              <p class="text-slate-300 mt-1.5">2. Tap the blue <strong>Shortcut Input</strong> token above your keyboard so it attaches to the URL!</p>
-            </div>
-            <p class="text-[10px] text-emerald-400 font-semibold mt-1.5">Tap Done. Your iPhone will now record incoming bank SMS automatically!</p>
-          </div>
+        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs space-y-1">
+          <p class="font-bold text-slate-300 flex items-center space-x-1.5">
+            <span>💡</span>
+            <span>ALTERNATIVE: Single Universal Keyword</span>
+          </p>
+          <p class="text-slate-400 leading-relaxed text-[11px]">
+            If you don't want to select a Sender, set <strong>Message Contains</strong> to: <code>Rs</code><br>
+            <em>(In India, almost all transaction SMS for both Send and Receive contain the word <code>Rs</code>).</em>
+          </p>
         </div>
       </div>
 
-      <!-- Test Simulation Button -->
+      <!-- Live Simulator Suite -->
       <div class="pt-2 border-t border-slate-800 space-y-2">
-        <button onclick="simulateShortcutTest()" class="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 active:scale-98">
-          <span>🧪</span>
-          <span>Test Shortcut Automation (Simulate Live SMS)</span>
-        </button>
-        <button onclick="closeShortcutsModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
-          Close
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Live Simulators (Test Now):</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="simulateSendMoney()" class="py-2 px-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+            <span>💸</span>
+            <span>Test: Send Money</span>
+          </button>
+          <button onclick="simulateReceiveMoney()" class="py-2 px-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+            <span>💰</span>
+            <span>Test: Receive Money</span>
+          </button>
+        </div>
+        <button onclick="simulateCardDebit()" class="w-full py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+          <span>💳</span>
+          <span>Test: Starbucks Card Swipe</span>
         </button>
       </div>
+
+      <button onclick="closeShortcutsModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+        Done
+      </button>
     </div>
   </div>
 
-    <!-- iOS Add to Home Screen Instructions Modal -->
+  <!-- iOS Add to Home Screen Instructions Modal -->
   <div id="iosInstallModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -445,9 +437,30 @@
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none z-50">
-    Notification
+  <!-- Centered Alert / Popup Modal (Always in the middle of screen) -->
+  <div id="centerAlertModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-4">
+      <div id="centerAlertIcon" class="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        ℹ️
+      </div>
+      <div class="space-y-1">
+        <h3 id="centerAlertTitle" class="text-base font-bold text-white leading-snug">Notification</h3>
+        <p id="centerAlertMsg" class="text-xs text-slate-300 leading-relaxed font-normal pt-1">
+          <!-- Injected message text -->
+        </p>
+      </div>
+      <div class="pt-2">
+        <button onclick="closeCenterAlert()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30">
+          OK, Got It
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Centered Floating Toast (Always in center, high contrast, readable) -->
+  <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[85vw] bg-slate-900/95 border border-slate-700 text-white px-5 py-3.5 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center space-x-2.5 backdrop-blur-xl scale-95">
+    <span id="toastIcon" class="text-base">⚡</span>
+    <span id="toastText" class="leading-snug">Notification</span>
   </div>
 
   <!-- ================= JAVASCRIPT ENGINE ================= -->
@@ -582,13 +595,77 @@
       localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
     }
 
-    function showToast(msg) {
+    let toastTimeout = null;
+    let centerAlertTimeout = null;
+
+    function showCenterAlert(title, msg, type = 'info', autoDismissSeconds = 0) {
+      if (centerAlertTimeout) clearTimeout(centerAlertTimeout);
+      const modal = document.getElementById('centerAlertModal');
+      const titleEl = document.getElementById('centerAlertTitle');
+      const msgEl = document.getElementById('centerAlertMsg');
+      const iconEl = document.getElementById('centerAlertIcon');
+      if (!modal || !titleEl || !msgEl) return;
+
+      titleEl.textContent = title;
+      msgEl.innerHTML = msg;
+
+      let icon = 'ℹ️';
+      let iconBg = 'bg-blue-600/20 text-blue-400 border-blue-500/30';
+      if (type === 'success') {
+        icon = '✅';
+        iconBg = 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30';
+      } else if (type === 'error') {
+        icon = '❌';
+        iconBg = 'bg-rose-600/20 text-rose-400 border-rose-500/30';
+      } else if (type === 'warning') {
+        icon = '⚠️';
+        iconBg = 'bg-amber-600/20 text-amber-400 border-amber-500/30';
+      }
+
+      if (iconEl) {
+        iconEl.textContent = icon;
+        iconEl.className = `w-14 h-14 rounded-2xl ${iconBg} border flex items-center justify-center text-3xl mx-auto shadow-inner`;
+      }
+
+      modal.classList.remove('hidden');
+
+      if (autoDismissSeconds > 0) {
+        centerAlertTimeout = setTimeout(() => {
+          closeCenterAlert();
+        }, autoDismissSeconds * 1000);
+      }
+    }
+
+    function closeCenterAlert() {
+      if (centerAlertTimeout) clearTimeout(centerAlertTimeout);
+      const modal = document.getElementById('centerAlertModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function showToast(msg, type = 'info') {
       const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
-      setTimeout(() => {
-        el.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
-      }, 2400);
+      const iconEl = document.getElementById('toastIcon');
+      const textEl = document.getElementById('toastText');
+      if (!el) return;
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+
+      let icon = '⚡';
+      if (type === 'success' || msg.includes('✅') || msg.includes('⚡') || msg.includes('Recorded') || msg.includes('Saved')) icon = '✅';
+      else if (type === 'error' || msg.includes('❌') || msg.includes('Could not') || msg.includes('Incorrect') || msg.includes('Error')) icon = '❌';
+      else if (type === 'warning' || msg.includes('⚠️') || msg.includes('Please')) icon = '⚠️';
+
+      if (iconEl) iconEl.textContent = icon;
+      const cleanMsg = msg.replace(/^[✅❌⚠️⚡ℹ️]\s*/, '');
+      if (textEl) textEl.textContent = cleanMsg;
+
+      el.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+      el.classList.add('scale-100', 'opacity-100');
+
+      toastTimeout = setTimeout(() => {
+        el.classList.remove('scale-100', 'opacity-100');
+        el.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+      }, 2800);
     }
 
     let syncSubTab = 'sms';
@@ -1207,9 +1284,8 @@ Example:
       }
     }
 
-    function simulateShortcutTest() {
-      const sample = 'HDFC Bank: Rs 649.00 debited from A/c **4321 on ' + formatDisplayDate(getTodayISO()) + ' towards transfer to Swiggy via UPI. Avl Bal: Rs 42,350.00';
-      const res = parseBankSMSText(sample);
+    function recordSimulatedTransaction(sampleText) {
+      const res = parseBankSMSText(sampleText);
       if (res && res.amount) {
         transactions.unshift({
           id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
@@ -1222,13 +1298,34 @@ Example:
           mode: res.mode,
           date: res.date || getTodayISO(),
           isAuto: true,
-          raw: 'Simulated Shortcut: ' + sample
+          raw: 'Simulated: ' + sampleText
         });
         saveState();
         closeShortcutsModal();
-        showToast(`⚡ Saved to Mobile: ${currencySymbol}${res.amount.toFixed(2)} (${res.merchant})`);
+        showCenterAlert(
+          'Simulated SMS Recorded!',
+          `⚡ Successfully logged <strong>${currencySymbol}${res.amount.toFixed(2)}</strong><br><span class="text-xs text-slate-300">(${res.merchant} • ${res.mode})</span>`,
+          'success',
+          4
+        );
         switchTab('expenses');
       }
+    }
+
+    function simulateSendMoney() {
+      recordSimulatedTransaction('Sent Rs. 450 to Rahul Sharma using PhonePe UPI. A/c debited by 450.00');
+    }
+
+    function simulateReceiveMoney() {
+      recordSimulatedTransaction('A/c *1234 credited by Rs. 2,500.00 on ' + formatDisplayDate(getTodayISO()) + ' by transfer from Priya Singh via Google Pay UPI. Avl Bal: Rs 28,450.00');
+    }
+
+    function simulateCardDebit() {
+      recordSimulatedTransaction('Rs 1,299.00 spent on your ICICI Bank Credit Card ending 4321 at Starbucks Coffee Bangalore.');
+    }
+
+    function simulateShortcutTest() {
+      simulateSendMoney();
     }
 
     function toggleStatementPasteBox() {
@@ -1324,13 +1421,13 @@ Example:
     // --- 100% DYNAMIC STATEMENT PARSER (ADAPTIVE UNIVERSAL ENGINE) ---
     function importDynamicBankStatement(rawText, filename) {
       if (!rawText || !rawText.trim()) {
-        showToast('Statement file or text is empty.');
+        showCenterAlert('Statement File Empty', 'The uploaded file or statement text contains no content.', 'warning');
         return;
       }
 
       const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (rawLines.length === 0) {
-        showToast('No readable text found in statement.');
+        showCenterAlert('No Readable Text', 'Could not find readable text lines in this document. If this is a photo or scanned PDF, please copy and paste the text.', 'error');
         return;
       }
 
@@ -1419,12 +1516,12 @@ Example:
         };
       }
 
-      const DATE_REGEX_STR = '(?:\d{1,2}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3,9}\s+\d{2,4}|\d{4}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{1,2}|[a-zA-Z]{3,9}\s+\d{1,2},?\s+\d{2,4})';
-      const DATE_REGEX = new RegExp(DATE_REGEX_STR, 'i');
+      // CRITICAL: Native RegExp literal ensures no backslash escape loss in browser
+      const DATE_REGEX = /(?:\d{1,2}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3,9}\s+\d{2,4}|\d{4}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{1,2}|[a-zA-Z]{3,9}\s+\d{1,2},?\s+\d{2,4})/i;
 
       const parsedRecords = [];
 
-      // Pass 1: Line-by-Line Adaptive Parsing (Handles CSV, Tables, Serials, Flags)
+      // Pass 1: Line-by-Line Adaptive Parsing (CSV, Tables, Serials, Flags)
       for (let i = 0; i < rawLines.length; i++) {
         let line = rawLines[i];
         if (/^(statement\s+date|opening\s+balance|closing\s+balance|total\s+amount\s+due|minimum\s+amount\s+due|credit\s+limit|payment\s+due\s+date|rewards\s+summary|page\s+\d+|sl\.?\s*no|date\s+narration|txn\s+date)\b/i.test(line)) {
@@ -1479,8 +1576,8 @@ Example:
           postDateText = postDateText.substring(mDate2[0].length).trim();
         }
 
-        // Match amounts with optional currency prefix and CR/DR flags
-        const amtRegex = /(?:(?<=\s)|^)(?:(?:Rs\.?|INR|₹|\$)\s*)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]{1,2})|[0-9]+(?:\.[0-9]{1,2})|[0-9]{1,3}(?:,[0-9]{2,3})+|[0-9]{2,7})\s*(?:\(([A-Za-z]+)\)|([A-Za-z]{1,4})\.?)?(?=\s|$)/gi;
+        // Match amounts without lookbehinds for universal WebKit compatibility
+        const amtRegex = /(?:^|\s+)(?:(?:Rs\.?|INR|₹|\$)\s*)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]{1,2})|[0-9]+(?:\.[0-9]{1,2})|[0-9]{1,3}(?:,[0-9]{2,3})+|[0-9]{2,7})\s*(?:\(([A-Za-z]+)\)|([A-Za-z]{1,4})\.?)?(?=\s|$|[,\)])/gi;
         const allAmtMatches = [];
         let match;
         while ((match = amtRegex.exec(postDateText)) !== null) {
@@ -1515,14 +1612,15 @@ Example:
 
         if (allAmtMatches.length === 0) continue;
 
-        // Prioritize numbers with decimals (.XX) or commas over bare integers
+        // Prioritize numbers with decimals (.XX) or commas or flags
         const decimalMatches = allAmtMatches.filter(m => m.valStr.includes('.') || m.valStr.includes(',') || m.flag);
         const candidateMatches = decimalMatches.length > 0 ? decimalMatches : allAmtMatches;
 
         const validAmounts = [];
         for (const m of candidateMatches) {
           const val = parseFloat(m.valStr.replace(/,/g, ''));
-          if (isNaN(val) || val <= 0) continue;
+          // Allow 0.00 to preserve column alignments in Debit/Credit tables
+          if (isNaN(val) || val < 0) continue;
           if (!m.valStr.includes('.') && !m.valStr.includes(',') && !m.flag) {
             // Filter bare integers in middle of words (like Ref 123456)
             if (m.end < postDateText.length - 8 && !/^\s*[\d,.]/.test(postDateText.substring(m.end))) {
@@ -1534,7 +1632,7 @@ Example:
 
         if (validAmounts.length === 0) continue;
 
-        // Narration is before the first valid amount
+        // Narration is before the first candidate amount
         let rawDesc = postDateText.substring(0, validAmounts[0].start).trim();
         if (!rawDesc) rawDesc = 'Bank Transaction';
 
@@ -1544,9 +1642,10 @@ Example:
         let amt = null, isCr = false;
 
         if (validAmounts.length >= 3) {
+          // Standard table: [Debit, Credit, Balance]
           const deb = validAmounts[0].val;
           const cred = validAmounts[1].val;
-          if (deb > 0 && (cred == 0 || deb !== cred)) {
+          if (deb > 0 && (cred === 0 || deb !== cred)) {
             amt = deb;
             isCr = false;
           } else if (cred > 0) {
@@ -1562,6 +1661,10 @@ Example:
             isCr = true;
           } else if (flag === 'DR' || flag === 'D' || /\b(dr|debit|withdrawal|paid|transfer to)\b/i.test(rawDesc)) {
             isCr = false;
+          } else {
+            if (validAmounts[1].flag === 'CR' || validAmounts[1].flag === 'C') {
+              isCr = true;
+            }
           }
         } else {
           amt = validAmounts[0].val;
@@ -1578,10 +1681,10 @@ Example:
         }
       }
 
-      // Pass 2: Unstructured Text Scanner (Safety Net for Non-Standard Statements & NetBanking Dumps)
+      // Pass 2: Unstructured Text Scanner (Safety Net for non-table dumps)
       if (parsedRecords.length === 0) {
         const fullText = rawLines.join('\n');
-        const unstructRegex = new RegExp('(' + DATE_REGEX_STR + ')[\\s\\S]{1,80}?(?:(?:Rs\\.?|INR|₹|\\$)\\s*)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\\.[0-9]{1,2})|[0-9]+(?:\\.[0-9]{1,2}))\\s*(CR|DR|Cr|Dr)?', 'gi');
+        const unstructRegex = /(?:(\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3,9}\s+\d{2,4}|\d{1,2}[-/.]\w{3}[-/.]\d{2,4})[\s\S]{1,80}?(?:(?:Rs\.?|INR|₹|\$)\s*)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]{1,2})|[0-9]+(?:\.[0-9]{1,2}))\s*(CR|DR|Cr|Dr)?)/gi;
         let unstructMatch;
         while ((unstructMatch = unstructRegex.exec(fullText)) !== null) {
           const rDate = unstructMatch[1];
@@ -1597,11 +1700,19 @@ Example:
       if (parsedRecords.length > 0) {
         parsedRecords.forEach(r => transactions.unshift(r));
         saveState();
-        showToast(`⚡ Successfully imported ${parsedRecords.length} transactions from ${accountBadge}!`);
+        showCenterAlert(
+          'Statement Imported!',
+          `⚡ Successfully extracted <strong>${parsedRecords.length}</strong> transactions from <strong>${accountBadge}</strong>.<br><br>All records are safely stored on your phone.`,
+          'success',
+          5
+        );
         switchTab('expenses');
       } else {
-        showToast('⚠️ No transactions detected. If this is a scanned/photo PDF, please paste text or export as CSV.');
-        // Automatically open paste box for convenience
+        showCenterAlert(
+          'No Transactions Detected',
+          'Could not find standard transaction rows in this document.<br><br>• If your PDF is a photo/scanned image, please paste text below.<br>• Or export your bank statement as CSV / Excel.',
+          'error'
+        );
         const pasteSection = document.getElementById('statementPasteSection');
         if (pasteSection) pasteSection.classList.remove('hidden');
       }
@@ -1892,10 +2003,9 @@ Example:
       switchTab('expenses');
     }
 
-    // --- AUTOMATIC URL INGESTION (SHORTCUTS INTEGRATION) ---
+    // --- AUTOMATIC URL INGESTION (APPLE SHORTCUTS INTEGRATION) ---
     function checkURLParameters() {
       try {
-        // Support both query (?sms=...) and hash (#sms=...)
         let rawQuery = window.location.search;
         if (!rawQuery && window.location.hash) {
           rawQuery = '?' + window.location.hash.replace(/^#/, '');
@@ -1905,12 +2015,20 @@ Example:
         const params = new URLSearchParams(rawQuery);
         let sms = params.get('sms') || params.get('text') || params.get('body') || params.get('msg');
         if (sms) {
-          // Replace + with space (standard URL form encoding) before decoding
-          sms = decodeURIComponent(sms.replace(/\+/g, ' ')).trim();
+          // Safe decode preventing URIError from bare % or +
+          try {
+            sms = decodeURIComponent(sms.replace(/\+/g, ' '));
+          } catch (e1) {
+            try {
+              sms = decodeURIComponent(sms.replace(/\+/g, ' ').replace(/%(?![0-9a-fA-F]{2})/g, '%25'));
+            } catch (e2) {
+              sms = sms.replace(/\+/g, ' ');
+            }
+          }
+          sms = sms.trim();
 
-          // Check if user literally typed "[Shortcut Input]" without selecting the iOS variable
           if (/^\[shortcut input\]$/i.test(sms) || sms === '[Shortcut Input]') {
-            showToast('⚠️ In Apple Shortcuts, tap the variable token "Shortcut Input" above the keyboard.');
+            showCenterAlert('Shortcuts Setup Notice', 'In Apple Shortcuts, tap the blue token <strong>"Shortcut Input"</strong> above the keyboard instead of typing the words literally.', 'warning');
             switchTab('sms');
             return;
           }
@@ -1932,23 +2050,32 @@ Example:
             };
             transactions.unshift(newRec);
             saveState();
-            showToast(`⚡ Saved to Mobile: ${currencySymbol}${res.amount.toFixed(2)} (${res.merchant})`);
+            showCenterAlert(
+              'SMS Recorded!',
+              `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong><br><span class="text-xs text-slate-300">(${res.merchant} • ${res.mode})</span>`,
+              'success',
+              4
+            );
             window.history.replaceState({}, document.title, window.location.pathname);
             switchTab('expenses');
           } else {
-            // Switch to SMS tab and place raw text in input for 1-tap review
             switchTab('sms');
             setTimeout(() => {
               const input = document.getElementById('smsInput');
               if (input) input.value = sms;
             }, 150);
-            showToast('⚠️ SMS received! Tap "Parse & Save to Mobile" to record.');
+            showCenterAlert('SMS Received for Review', 'We received an SMS from your shortcut. Please review the details in the box and tap "Parse & Save".', 'info');
           }
         }
       } catch (e) {
         console.error('URL parse error:', e);
       }
     }
+
+    // Re-check URL when app returns from background or URL hash changes
+    window.addEventListener('popstate', checkURLParameters);
+    window.addEventListener('hashchange', checkURLParameters);
+    window.addEventListener('pageshow', checkURLParameters);
 
     // --- AUTOMATIC CLIPBOARD DETECTION ---
     async function checkClipboardOnResume() {
