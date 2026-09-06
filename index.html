@@ -198,140 +198,149 @@
   <!-- iOS Shortcuts Instructions Modal -->
   <div id="shortcutsModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <!-- Modal Header -->
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div class="flex items-center space-x-2">
-          <span class="text-2xl">🏦</span>
+        <div class="flex items-center space-x-2.5">
+          <span class="text-2xl">⚡</span>
           <div>
-            <h3 class="text-base font-bold text-white">Apple Shortcuts Bank Sender Guide</h3>
-            <p class="text-[10px] text-emerald-400 font-medium">Select your bank to see exact SMS sender names & routes</p>
+            <h3 class="text-base font-bold text-white">Apple Shortcuts Auto-Setup</h3>
+            <p class="text-[10px] text-emerald-400 font-medium">Automatic Bank Recognition • Zero Sender Typing</p>
           </div>
         </div>
         <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <!-- Bank Selector Dropdown -->
-      <div class="bg-slate-950 p-3.5 rounded-2xl border border-indigo-500/40 space-y-2">
-        <label class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider block">
-          1. Select Your Bank (To get exact sender codes):
-        </label>
-        <select id="bankSenderPicker" onchange="onBankSenderSelected(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-indigo-400">
-          <option value="ICICI" selected>ICICI Bank (ICICIT, ICICIB, ICICBK)</option>
-          <option value="HDFC">HDFC Bank (HDFCBK, HDFCB)</option>
-          <option value="SBI">State Bank of India (SBIINB, SBIBNK)</option>
-          <option value="AXIS">Axis Bank (AXISBK, AXISB)</option>
-          <option value="KOTAK">Kotak Mahindra Bank (KOTAKB, KOTAKM)</option>
-          <option value="IDFC">IDFC FIRST Bank (IDFCFB, IDFCB)</option>
-          <option value="INDUS">IndusInd Bank (INDUSB, INDUS)</option>
-          <option value="YES">Yes Bank (YESBNK, YESB)</option>
-          <option value="BOB">Bank of Baroda (BOBTXN, BOB)</option>
-          <option value="CANARA">Canara Bank (CANBNK, CANARA)</option>
-          <option value="PNB">Punjab National Bank (PNBSMS, PNB)</option>
-          <option value="UNION">Union Bank (UNIONB, UNIONBK)</option>
-          <option value="FEDERAL">Federal Bank (FEDBNK, FEDERAL)</option>
-          <option value="RBL">RBL Bank (RBLBNK)</option>
-          <option value="AU">AU Small Finance Bank (AUBANK)</option>
-        </select>
-
-        <!-- Dynamic Sender Info Card -->
-        <div id="dynamicBankInfoCard" class="bg-indigo-950/60 border border-indigo-500/30 p-3 rounded-xl text-xs space-y-2 mt-2">
-          <div class="flex items-center justify-between">
-            <span id="selectedBankTitle" class="font-bold text-white text-xs">ICICI Bank</span>
-            <span class="text-[10px] bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full font-semibold">DLT Verified</span>
-          </div>
-          <p class="text-[11px] text-slate-300">
-            In Apple Shortcuts ➔ <strong>Sender</strong> field, search & select:
-          </p>
-          <div class="flex flex-wrap gap-1.5 pt-0.5" id="bankSenderBadges">
-            <span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">ICICIT</span>
-            <span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">ICICIB</span>
-            <span class="px-2 py-1 bg-slate-900 border border-indigo-400/50 rounded-lg text-indigo-300 font-mono text-xs font-bold">ICICBK</span>
-          </div>
-          <div class="p-2 bg-slate-950/80 rounded-lg border border-slate-800 text-[10px] text-slate-300 space-y-1">
-            <p>• <strong>-T Suffix (e.g. ICICIT-T):</strong> Transactional route (debits, credits, UPI, card swipes)</p>
-            <p>• <strong>-S Suffix (e.g. ICICIT-S):</strong> Service route (account alerts, salary notifications)</p>
-            <p class="text-emerald-400 font-semibold mt-0.5">👉 In "Message Contains": <span class="underline">LEAVE BLANK</span> so all transactions are read automatically!</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Action Bar -->
-      <div class="bg-gradient-to-r from-purple-950/70 to-indigo-950/70 border border-purple-500/40 p-3.5 rounded-2xl space-y-2">
+      <!-- 1-Tap Hero Direct Launch Button -->
+      <div class="bg-gradient-to-r from-purple-950/80 via-indigo-950/80 to-blue-950/80 border border-purple-500/40 p-4 rounded-2xl space-y-2.5 shadow-lg">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-purple-200">⚡ 1-Tap Quick Setup</span>
-          <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-bold">Recommended</span>
+          <span class="text-xs font-bold text-purple-200">🚀 Direct iPhone Integration</span>
+          <span class="text-[9px] bg-purple-500/30 text-purple-300 px-2 py-0.5 rounded-full font-bold">1-Tap Jump</span>
         </div>
         <p class="text-[11px] text-slate-300 leading-relaxed">
-          Tap below to copy your personal URL and open the Shortcuts app on your iPhone:
+          Tap below to copy your setup URL and immediately open the Apple Shortcuts automation creator on your iPhone:
         </p>
         <div class="flex gap-2 pt-1">
-          <button onclick="launchShortcutsAutoSetup()" class="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-lg shadow-purple-600/30 active:scale-98">
-            <span>⚡</span>
-            <span>Launch Shortcuts App</span>
+          <button onclick="launchShortcutsAutoSetupDirect()" class="flex-1 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center space-x-2 shadow-lg shadow-purple-600/40 active:scale-98">
+            <span class="text-sm">⚡</span>
+            <span id="launchPresetBtnText">Launch Apple Shortcuts</span>
           </button>
-          <button onclick="copySetupURL()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1 active:scale-98">
+          <button onclick="copySetupURL()" class="py-3 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1 active:scale-98">
             <span id="copyUrlIcon">📋</span>
             <span>Copy URL</span>
           </button>
         </div>
       </div>
 
-      <!-- Instructions: The 2 Best Ways -->
-      <div class="space-y-3 pt-1">
-        <div class="bg-emerald-950/50 border border-emerald-500/40 p-3 rounded-2xl text-xs space-y-1">
-          <p class="font-bold text-emerald-300 flex items-center space-x-1.5">
-            <span>🎯</span>
-            <span>THE BEST WAY (Catches Send & Receive Money):</span>
-          </p>
-          <p class="text-slate-300 leading-relaxed">
-            In Apple Shortcuts ➔ <strong>Automation</strong> ➔ <strong>+</strong> ➔ <strong>Message</strong>:
-          </p>
-          <p class="text-slate-200 pt-1">
-            1. In <strong>Sender</strong>: Select your bank or UPI app (HDFC, SBI, ICICI, Axis, Paytm, PhonePe).<br>
-            2. In <strong>Message Contains</strong>: <span class="text-amber-300 font-bold underline">LEAVE BLANK</span> (do not type anything)!<br>
-            3. Select <strong>Run Immediately</strong> (turn off "Notify When Run").<br>
-            4. Add action <strong>URL Encode</strong> (Shortcut Input) ➔ Add action <strong>Open URLs</strong>:
-          </p>
-          <div class="font-mono text-[10px] text-blue-300 bg-slate-950 p-2 rounded-lg break-all select-all mt-1">
-            https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[URL Encoded Text]
-          </div>
-          <p class="text-[10px] text-emerald-400 mt-1 font-semibold">
-            ✨ Leaving "Message Contains" blank ensures 100% of SMS from your bank (whether you Sent money, Received money, or swiped card) trigger automatically!
-          </p>
+      <!-- Critical Reassurance: ZERO SENDER TYPING -->
+      <div class="bg-emerald-950/60 border border-emerald-500/50 p-3.5 rounded-2xl space-y-1.5 text-xs">
+        <div class="flex items-center space-x-1.5">
+          <span class="text-base">✨</span>
+          <span class="font-black text-emerald-300 uppercase tracking-wide text-[11px]">NO SENDER NAME NEEDED — 100% AUTOMATIC</span>
+        </div>
+        <p class="text-slate-200 text-[11px] leading-relaxed">
+          In Apple Shortcuts, <strong class="text-emerald-300 underline">LEAVE SENDER BLANK</strong>. You do NOT need to type or search any contact name!
+        </p>
+        <p class="text-[10px] text-emerald-400 font-medium">
+          🤖 Our app automatically detects <strong>ICICI, HDFC, SBI, Axis, Kotak, IDFC, PhonePe, GPay</strong> and all banks directly from your SMS text and adds the sender name automatically!
+        </p>
+      </div>
+
+      <!-- Step-by-Step Visual Automation Blueprint -->
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
+        <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+          <span class="font-bold text-slate-200 text-xs">📱 Apple Shortcuts Blueprint:</span>
+          <span class="text-[10px] text-indigo-400 font-semibold">In iOS Shortcuts ➔ Automation ➔ + ➔ Message</span>
         </div>
 
-        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs space-y-1">
-          <p class="font-bold text-slate-300 flex items-center space-x-1.5">
-            <span>💡</span>
-            <span>ALTERNATIVE: Single Universal Keyword</span>
-          </p>
-          <p class="text-slate-400 leading-relaxed text-[11px]">
-            If you don't want to select a Sender, set <strong>Message Contains</strong> to: <code>Rs</code><br>
-            <em>(In India, almost all transaction SMS for both Send and Receive contain the word <code>Rs</code>).</em>
-          </p>
+        <div class="space-y-2 text-[11px]">
+          <div class="flex items-start justify-between bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">1. Sender</span>
+              <span class="text-emerald-400 font-bold">LEAVE COMPLETELY EMPTY</span>
+            </div>
+            <span class="text-[10px] text-slate-400">Auto-reads all banks</span>
+          </div>
+
+          <div class="flex items-start justify-between bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">2. Message Contains</span>
+              <span id="blueprintKeyword" class="font-mono text-indigo-300 font-bold bg-indigo-950 px-2 py-0.5 rounded border border-indigo-500/30">Rs</span>
+            </div>
+            <span class="text-[10px] text-slate-400">Catches debits & credits</span>
+          </div>
+
+          <div class="flex items-start justify-between bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">3. Run Setting</span>
+              <span class="text-purple-300 font-bold">Run Immediately</span>
+            </div>
+            <span class="text-[10px] text-slate-400">Turn OFF 'Notify When Run'</span>
+          </div>
+
+          <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-bold">4. Action (Open URLs)</span>
+            <p class="text-[10px] text-slate-300">Add action <strong>URL Encode</strong> (Shortcut Input) ➔ Add <strong>Open URLs</strong>:</p>
+            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 font-mono text-[10px] text-blue-300 break-all select-all flex justify-between items-center gap-1.5 mt-1">
+              <span>https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]</span>
+              <button onclick="copySetupURL()" class="px-2 py-0.5 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[9px] rounded font-bold whitespace-nowrap">Copy</button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- 1-Tap Bank Preset Selector -->
+      <div class="space-y-2 pt-1">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">1-Tap Bank Specific Presets (Optional):</span>
+          <span id="presetDescription" class="text-[10px] text-indigo-400 font-medium">All Banks (Universal)</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5" id="bankPresetPills">
+          <button type="button" onclick="selectBankPreset('ALL')" data-preset="ALL" class="bank-preset-pill px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[11px] font-bold shadow transition">🌟 All Banks ("Rs")</button>
+          <button type="button" onclick="selectBankPreset('ICICI')" data-preset="ICICI" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">ICICI Bank</button>
+          <button type="button" onclick="selectBankPreset('HDFC')" data-preset="HDFC" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">HDFC Bank</button>
+          <button type="button" onclick="selectBankPreset('SBI')" data-preset="SBI" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">SBI Bank</button>
+          <button type="button" onclick="selectBankPreset('AXIS')" data-preset="AXIS" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">Axis Bank</button>
+          <button type="button" onclick="selectBankPreset('KOTAK')" data-preset="KOTAK" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">Kotak Bank</button>
+          <button type="button" onclick="selectBankPreset('IDFC')" data-preset="IDFC" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">IDFC FIRST</button>
+          <button type="button" onclick="selectBankPreset('UPI')" data-preset="UPI" class="bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition">UPI (PhonePe/GPay)</button>
+        </div>
+      </div>
+
+      <!-- Quick Clipboard Direct Option -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-center justify-between gap-2">
+        <div class="flex items-center space-x-2">
+          <span class="text-base">📋</span>
+          <div>
+            <span class="text-xs font-bold text-white block">Copied an SMS right now?</span>
+            <span class="text-[10px] text-slate-400">Skip shortcuts and log directly from clipboard</span>
+          </div>
+        </div>
+        <button onclick="quickReadClipboardNow()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-[11px] font-bold transition whitespace-nowrap shadow-md shadow-blue-600/30">
+          Paste &amp; Log
+        </button>
       </div>
 
       <!-- Live Simulator Suite -->
       <div class="pt-2 border-t border-slate-800 space-y-2">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Live Simulators (Test Bank SMS Now):</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Verify Auto-Detection with Real Bank SMS:</span>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="simulateBankSenderSMS(document.getElementById('bankSenderPicker').value, 'T')" class="py-2 px-2 bg-indigo-600/25 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/40 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+          <button onclick="simulateBankSenderSMS('ICICI', 'T')" class="py-2 px-2 bg-indigo-600/25 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/40 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
             <span>⚡</span>
-            <span>Test: Bank Sender (-T)</span>
+            <span>Test: ICICIT-T</span>
           </button>
-          <button onclick="simulateBankSenderSMS(document.getElementById('bankSenderPicker').value, 'S')" class="py-2 px-2 bg-purple-600/25 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+          <button onclick="simulateBankSenderSMS('ICICI', 'S')" class="py-2 px-2 bg-purple-600/25 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
             <span>📨</span>
-            <span>Test: Service SMS (-S)</span>
+            <span>Test: ICICIT-S</span>
           </button>
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="simulateSendMoney()" class="py-2 px-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
-            <span>💸</span>
-            <span>Test: Send Money</span>
+          <button onclick="simulateBankSenderSMS('HDFC', 'T')" class="py-2 px-2 bg-blue-600/25 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+            <span>🏦</span>
+            <span>Test: HDFCBK</span>
           </button>
-          <button onclick="simulateReceiveMoney()" class="py-2 px-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
-            <span>💰</span>
-            <span>Test: Receive Money</span>
+          <button onclick="simulateBankSenderSMS('SBI', 'S')" class="py-2 px-2 bg-emerald-600/25 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 rounded-xl text-[11px] font-bold transition flex items-center justify-center space-x-1 active:scale-95">
+            <span>🏦</span>
+            <span>Test: SBIINB</span>
           </button>
         </div>
       </div>
@@ -1175,8 +1184,9 @@
                 <p class="text-[10px] text-slate-400">Auto-catch bank SMS when received</p>
               </div>
             </div>
-            <button onclick="openShortcutsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl text-[11px] font-bold transition">
-              Setup
+            <button onclick="launchShortcutsAutoSetupDirect()" class="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white rounded-xl text-[11px] font-bold transition flex items-center space-x-1 shadow-md shadow-purple-600/30 active:scale-95">
+              <span>⚡</span>
+              <span>Auto-Setup</span>
             </button>
           </div>
 
@@ -1454,7 +1464,7 @@
                 <span class="block text-[10px] text-purple-300">Pre-Created • You only grant iOS permissions</span>
               </div>
             </div>
-            <button onclick="launchShortcutsAutoSetup()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-[11px] font-bold transition shadow-md shadow-indigo-600/30 flex items-center space-x-1">
+            <button onclick="launchShortcutsAutoSetupDirect()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-[11px] font-bold transition shadow-md shadow-indigo-600/30 flex items-center space-x-1">
               <span>⚡</span>
               <span>Auto-Setup</span>
             </button>
@@ -1850,18 +1860,134 @@ Example:
       }
     }
 
-    function launchShortcutsAutoSetup() {
-      const baseUrl = window.location.origin + window.location.pathname;
-      const targetUrl = baseUrl + '?sms=';
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(targetUrl).then(() => {
-          showToast('✅ Shortcut URL copied! Opening iOS Shortcuts...');
-        }).catch(() => {});
+        // --- APPLE SHORTCUTS AUTOMATION ASSISTANT & PRESETS ---
+    let currentShortcutsPreset = 'ALL';
+
+    function selectBankPreset(presetKey) {
+      currentShortcutsPreset = presetKey || 'ALL';
+      const kwElem = document.getElementById('blueprintKeyword');
+      const btnElem = document.getElementById('launchPresetBtnText');
+      const presetDescElem = document.getElementById('presetDescription');
+
+      let keyword = 'Rs';
+      let bankName = 'All Indian Banks';
+
+      if (presetKey === 'ICICI') { keyword = 'ICICI'; bankName = 'ICICI Bank'; }
+      else if (presetKey === 'HDFC') { keyword = 'HDFC'; bankName = 'HDFC Bank'; }
+      else if (presetKey === 'SBI') { keyword = 'SBI'; bankName = 'SBI Bank'; }
+      else if (presetKey === 'AXIS') { keyword = 'Axis'; bankName = 'Axis Bank'; }
+      else if (presetKey === 'KOTAK') { keyword = 'Kotak'; bankName = 'Kotak Bank'; }
+      else if (presetKey === 'IDFC') { keyword = 'IDFC'; bankName = 'IDFC FIRST Bank'; }
+      else if (presetKey === 'UPI') { keyword = 'UPI'; bankName = 'UPI Apps'; }
+      else { keyword = 'Rs'; bankName = 'All Indian Banks'; }
+
+      if (kwElem) kwElem.textContent = keyword;
+      if (btnElem) btnElem.textContent = presetKey === 'ALL' ? 'Launch Apple Shortcuts' : `Launch Shortcuts (${bankName})`;
+      if (presetDescElem) {
+        presetDescElem.innerHTML = `${bankName}: Contains <code class="text-indigo-300 font-bold bg-slate-900 px-1 rounded font-mono">${keyword}</code>`;
       }
-      openShortcutsModal();
+
+      // Update pill styles
+      document.querySelectorAll('.bank-preset-pill').forEach(el => {
+        if (el.dataset.preset === presetKey) {
+          el.className = 'bank-preset-pill px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[11px] font-bold shadow transition';
+        } else {
+          el.className = 'bank-preset-pill px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-semibold transition';
+        }
+      });
+    }
+
+    function launchShortcutsAutoSetupDirect(presetKey = null) {
+      if (presetKey) {
+        selectBankPreset(presetKey);
+      }
+      copySetupURL();
+      openShortcutsModal(presetKey || currentShortcutsPreset || 'ALL');
+      showToast('⚡ Action URL copied! Launching Apple Shortcuts...');
+
       setTimeout(() => {
         window.location.href = 'shortcuts://create-automation';
-      }, 500);
+      }, 350);
+    }
+
+    // Backward compatibility alias
+    function launchShortcutsAutoSetup() {
+      launchShortcutsAutoSetupDirect();
+    }
+
+    function copySetupURL() {
+      const url = "https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('Copied Setup URL to clipboard!');
+        }).catch(() => {
+          showToast('Setup URL ready to copy');
+        });
+      } else {
+        showToast('Setup URL ready');
+      }
+    }
+
+    function openShortcutsModal(presetKey = 'ALL') {
+      const modal = document.getElementById('shortcutsModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        selectBankPreset(presetKey || currentShortcutsPreset || 'ALL');
+      }
+    }
+
+    function closeShortcutsModal() {
+      const modal = document.getElementById('shortcutsModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function quickReadClipboardNow() {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (!text || text.trim().length === 0) {
+            showToast('Clipboard is empty. Copy a bank SMS first!');
+            return;
+          }
+          const res = parseBankSMSText(text);
+          if (res && res.amount) {
+            const newRec = {
+              id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+              amount: res.amount,
+              type: res.type,
+              merchant: res.merchant,
+              category: res.category,
+              bank: res.bank,
+              last4: res.last4,
+              mode: res.mode,
+              date: res.date || getTodayISO(),
+              isAuto: true,
+              isMissingDetails: res.isMissingDetails || false,
+              raw: text
+            };
+            transactions.unshift(newRec);
+            saveState();
+            closeShortcutsModal();
+            render();
+            showCenterAlert(
+              `SMS Logged (${res.bank})!`,
+              `⚡ Recorded <strong>${currencySymbol}${res.amount.toFixed(2)}</strong> from clipboard!<br><span class="text-xs text-slate-300">(${res.merchant} • ${res.mode})</span>`,
+              'success',
+              4
+            );
+          } else {
+            showCenterAlert(
+              'Could Not Parse SMS',
+              `The clipboard content did not match a recognized bank transaction format:<br><div class="p-2 bg-slate-950 font-mono text-[11px] text-slate-400 rounded mt-1 max-h-20 overflow-hidden text-ellipsis">${text.substring(0, 150)}...</div>`,
+              'warning'
+            );
+          }
+        } catch (e) {
+          showToast('Clipboard access was denied by browser.');
+        }
+      } else {
+        showToast('Clipboard API not available in this browser.');
+      }
     }
 
     function copyKeywords() {
@@ -2925,9 +3051,9 @@ Example:
                 <h3 class="text-xs font-bold text-slate-200">Apple Shortcuts Integration</h3>
                 <p class="text-[10px] text-slate-400">100% on-device automated SMS sync</p>
               </div>
-              <button onclick="openShortcutsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl text-xs font-bold transition flex items-center space-x-1">
-                <span>🍎</span>
-                <span>Setup Guide</span>
+              <button onclick="launchShortcutsAutoSetupDirect()" class="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1 shadow-md shadow-purple-600/30 active:scale-95">
+                <span>⚡</span>
+                <span>Auto-Setup</span>
               </button>
             </div>
             <button onclick="openIosInstallModal()" class="w-full py-2 bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 text-blue-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5">
@@ -2993,27 +3119,7 @@ Example:
       }
     }
 
-    // --- SHORTCUTS MODAL ---
-    function openShortcutsModal() {
-      document.getElementById('shortcutsModal').classList.remove('hidden');
-    }
 
-        function copySetupURL() {
-      const url = "https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]";
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(() => {
-          showToast('Copied Setup URL to clipboard!');
-        }).catch(() => {
-          showToast('Setup URL ready to copy');
-        });
-      } else {
-        showToast('Setup URL ready');
-      }
-    }
-
-    function closeShortcutsModal() {
-      document.getElementById('shortcutsModal').classList.add('hidden');
-    }
 
     // --- TRANSACTION DETAIL INSPECTOR ---
     function openDetailModal(id) {
