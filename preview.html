@@ -704,29 +704,67 @@
     // 100% PRIVATE MOBILE DATABASE (Stored exclusively in this phone's localStorage)
     const initialData = [];
 
-    let storedRecords = localStorage.getItem('expenses_pwa_records_v2');
+    // --- PWA vs WEB DETECTION (EPHEMERAL ON WEB REFRESH • PERSISTENT ON MOBILE PWA) ---
+    function isPwaStandalone() {
+      return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+             (window.navigator.standalone === true) ||
+             (document.referrer && document.referrer.includes('android-app://'));
+    }
+
+    const isAppPWA = isPwaStandalone();
+
+    // Check if web page was refreshed (reload)
+    const navEntries = (performance.getEntriesByType && performance.getEntriesByType('navigation')) || [];
+    const isPageReload = (navEntries[0] && navEntries[0].type === 'reload') || (performance.navigation && performance.navigation.type === 1);
+
     let transactions = [];
-    if (storedRecords) {
-      try {
-        const parsed = JSON.parse(storedRecords);
-        if (Array.isArray(parsed)) {
-          const legacyIds = new Set(['1', '2', '3', '4', '5', '6']);
-          // Unconditionally purge any legacy mock/sample records (Starbucks mock, Infosys mock, etc.)
-          transactions = parsed.filter(t => 
-            !legacyIds.has(String(t.id)) && 
-            t.merchant !== 'Infosys Ltd (Salary)' && 
-            !/infosys/i.test(t.merchant || '') &&
-            t.merchant !== 'Starbucks Coffee (Sample)' &&
-            !(t.merchant === 'Starbucks Coffee' && t.amount === 350.0 && t.id === '1')
-          );
-          if (transactions.length !== parsed.length) {
-            localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
-          }
-        }
-      } catch (e) {
+
+    if (!isAppPWA) {
+      // WEB BROWSER MODE:
+      // If refreshed or session ended, wipe all data so nobody else sees your bank statement!
+      if (isPageReload || !sessionStorage.getItem('web_active_session')) {
         transactions = [];
+        localStorage.removeItem('expenses_pwa_records_v2');
+        sessionStorage.setItem('web_active_session', 'true');
+      } else {
+        const stored = localStorage.getItem('expenses_pwa_records_v2');
+        if (stored) {
+          try { transactions = JSON.parse(stored) || []; } catch(e) { transactions = []; }
+        }
+      }
+
+      // Wipe local storage on page unload / tab close in web mode for absolute privacy
+      window.addEventListener('beforeunload', () => {
+        if (!isPwaStandalone()) {
+          localStorage.removeItem('expenses_pwa_records_v2');
+        }
+      });
+    } else {
+      // PWA STANDALONE MODE (Add to Home Screen):
+      // 100% Persistent on-device mobile database. NEVER wiped on refresh!
+      let storedRecords = localStorage.getItem('expenses_pwa_records_v2');
+      if (storedRecords) {
+        try {
+          const parsed = JSON.parse(storedRecords);
+          if (Array.isArray(parsed)) {
+            const legacyIds = new Set(['1', '2', '3', '4', '5', '6']);
+            transactions = parsed.filter(t => 
+              !legacyIds.has(String(t.id)) && 
+              t.merchant !== 'Infosys Ltd (Salary)' && 
+              !/infosys/i.test(t.merchant || '') &&
+              t.merchant !== 'Starbucks Coffee (Sample)' &&
+              !(t.merchant === 'Starbucks Coffee' && t.amount === 350.0 && t.id === '1')
+            );
+            if (transactions.length !== parsed.length) {
+              localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
+            }
+          }
+        } catch (e) {
+          transactions = [];
+        }
       }
     }
+
     // Purge old storage keys from previous builds
     localStorage.removeItem('expenses_dual_data');
     localStorage.removeItem('expenses_data');
@@ -1171,6 +1209,60 @@
     checkIosInstallState();
     }
 
+        // --- MULTIPLE DELETE (BULK DELETE) SYSTEM ---
+    let isMultiSelectMode = false;
+    let selectedTxnIds = new Set();
+
+    function toggleMultiSelectMode() {
+      isMultiSelectMode = !isMultiSelectMode;
+      if (!isMultiSelectMode) {
+        selectedTxnIds.clear();
+      }
+      render();
+    }
+
+    function toggleSelectTransaction(id) {
+      if (selectedTxnIds.has(id)) {
+        selectedTxnIds.delete(id);
+      } else {
+        selectedTxnIds.add(id);
+      }
+      render();
+    }
+
+    function selectAllTransactions() {
+      transactions.forEach(t => selectedTxnIds.add(t.id));
+      render();
+    }
+
+    function deselectAllTransactions() {
+      selectedTxnIds.clear();
+      render();
+    }
+
+    function confirmDeleteSelected() {
+      if (selectedTxnIds.size === 0) {
+        showToast('Please select at least one transaction to delete');
+        return;
+      }
+
+      const count = selectedTxnIds.size;
+      showCenterAlertWithAction(
+        `Delete ${count} Transaction${count > 1 ? 's' : ''}?`,
+        `Are you sure you want to permanently delete the <strong>${count}</strong> selected transactions?<br><span class="text-xs text-rose-300 font-normal">This action cannot be undone.</span>`,
+        'warning',
+        `🗑️ Delete Permanently (${count})`,
+        () => {
+          transactions = transactions.filter(t => !selectedTxnIds.has(t.id));
+          saveState();
+          selectedTxnIds.clear();
+          isMultiSelectMode = false;
+          render();
+          showToast(`🗑️ Deleted ${count} transaction${count > 1 ? 's' : ''}!`);
+        }
+      );
+    }
+
     function renderExpenses(container) {
       // Sort transactions chronologically descending (newest date first)
       transactions.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -1186,17 +1278,53 @@
       const sortedMonthKeys = Object.keys(monthsMap).sort().reverse();
       const displayMonthKeys = selectedMonthFilter === 'all' ? sortedMonthKeys : [selectedMonthFilter];
 
+      const isWeb = !isPwaStandalone();
       container.innerHTML = `
         <div class="space-y-4">
+          <!-- Privacy Mode Banner -->
+          <div class="p-2.5 rounded-xl text-xs flex items-center justify-between gap-2 ${isWeb ? 'bg-amber-950/40 border border-amber-500/30 text-amber-200' : 'bg-emerald-950/30 border border-emerald-500/30 text-emerald-200'}">
+            <div class="flex items-center space-x-2 min-w-0">
+              <span>${isWeb ? '🔒' : '📱'}</span>
+              <span class="text-[11px] truncate">
+                ${isWeb ? '<strong>Web Session:</strong> Data wipes on page refresh for privacy' : '<strong>Mobile PWA:</strong> 100% Persistent on-device database'}
+              </span>
+            </div>
+            ${isWeb ? `<button onclick="openIosInstallModal()" class="px-2 py-0.5 bg-amber-600/30 hover:bg-amber-600 text-white rounded text-[10px] font-bold shrink-0">Install PWA</button>` : ''}
+          </div>
+
+          <!-- Header with Multi-Select Toggle -->
           <div class="flex justify-between items-center">
             <div>
               <h2 class="text-lg font-extrabold text-white">All Transactions</h2>
-              <p class="text-[11px] text-slate-400">Grouped by month from bank SMS dates</p>
+              <p class="text-[11px] text-slate-400">Grouped by month • ${transactions.length} total</p>
             </div>
-            <button onclick="openAddModal()" class="px-3 py-1 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-xl text-xs font-bold transition">
-              + Add
-            </button>
+            <div class="flex items-center space-x-2">
+              <button onclick="toggleMultiSelectMode()" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${isMultiSelectMode ? 'bg-rose-600 text-white shadow-md' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'}">
+                ${isMultiSelectMode ? 'Done' : '☑️ Select'}
+              </button>
+              <button onclick="openAddModal()" class="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-xl text-xs font-bold transition">
+                + Add
+              </button>
+            </div>
           </div>
+
+          <!-- Sticky Multi-Delete Action Bar (Visible when Select Mode active) -->
+          ${isMultiSelectMode ? `
+            <div class="bg-gradient-to-r from-slate-900 to-slate-950 border-2 border-blue-500/50 p-3 rounded-2xl shadow-xl flex items-center justify-between gap-2 animate-scaleUp">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-white px-2 py-1 bg-blue-600/30 border border-blue-500/40 rounded-lg">
+                  ${selectedTxnIds.size} Selected
+                </span>
+                <button onclick="selectAllTransactions()" class="text-[11px] text-blue-400 hover:text-white underline font-medium">Select All</button>
+                <span class="text-slate-600">•</span>
+                <button onclick="deselectAllTransactions()" class="text-[11px] text-slate-400 hover:text-white font-medium">Clear</button>
+              </div>
+              <button onclick="confirmDeleteSelected()" ${selectedTxnIds.size === 0 ? 'disabled' : ''} class="px-3.5 py-1.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 disabled:opacity-40 disabled:pointer-events-none text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-600/30 flex items-center space-x-1">
+                <span>🗑️</span>
+                <span>Delete (${selectedTxnIds.size})</span>
+              </button>
+            </div>
+          ` : ''}
 
           <!-- Month Selector Pills -->
           <div class="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar text-xs">
@@ -1255,12 +1383,20 @@
     function getTransactionRowHTML(t) {
       const isExp = t.type === 'Expense';
       const formattedDate = formatDisplayDate(t.date);
+      const isSelected = selectedTxnIds.has(t.id);
+
       return `
-        <div onclick="openDetailModal('${t.id}')" class="bg-slate-900/90 border border-slate-800/90 p-3.5 rounded-2xl flex items-center justify-between active:scale-98 hover:border-slate-700 cursor-pointer transition">
+        <div onclick="${isMultiSelectMode ? `toggleSelectTransaction('${t.id}')` : `openDetailModal('${t.id}')`}" class="bg-slate-900/90 border ${isSelected ? 'border-blue-500 bg-blue-950/20' : 'border-slate-800/90'} p-3.5 rounded-2xl flex items-center justify-between active:scale-98 hover:border-slate-700 cursor-pointer transition">
           <div class="flex items-center space-x-3 min-w-0">
-            <div class="w-10 h-10 rounded-xl ${isExp ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'} flex items-center justify-center font-bold text-sm shrink-0">
-              ${isExp ? '↓' : '↑'}
-            </div>
+            ${isMultiSelectMode ? `
+              <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition ${isSelected ? 'bg-blue-600 border-blue-500 text-white' : 'border-slate-600 bg-slate-950'}">
+                ${isSelected ? '✓' : ''}
+              </div>
+            ` : `
+              <div class="w-10 h-10 rounded-xl ${isExp ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'} flex items-center justify-center font-bold text-sm shrink-0">
+                ${isExp ? '↓' : '↑'}
+              </div>
+            `}
             <div class="min-w-0">
               <div class="flex items-center space-x-1.5">
                 <p class="text-xs font-bold text-white truncate">${t.merchant}</p>
@@ -1342,21 +1478,34 @@
           </div>
         </div>
 
-        <!-- Direct Paste Box -->
+        <!-- Direct Paste Box with Instant Test Templates & Real-Time Breakdown -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
           <div class="flex justify-between items-center">
             <label class="text-xs font-bold text-slate-200">Paste Bank or UPI SMS</label>
             <button onclick="clearSMSInput()" class="text-[11px] text-slate-400 hover:text-white">Clear</button>
           </div>
 
-          <textarea id="smsInput" rows="5" placeholder="Paste single or multiple bank SMS messages here...
+          <!-- 1-Tap Bank SMS Template Chips -->
+          <div class="space-y-1">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">1-Tap Test Templates:</span>
+            <div class="flex flex-wrap gap-1.5 text-[10px]">
+              <button type="button" onclick="loadSMSTemplate('ICICI_S')" class="px-2 py-1 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-lg font-semibold transition">⚡ ICICIT-S (Service)</button>
+              <button type="button" onclick="loadSMSTemplate('ICICI_T')" class="px-2 py-1 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-lg font-semibold transition">⚡ ICICIT-T (Transact)</button>
+              <button type="button" onclick="loadSMSTemplate('HDFC')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold transition">HDFCBK-T Debit</button>
+              <button type="button" onclick="loadSMSTemplate('SBI')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold transition">SBIINB Credit</button>
+              <button type="button" onclick="loadSMSTemplate('PHONEPE')" class="px-2 py-1 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-lg font-semibold transition">PhonePe UPI</button>
+              <button type="button" onclick="loadSMSTemplate('GPAY')" class="px-2 py-1 bg-blue-950/80 hover:bg-blue-900 border border-blue-500/30 text-blue-300 rounded-lg font-semibold transition">Google Pay</button>
+            </div>
+          </div>
 
-Handles:
-• Sent money (P2P UPI to friends & family)
-• Received money (UPI / Refund / Deposit)
-• Purchases (Swiggy, Zomato, Starbucks, Groceries)
-• Salary & Bank credits" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
+          <textarea id="smsInput" oninput="updateSMSLivePreview(this.value)" rows="4" placeholder="Paste single or multiple bank SMS messages here...
+Handles ICICIT-S, ICICIT-T, HDFCBK, SBI, PhonePe, GPay, Paytm, etc." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
           
+          <!-- Live Real-Time Breakdown Card -->
+          <div id="smsLivePreview" class="hidden p-3 rounded-xl bg-slate-950 border border-blue-500/30 space-y-2 text-xs">
+            <!-- Injected dynamically -->
+          </div>
+
           <div class="flex gap-2">
             <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
               <span>📋</span>
@@ -1444,6 +1593,73 @@ Example:
               <span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">PNB / BoB</span>
               <span class="px-2 py-0.5 bg-blue-900/40 text-blue-300 rounded-md border border-blue-500/30">All Indian Banks</span>
             </div>
+          </div>
+        </div>
+      `;
+    }
+
+        const SMS_TEMPLATES = {
+      'ICICI_S': 'ICICIT-S: Dear Customer, your A/c 1234 has been debited by 850.00 on 04Sep26. Avl Bal INR 14,250.00.',
+      'ICICI_T': 'ICICIT-T: Dear Customer, A/c 1234 debited by Rs. 450.00 on 04Sep26 towards transfer to Rahul Sharma via UPI.',
+      'HDFC': 'HDFCBK-T: Rs.649.00 debited from A/c **4321 on 04-09-26 to Swiggy via UPI. Avl bal: Rs 42,350.00',
+      'SBI': 'VK-SBIINB-S: Your A/c 9876 has been credited with INR 25,000.00 on 04-Sep-26 by transfer from Priya Singh via UPI. Bal INR 55,000.',
+      'PHONEPE': 'Sent Rs 500 to Ramesh Kumar on 04-09-2026 using PhonePe UPI. Txn ID: T260904123456.',
+      'GPAY': 'Paid Rs. 120.00 to Sharma General Store using Google Pay UPI on 04 Sep 2026.'
+    };
+
+    function loadSMSTemplate(key) {
+      const txt = SMS_TEMPLATES[key] || '';
+      const input = document.getElementById('smsInput');
+      if (input) {
+        input.value = txt;
+        updateSMSLivePreview(txt);
+      }
+    }
+
+    function updateSMSLivePreview(text) {
+      const preview = document.getElementById('smsLivePreview');
+      if (!preview) return;
+
+      if (!text || !text.trim()) {
+        preview.classList.add('hidden');
+        return;
+      }
+
+      const res = parseBankSMSText(text);
+      if (!res || !res.amount) {
+        preview.classList.remove('hidden');
+        preview.innerHTML = `
+          <div class="text-[11px] text-amber-400 flex items-center space-x-1.5">
+            <span>⚠️</span>
+            <span>Could not extract monetary amount. Ensure text contains debited/credited amount (e.g. 850.00 or Rs. 450).</span>
+          </div>
+        `;
+        return;
+      }
+
+      const isExp = res.type === 'Expense';
+      preview.classList.remove('hidden');
+      preview.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+          <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">⚡ Live SMS Detection Preview:</span>
+          <span class="text-[10px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-bold">${res.mode}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs pt-0.5">
+          <div>
+            <span class="text-slate-400 block text-[10px]">Merchant / Recipient:</span>
+            <strong class="text-white">${res.merchant}</strong>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-400 block text-[10px]">Amount & Type:</span>
+            <strong class="${isExp ? 'text-rose-400' : 'text-emerald-400'}">${isExp ? '-' : '+'}${currencySymbol}${res.amount.toFixed(2)} (${res.type})</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px]">Bank / Route:</span>
+            <span class="text-slate-300 font-medium">${res.bank} ${res.route ? `(${res.route})` : ''}</span>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-400 block text-[10px]">Category:</span>
+            <span class="text-slate-300">${res.category}</span>
           </div>
         </div>
       `;
