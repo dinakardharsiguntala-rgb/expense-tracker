@@ -294,14 +294,33 @@
             <span class="text-[10px] text-purple-300 font-bold">Run Immediately</span>
           </div>
 
-          <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1">
-            <span class="text-slate-400 block text-[10px] uppercase font-bold">2. Do (Action)</span>
-            <p class="text-[10px] text-slate-300">Tap <strong>Add Action</strong> ➔ Search <strong>Open URLs</strong> ➔ Paste the copied link:</p>
-            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 font-mono text-[10px] text-blue-300 break-all select-all flex justify-between items-center gap-1.5 mt-1">
-              <span>https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]</span>
-              <button onclick="copySetupURL()" class="px-2 py-0.5 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[9px] rounded font-bold whitespace-nowrap">Copy</button>
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">2. Do (2 Simple Actions in Shortcuts)</span>
+              <span class="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">Fixes "Shortcut is running"</span>
             </div>
-            <p class="text-[9px] text-emerald-400 mt-1">⚡ Tip: In the link, tap the blue token <strong>[Shortcut Input]</strong> above the keyboard.</p>
+
+            <!-- Action A: URL Encode -->
+            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800/80 space-y-1">
+              <div class="flex items-center space-x-1 text-[11px] font-bold text-white">
+                <span class="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">A</span>
+                <span>Search Action: <code class="text-indigo-300 bg-indigo-950 px-1 py-0.5 rounded font-mono">URL Encode</code></span>
+              </div>
+              <p class="text-[10px] text-slate-300 pl-5">Tap <strong>Text</strong> ➔ choose <strong class="text-blue-300">Shortcut Input</strong>. (This encodes spaces so the URL opens without errors!).</p>
+            </div>
+
+            <!-- Action B: Open URLs -->
+            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800/80 space-y-1">
+              <div class="flex items-center space-x-1 text-[11px] font-bold text-white">
+                <span class="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px]">B</span>
+                <span>Search Action: <code class="text-indigo-300 bg-indigo-950 px-1 py-0.5 rounded font-mono">Open URLs</code></span>
+              </div>
+              <p class="text-[10px] text-slate-300 pl-5">Paste the link base and tap <strong class="text-purple-300">URL Encoded Text</strong>:</p>
+              <div class="bg-slate-900 p-2 rounded border border-slate-800 font-mono text-[10px] text-blue-300 break-all select-all flex justify-between items-center gap-1.5 mt-1">
+                <span>https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[URL Encoded Text]</span>
+                <button onclick="copySetupURL()" class="px-2 py-0.5 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[9px] rounded font-bold whitespace-nowrap">Copy</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2010,7 +2029,7 @@ Example:
     }
 
     function copySetupURL() {
-      const url = "https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]";
+      const url = "https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=";
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(() => {
           showToast('Copied Setup URL to clipboard!');
