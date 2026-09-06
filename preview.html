@@ -556,18 +556,27 @@
     if (storedRecords) {
       try {
         const parsed = JSON.parse(storedRecords);
-        // Purge legacy sample seeds (ids '1' through '6') if user had old dummy data
-        const legacyIds = new Set(['1', '2', '3', '4', '5', '6']);
-        if (Array.isArray(parsed) && parsed.length === 6 && parsed.every(t => legacyIds.has(t.id))) {
-          transactions = [];
-          localStorage.setItem('expenses_pwa_records_v2', JSON.stringify([]));
-        } else if (Array.isArray(parsed)) {
-          transactions = parsed;
+        if (Array.isArray(parsed)) {
+          const legacyIds = new Set(['1', '2', '3', '4', '5', '6']);
+          // Unconditionally purge any legacy mock/sample records (Starbucks mock, Infosys mock, etc.)
+          transactions = parsed.filter(t => 
+            !legacyIds.has(String(t.id)) && 
+            t.merchant !== 'Infosys Ltd (Salary)' && 
+            !/infosys/i.test(t.merchant || '') &&
+            t.merchant !== 'Starbucks Coffee (Sample)' &&
+            !(t.merchant === 'Starbucks Coffee' && t.amount === 350.0 && t.id === '1')
+          );
+          if (transactions.length !== parsed.length) {
+            localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
+          }
         }
       } catch (e) {
         transactions = [];
       }
     }
+    // Purge old storage keys from previous builds
+    localStorage.removeItem('expenses_dual_data');
+    localStorage.removeItem('expenses_data');
 
     function saveState() {
       localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
@@ -1268,7 +1277,7 @@ Example:
       if (/zomato/i.test(clean)) return 'Zomato Dining';
       if (/bescom|electricity/i.test(clean)) return 'Electricity Bill';
       if (/shell|fuel|petrol|hpcl|bpcl/i.test(clean)) return 'Fuel Station';
-      if (/salary|infosys|payroll/i.test(clean)) return 'Monthly Salary';
+      if (/salary|payroll/i.test(clean)) return 'Salary';
       if (/bbps|infinity payment|payment received/i.test(clean)) return 'Credit Card Bill Payment';
       if (/reliance digital/i.test(clean)) return 'Reliance Digital';
       return clean.length > 25 ? clean.substring(0, 25).trim() : clean;
@@ -1598,7 +1607,7 @@ Example:
       }
     }
 
-    // --- ROCK-SOLID ON-DEVICE SMS PARSER ---
+    // --- ROCK-SOLID ON-DEVICE SMS PARSER (MULTI-UPI APPS & BANKS) ---
     function parseBankSMSText(clean) {
       if (!clean) return null;
       clean = clean.trim();
@@ -1610,33 +1619,39 @@ Example:
       // 2. Extract transaction amount (ignoring balance)
       let amount = null;
 
-      // Priority 1: Action word followed by amount (e.g. "debited by Rs. 450", "credited with INR 1,299", "sent Rs 500")
-      const p1 = clean.match(/(?:debited|spent|paid|credited|transferred|withdrawn|deposited|sent|purchase\s+with|purchase\s+of)\s+(?:by|with|of|for)?\s*(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))/i);
-      if (p1) {
-        const val = p1[1] || p1[2];
-        amount = parseFloat(val.replace(/,/g, ''));
-      } else {
-        // Priority 2: Amount preceding action word (e.g. "Rs. 450 debited", "INR 1,299.00 has been credited")
-        const p2 = clean.match(/(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))\s+(?:has\s+been\s+)?(?:debited|spent|paid|credited|transferred|deposited|sent)/i);
-        if (p2) {
-          const val = p2[1] || p2[2];
-          amount = parseFloat(val.replace(/,/g, ''));
-        } else {
-          // Priority 3: First valid currency pattern not preceded by balance
-          const curRegex = /(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))/gi;
-          let match;
-          while ((match = curRegex.exec(clean)) !== null) {
-            const val = match[1] || match[2];
-            const startIdx = match.index;
-            const preceding = clean.substring(Math.max(0, startIdx - 15), startIdx).toLowerCase();
-            if (preceding.includes('bal') || preceding.includes('balance')) {
-              continue;
-            }
-            const candidate = parseFloat(val.replace(/,/g, ''));
-            if (candidate && !isNaN(candidate) && candidate > 0) {
-              amount = candidate;
-              break;
-            }
+      // Priority 1: Action word followed by amount (currency optional!)
+      // e.g. "debited by 850.00", "debited by Rs. 450", "credited with INR 1,299", "sent Rs 500"
+      const p1 = clean.match(/(?:debited|spent|paid|credited|transferred|withdrawn|deposited|sent|purchase\s+with|purchase\s+of)\s+(?:by|with|of|for)?\s*(?:(?:Rs\.?|INR|USD|\$|₹)\s*)?(\d[\d,]*(?:\.\d+)?)\b/i);
+      if (p1 && p1[1]) {
+        const val = parseFloat(p1[1].replace(/,/g, ''));
+        if (!isNaN(val) && val > 0) amount = val;
+      }
+
+      if (!amount) {
+        // Priority 2: Amount preceding action word
+        // e.g. "Rs. 450 debited", "850.00 has been debited", "INR 1,299.00 has been credited"
+        const p2 = clean.match(/(?:(?:Rs\.?|INR|USD|\$|₹)\s*)?(\d[\d,]*(?:\.\d+)?)\s+(?:has\s+been\s+)?(?:debited|spent|paid|credited|transferred|deposited|sent)\b/i);
+        if (p2 && p2[1]) {
+          const val = parseFloat(p2[1].replace(/,/g, ''));
+          if (!isNaN(val) && val > 0) amount = val;
+        }
+      }
+
+      if (!amount) {
+        // Priority 3: First valid currency pattern not preceded by balance
+        const curRegex = /(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))/gi;
+        let match;
+        while ((match = curRegex.exec(clean)) !== null) {
+          const val = match[1] || match[2];
+          const startIdx = match.index;
+          const preceding = clean.substring(Math.max(0, startIdx - 15), startIdx).toLowerCase();
+          if (preceding.includes('bal') || preceding.includes('balance')) {
+            continue;
+          }
+          const candidate = parseFloat(val.replace(/,/g, ''));
+          if (candidate && !isNaN(candidate) && candidate > 0) {
+            amount = candidate;
+            break;
           }
         }
       }
@@ -1645,17 +1660,30 @@ Example:
         return null;
       }
 
-      // 3. Merchant & P2P detection
+      // 3. Detect UPI App Brand (GPay, PhonePe, Paytm, CRED, Amazon Pay, WhatsApp, BHIM, etc.)
+      let upiApp = null;
+      if (/\bgpay|google\s*pay\b/i.test(clean)) upiApp = 'GPay';
+      else if (/\bphonepe\b/i.test(clean)) upiApp = 'PhonePe';
+      else if (/\bpaytm\b/i.test(clean)) upiApp = 'Paytm';
+      else if (/\bcred\b/i.test(clean)) upiApp = 'CRED';
+      else if (/\bamazon\s*pay\b/i.test(clean)) upiApp = 'Amazon Pay';
+      else if (/\bwhatsapp\b/i.test(clean)) upiApp = 'WhatsApp';
+      else if (/\bbhim\b/i.test(clean)) upiApp = 'BHIM';
+      else if (/\bsuper\.?money\b/i.test(clean)) upiApp = 'super.money';
+      else if (/\bnavi\b/i.test(clean)) upiApp = 'Navi';
+      else if (/\bjupiter\b/i.test(clean)) upiApp = 'Jupiter';
+      else if (/\bfi\b/i.test(clean)) upiApp = 'Fi Money';
+
       let merchant = 'Bank Transaction';
       let category = 'Other';
-      let mode = /upi/i.test(clean) ? 'UPI' : /card|pos/i.test(clean) ? 'Card' : 'NetBanking';
+      let mode = upiApp ? `${upiApp} UPI` : (/upi/i.test(clean) ? 'UPI' : (/card|pos/i.test(clean) ? 'Card' : 'NetBanking'));
 
-      // Priority A: Known Merchants (with strict word boundaries to avoid matching inside words like "via")
+      // Priority A: Known Merchants
       if (/\b(starbucks|cafe|coffee|mcdonalds|kfc|pizza|burger|swiggy|zomato|dining|restaurant)\b/i.test(clean)) {
         merchant = /swiggy/i.test(clean) ? 'Swiggy Food' : /zomato/i.test(clean) ? 'Zomato Dining' : /starbucks/i.test(clean) ? 'Starbucks Coffee' : 'Dining / Food';
         category = 'Food & Dining';
       } else if (/\b(blinkit|zepto|bigbasket|grocery|supermarket|mart|dmart|instamart)\b/i.test(clean)) {
-        merchant = /blinkit/i.test(clean) ? 'Blinkit Grocery' : 'Grocery Store';
+        merchant = /blinkit/i.test(clean) ? 'Blinkit Grocery' : /zepto/i.test(clean) ? 'Zepto' : 'Grocery Store';
         category = 'Groceries';
       } else if (/\b(uber|ola|rapido|fuel|petrol|shell|hpcl|bpcl|metro|irctc)\b/i.test(clean)) {
         merchant = /fuel|petrol|shell|hpcl|bpcl/i.test(clean) ? 'Fuel Station' : 'Uber Ride';
@@ -1677,7 +1705,7 @@ Example:
           'upi', 'via', 'on', 'using', 'ref', 'a/c', 'account', 'for', 'at', 'bank',
           'avl', 'bal', 'inr', 'rs', 'phonepe', 'gpay', 'paytm', 'customer', 'user',
           'info', 'acct', 'xx', 'towards', 'transfer', 'trf', 'from', 'your', 'through',
-          'neft', 'imps', 'rtgs', 'no', 'linked'
+          'neft', 'imps', 'rtgs', 'no', 'linked', 'ac', 'in', 'with', 'using', 'pay'
         ]);
 
         function cleanName(raw) {
@@ -1690,7 +1718,7 @@ Example:
             if (stopWords.has(cw.toLowerCase())) break;
             if (cw) cleaned.push(cw.charAt(0).toUpperCase() + cw.slice(1).toLowerCase());
           }
-          if (cleaned.length > 0 && cleaned.length <= 3) {
+          if (cleaned.length > 0 && cleaned.length <= 4) {
             return cleaned.join(' ');
           }
           return null;
@@ -1703,11 +1731,11 @@ Example:
           if (name && !/customer|user|account|payment/i.test(name)) {
             merchant = isCredit ? `Received from ${name}` : `Sent to ${name}`;
             category = 'Personal Transfer';
-            mode = 'UPI';
+            mode = upiApp ? `${upiApp} UPI` : 'UPI';
           }
         }
 
-        // Pattern B2: Standard Send/Receive text
+        // Pattern B2: Direct "Paid/Sent [Amount] to [Name]" or "Transfer to [Name]"
         if (merchant === 'Bank Transaction') {
           if (isCredit) {
             const mRec = clean.match(/\b(?:received\s+from|from|credited\s+by|deposited\s+by|trf\s+from|transfer\s+from)\s+([A-Za-z\s]{2,30})/i);
@@ -1719,12 +1747,23 @@ Example:
               }
             }
           } else {
-            const mSend = clean.match(/\b(?:towards\s+transfer\s+to|transfer(?:red)?\s+to|trf\s+to|paid\s+to|sent\s+to|to|towards)\s+([A-Za-z\s]{2,25})/i);
-            if (mSend) {
-              const name = cleanName(mSend[1]);
+            // Check "Paid/Sent Rs 500 to [Name]" or "towards transfer to [Name]"
+            const mSendWithAmt = clean.match(/\b(?:paid|sent|transferred)\s+(?:(?:Rs\.?|INR|₹|\$)\s*)?[\d,.]*\s*(?:by|via)?\s*to\s+([A-Za-z\s]{2,30})\b/i);
+            if (mSendWithAmt) {
+              const name = cleanName(mSendWithAmt[1]);
               if (name && !/customer|user|account|payment|your\s+bank/i.test(name)) {
                 merchant = `Sent to ${name}`;
                 category = 'Personal Transfer';
+              }
+            }
+            if (merchant === 'Bank Transaction') {
+              const mSend = clean.match(/\b(?:towards\s+transfer\s+to|transfer(?:red)?\s+to|trf\s+to|paid\s+to|sent\s+to|to|towards)\s+([A-Za-z\s]{2,25})/i);
+              if (mSend) {
+                const name = cleanName(mSend[1]);
+                if (name && !/customer|user|account|payment|your\s+bank/i.test(name)) {
+                  merchant = `Sent to ${name}`;
+                  category = 'Personal Transfer';
+                }
               }
             }
           }
@@ -1748,7 +1787,7 @@ Example:
 
       // 5. Last 4 digits
       let last4 = '';
-      const cardMatch = clean.match(/(?:card|a\/c|account|xx|\*\*)[^\d]*(\d{4})/i);
+      const cardMatch = clean.match(/(?:card|a\/c|account|ac|xx|\*\*)[^\d]*(\d{4})/i);
       if (cardMatch) last4 = cardMatch[1];
 
       const date = extractDateFromSMS(clean);
