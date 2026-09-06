@@ -231,18 +231,22 @@
       </div>
 
       <!-- End-to-End iOS Permission Checkpoints -->
-      <div class="space-y-2.5 pt-1">
-        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">End-to-End Permission Guide (Only 3 Steps)</h4>
+      <div class="space-y-3 pt-1">
+        <div class="bg-rose-950/50 border border-rose-500/50 p-3 rounded-xl text-xs text-rose-200 leading-relaxed">
+          <strong>⚠️ Critical Apple Rule:</strong> In Apple Shortcuts, the "Message Contains" field only accepts <strong>ONE SINGLE WORD</strong> (e.g. <code>debited</code>). Do NOT separate multiple words with commas, or Apple Shortcuts will wait for the entire phrase and will NEVER run!
+        </div>
+
+        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">3-Step Setup (Only 2 Minutes)</h4>
 
         <!-- Step 1 -->
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
           <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-bold text-white">Select Trigger: "Message"</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">In Shortcuts app, tap <strong>New Automation (+)</strong> &rarr; choose <strong>Message</strong>.</p>
-            <div class="mt-2 flex items-center justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-800">
-              <span class="text-[10px] font-mono text-emerald-400 truncate">debited, spent, credited, paid, INR, Rs</span>
-              <button onclick="copyKeywords()" class="ml-2 text-[10px] text-blue-400 font-bold shrink-0 hover:text-blue-300">Copy</button>
+            <h4 class="text-xs font-bold text-white">Create Automation ➔ Message</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">In Shortcuts app, tap <strong>Automation</strong> tab ➔ tap <strong>+</strong> ➔ choose <strong>Message</strong>.</p>
+            <div class="mt-2 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[11px] text-slate-300 space-y-1">
+              <p>• In <strong>Message Contains</strong>: enter only <code>debited</code></p>
+              <p class="text-[10px] text-slate-400"><em>(Or leave it blank if selecting your Bank name under Sender)</em></p>
             </div>
           </div>
         </div>
@@ -252,14 +256,14 @@
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
           <div>
             <div class="flex items-center space-x-1.5">
-              <h4 class="text-xs font-bold text-white">Grant Permission: "Run Immediately"</h4>
-              <span class="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-bold">User Permission</span>
+              <h4 class="text-xs font-bold text-white">Select "Run Immediately"</h4>
+              <span class="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-bold">Required iOS Permission</span>
             </div>
             <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
-              Select <strong>"Run Immediately"</strong> and turn OFF <strong>"Ask Before Running"</strong>.
+              Select <strong>"Run Immediately"</strong> and turn OFF <strong>"Notify When Run"</strong>.
             </p>
             <p class="text-[10px] text-slate-400 mt-1">
-              <em>Why Apple asks this:</em> Apple requires your device owner permission so your iPhone can log bank SMS automatically in the background without prompting you every single time.
+              This gives Apple permission to log your expenses automatically in the background without asking every time.
             </p>
           </div>
         </div>
@@ -268,12 +272,16 @@
         <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-start space-x-3">
           <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
           <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-bold text-white">Add Action: "Open URLs"</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>Add Action</strong> &rarr; search <strong>"Open URLs"</strong> &rarr; paste the pre-copied link:</p>
-            <div class="mt-1.5 p-2 bg-slate-900 rounded-lg text-[10px] font-mono text-blue-300 break-all select-all border border-slate-800">
-              https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]
+            <h4 class="text-xs font-bold text-white">Add Action ➔ "Open URLs"</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Tap <strong>Next</strong> ➔ search for action <strong>"Open URLs"</strong>.</p>
+            <div class="mt-2 p-2.5 bg-slate-900 rounded-xl border border-slate-800 space-y-1 text-[11px]">
+              <p class="text-slate-300">1. Paste your private URL:</p>
+              <div class="font-mono text-blue-300 break-all select-all text-[10px] bg-slate-950 p-1.5 rounded">
+                https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=
+              </div>
+              <p class="text-slate-300 mt-1.5">2. Tap the blue <strong>Shortcut Input</strong> token above your keyboard so it attaches to the URL!</p>
             </div>
-            <p class="text-[10px] text-emerald-400 font-semibold mt-1">Tap Done. That is all! Your iPhone is fully automated.</p>
+            <p class="text-[10px] text-emerald-400 font-semibold mt-1.5">Tap Done. Your iPhone will now record incoming bank SMS automatically!</p>
           </div>
         </div>
       </div>
@@ -1064,51 +1072,42 @@ Example:
           const content = await page.getTextContent();
           if (!content.items || content.items.length === 0) continue;
 
-          // Group text items into rows by vertical Y coordinate (~4px bucket)
-          // and sort columns horizontally left-to-right by X coordinate
-          const sortedItems = content.items.slice().sort((a, b) => {
-            const yA = (a.transform && a.transform[5] !== undefined) ? a.transform[5] : 0;
-            const yB = (b.transform && b.transform[5] !== undefined) ? b.transform[5] : 0;
-            const bucketA = Math.round(yA / 4);
-            const bucketB = Math.round(yB / 4);
-            if (bucketA !== bucketB) return bucketB - bucketA; // Top to bottom
-            const xA = (a.transform && a.transform[4] !== undefined) ? a.transform[4] : 0;
-            const xB = (b.transform && b.transform[4] !== undefined) ? b.transform[4] : 0;
-            return xA - xB; // Left to right
-          });
+          // Extract items with x, y coordinates
+          const items = content.items.map(it => {
+            const x = (it.transform && it.transform[4] !== undefined) ? it.transform[4] : 0;
+            const y = (it.transform && it.transform[5] !== undefined) ? it.transform[5] : 0;
+            return { str: (it.str || '').trim(), x, y };
+          }).filter(it => it.str.length > 0);
 
-          let pageLines = [];
-          let currentLine = [];
-          let currentBucket = null;
+          // Proximity Clustering: Group items on the same vertical line (within 6px Y proximity)
+          items.sort((a, b) => b.y - a.y); // Top to bottom
 
-          for (const item of sortedItems) {
-            const str = (item.str || '').trim();
-            if (!str) continue;
-            const y = (item.transform && item.transform[5] !== undefined) ? item.transform[5] : 0;
-            const bucket = Math.round(y / 4);
+          const lines = [];
+          let currentCluster = [];
+          let currentY = null;
 
-            if (currentBucket === null || bucket !== currentBucket) {
-              if (currentLine.length > 0) {
-                pageLines.push(currentLine.join(' '));
-                currentLine = [];
-              }
-              currentBucket = bucket;
+          for (const it of items) {
+            if (currentY === null || Math.abs(it.y - currentY) <= 6) {
+              currentCluster.push(it);
+              currentY = it.y;
+            } else {
+              // Sort current line left to right by X
+              currentCluster.sort((a, b) => a.x - b.x);
+              lines.push(currentCluster.map(c => c.str).join(' '));
+              currentCluster = [it];
+              currentY = it.y;
             }
-            currentLine.push(str);
           }
-          if (currentLine.length > 0) {
-            pageLines.push(currentLine.join(' '));
-          }
-
-          if (pageLines.length === 0 && content.items.length > 0) {
-            pageLines.push(content.items.map(it => it.str).join(' '));
+          if (currentCluster.length > 0) {
+            currentCluster.sort((a, b) => a.x - b.x);
+            lines.push(currentCluster.map(c => c.str).join(' '));
           }
 
-          extractedText += pageLines.join('\n') + '\n';
+          extractedText += lines.join('\n') + '\n';
         }
 
         if (!extractedText.trim()) {
-          showToast('Could not extract text. If this is a scanned PDF, please use CSV or paste text.');
+          showToast('Could not extract text. If this is a scanned image PDF, please use CSV or paste text.');
           return;
         }
 
@@ -1313,20 +1312,20 @@ Example:
       return null;
     }
 
-    // --- 100% DYNAMIC STATEMENT PARSER (ZERO HARDCODED DATA) ---
+    // --- 100% DYNAMIC STATEMENT PARSER (ADAPTIVE UNIVERSAL ENGINE) ---
     function importDynamicBankStatement(rawText, filename) {
       if (!rawText || !rawText.trim()) {
         showToast('Statement file or text is empty.');
         return;
       }
 
-      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length === 0) {
+      const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (rawLines.length === 0) {
         showToast('No readable text found in statement.');
         return;
       }
 
-      const sampleScan = rawText.substring(0, 4000);
+      const sampleScan = rawText.substring(0, 5000);
 
       // 1. Detect Bank Name
       let bankName = 'Bank';
@@ -1341,6 +1340,7 @@ Example:
       else if (/\bbaroda|bob\b/i.test(sampleScan + ' ' + filename)) bankName = 'Bank of Baroda';
       else if (/\bidfc\b/i.test(sampleScan + ' ' + filename)) bankName = 'IDFC FIRST';
       else if (/\byes\s+bank\b/i.test(sampleScan + ' ' + filename)) bankName = 'Yes Bank';
+      else if (/\bamex|american express\b/i.test(sampleScan + ' ' + filename)) bankName = 'American Express';
 
       // 2. Detect Account Type (Credit Card vs Savings / Current A/c)
       let isCreditCard = false;
@@ -1410,141 +1410,177 @@ Example:
         };
       }
 
-      const parsedRecords = [];
       const DATE_REGEX_STR = '(?:\d{1,2}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{2,4}|\d{1,2}\s+[a-zA-Z]{3,9}\s+\d{2,4}|\d{4}[-/.](?:[a-zA-Z]{3,9}|\d{1,2})[-/.]\d{1,2}|[a-zA-Z]{3,9}\s+\d{1,2},?\s+\d{2,4})';
       const DATE_REGEX = new RegExp(DATE_REGEX_STR, 'i');
 
-      for (const line of lines) {
-        if (/^(statement date|opening balance|closing balance|total amount due|minimum amount due|credit limit|payment due date|rewards summary|page \d+)/i.test(line)) {
+      const parsedRecords = [];
+
+      // Pass 1: Line-by-Line Adaptive Parsing (Handles CSV, Tables, Serials, Flags)
+      for (let i = 0; i < rawLines.length; i++) {
+        let line = rawLines[i];
+        if (/^(statement\s+date|opening\s+balance|closing\s+balance|total\s+amount\s+due|minimum\s+amount\s+due|credit\s+limit|payment\s+due\s+date|rewards\s+summary|page\s+\d+|sl\.?\s*no|date\s+narration|txn\s+date)\b/i.test(line)) {
           continue;
         }
 
-        // CSV line with commas
+        // CSV parsing
         if (line.includes(',')) {
           const cols = line.split(',').map(c => c.replace(/["']/g, '').trim());
-          if (cols.length >= 3 && DATE_REGEX.test(cols[0])) {
-            const rawDate = cols[0];
-            const rawDesc = cols[1];
-            let debitAmt = null, creditAmt = null;
+          if (cols.length >= 3) {
+            const dateColIdx = cols.findIndex(c => DATE_REGEX.test(c));
+            if (dateColIdx !== -1) {
+              const rawDate = cols[dateColIdx];
+              const rawDesc = cols[dateColIdx + 1] || 'Bank Transaction';
+              let debitAmt = null, creditAmt = null;
 
-            if (cols.length >= 4) {
-              const d = parseFloat((cols[2] || '').replace(/,/g, ''));
-              const c = parseFloat((cols[3] || '').replace(/,/g, ''));
-              if (!isNaN(d) && d > 0) debitAmt = d;
-              if (!isNaN(c) && c > 0) creditAmt = c;
-            } else if (cols.length === 3) {
-              const a = parseFloat((cols[2] || '').replace(/,/g, '').replace(/CR|DR/ig, '').trim());
-              if (!isNaN(a) && a > 0) {
-                if (/CR/i.test(cols[2])) creditAmt = a;
-                else debitAmt = a;
+              if (cols.length >= 4) {
+                const d = parseFloat((cols[dateColIdx + 2] || '').replace(/,/g, ''));
+                const c = parseFloat((cols[dateColIdx + 3] || '').replace(/,/g, ''));
+                if (!isNaN(d) && d > 0) debitAmt = d;
+                if (!isNaN(c) && c > 0) creditAmt = c;
+              }
+              if (debitAmt === null && creditAmt === null && cols[dateColIdx + 2]) {
+                const a = parseFloat((cols[dateColIdx + 2] || '').replace(/,/g, '').replace(/CR|DR/ig, '').trim());
+                if (!isNaN(a) && a > 0) {
+                  if (/CR/i.test(cols[dateColIdx + 2])) creditAmt = a;
+                  else debitAmt = a;
+                }
+              }
+
+              if (debitAmt !== null || creditAmt !== null) {
+                const isCr = creditAmt !== null;
+                const amt = isCr ? creditAmt : debitAmt;
+                parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
+                continue;
               }
             }
+          }
+        }
 
-            if (debitAmt !== null || creditAmt !== null) {
-              const isCr = creditAmt !== null;
-              const amt = isCr ? creditAmt : debitAmt;
-              parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
+        // Adaptive Space/Tab Row Matcher
+        const mDate = line.match(DATE_REGEX);
+        if (!mDate) continue;
+
+        const rawDate = mDate[0];
+        const dateIdx = line.indexOf(rawDate);
+        let postDateText = line.substring(dateIdx + rawDate.length).trim();
+
+        // Check if next token is a 2nd date (Value/Post Date)
+        const mDate2 = postDateText.match(DATE_REGEX);
+        if (mDate2 && postDateText.indexOf(mDate2[0]) === 0) {
+          postDateText = postDateText.substring(mDate2[0].length).trim();
+        }
+
+        // Match amounts with optional currency prefix and CR/DR flags
+        const amtRegex = /(?:(?<=\s)|^)(?:(?:Rs\.?|INR|₹|\$)\s*)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]{1,2})|[0-9]+(?:\.[0-9]{1,2})|[0-9]{1,3}(?:,[0-9]{2,3})+|[0-9]{2,7})\s*(?:\(([A-Za-z]+)\)|([A-Za-z]{1,4})\.?)?(?=\s|$)/gi;
+        const allAmtMatches = [];
+        let match;
+        while ((match = amtRegex.exec(postDateText)) !== null) {
+          allAmtMatches.push({
+            str: match[0],
+            valStr: match[1],
+            flag: (match[2] || match[3] || '').toUpperCase(),
+            start: match.index,
+            end: amtRegex.lastIndex
+          });
+        }
+
+        if (allAmtMatches.length === 0) {
+          // Check if amount is on the immediately NEXT line (2-line PDF table row)
+          if (i + 1 < rawLines.length) {
+            const nextLine = rawLines[i + 1];
+            if (!DATE_REGEX.test(nextLine)) {
+              line = line + ' ' + nextLine;
+              postDateText = postDateText + ' ' + nextLine;
+              while ((match = amtRegex.exec(postDateText)) !== null) {
+                allAmtMatches.push({
+                  str: match[0],
+                  valStr: match[1],
+                  flag: (match[2] || match[3] || '').toUpperCase(),
+                  start: match.index,
+                  end: amtRegex.lastIndex
+                });
+              }
+            }
+          }
+        }
+
+        if (allAmtMatches.length === 0) continue;
+
+        // Prioritize numbers with decimals (.XX) or commas over bare integers
+        const decimalMatches = allAmtMatches.filter(m => m.valStr.includes('.') || m.valStr.includes(',') || m.flag);
+        const candidateMatches = decimalMatches.length > 0 ? decimalMatches : allAmtMatches;
+
+        const validAmounts = [];
+        for (const m of candidateMatches) {
+          const val = parseFloat(m.valStr.replace(/,/g, ''));
+          if (isNaN(val) || val <= 0) continue;
+          if (!m.valStr.includes('.') && !m.valStr.includes(',') && !m.flag) {
+            // Filter bare integers in middle of words (like Ref 123456)
+            if (m.end < postDateText.length - 8 && !/^\s*[\d,.]/.test(postDateText.substring(m.end))) {
               continue;
             }
           }
+          validAmounts.push({ val, flag: m.flag, start: m.start, end: m.end });
         }
 
-        // Space-delimited line matching:
-        // Pattern 1: Savings Account with 3 amounts at end (Debit, Credit, Balance)
-        const m3 = line.match(new RegExp('^\\s*(' + DATE_REGEX_STR + ')(?:\\s+' + DATE_REGEX_STR + ')?\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})$', 'i'));
-        if (m3) {
-          const rawDate = m3[1];
-          const rawDesc = m3[2].trim();
-          const deb = parseFloat(m3[3].replace(/,/g, ''));
-          const cred = parseFloat(m3[4].replace(/,/g, ''));
-          if (deb > 0) {
-            parsedRecords.push(createRecord(rawDate, rawDesc, deb, false, line));
+        if (validAmounts.length === 0) continue;
+
+        // Narration is before the first valid amount
+        let rawDesc = postDateText.substring(0, validAmounts[0].start).trim();
+        if (!rawDesc) rawDesc = 'Bank Transaction';
+
+        // Clean out transaction type prefix and trailing ref IDs
+        rawDesc = rawDesc.replace(/^(UPI|POS|NEFT|IMPS|CARD)[-/\s]+/i, '').replace(/[-/\s]+\d{6,}$/, '').trim();
+
+        let amt = null, isCr = false;
+
+        if (validAmounts.length >= 3) {
+          const deb = validAmounts[0].val;
+          const cred = validAmounts[1].val;
+          if (deb > 0 && (cred == 0 || deb !== cred)) {
+            amt = deb;
+            isCr = false;
           } else if (cred > 0) {
-            parsedRecords.push(createRecord(rawDate, rawDesc, cred, true, line));
+            amt = cred;
+            isCr = true;
+          } else {
+            amt = deb;
           }
-          continue;
+        } else if (validAmounts.length === 2) {
+          amt = validAmounts[0].val;
+          const flag = validAmounts[0].flag;
+          if (flag === 'CR' || flag === 'C' || /\b(salary|deposit|refund|credit|cr)\b/i.test(rawDesc)) {
+            isCr = true;
+          } else if (flag === 'DR' || flag === 'D' || /\b(dr|debit|withdrawal|paid|transfer to)\b/i.test(rawDesc)) {
+            isCr = false;
+          }
+        } else {
+          amt = validAmounts[0].val;
+          const flag = validAmounts[0].flag;
+          if (flag === 'CR' || flag === 'C' || /\b(salary|deposit|refund|credit|payment received|cashback)\b/i.test(rawDesc)) {
+            isCr = true;
+          } else {
+            isCr = false;
+          }
         }
 
-        // Pattern 2: Savings Account with 2 amounts at end (Amount [CR/DR] Balance)
-        const m2 = line.match(new RegExp('^\\s*(' + DATE_REGEX_STR + ')(?:\\s+' + DATE_REGEX_STR + ')?\\s+(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr)?\\s+([\\d,]+\\.\\d{2})$', 'i'));
-        if (m2) {
-          const rawDate = m2[1];
-          const rawDesc = m2[2].trim();
-          const amt = parseFloat(m2[3].replace(/,/g, ''));
-          const flag = (m2[4] || '').toUpperCase();
-          let isCr = (flag === 'CR') || /salary|deposit|refund|interest credit|credit/i.test(rawDesc);
-          if (flag === 'DR') isCr = false;
-
-          if (amt > 0) {
-            parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
-          }
-          continue;
-        }
-
-        // Pattern 3: Credit Card or Single Amount lines (handles optional 2nd date and ref/auth code)
-        const m1 = line.match(new RegExp('^\\s*(' + DATE_REGEX_STR + ')(?:\\s+' + DATE_REGEX_STR + ')?\\s+(?:[\\d:]{5,20}\\s+)?(.+?)\\s+([\\d,]+\\.\\d{2})\\s*(CR|DR|Cr|Dr|C|D)?(?:\\s+[\\d,]+\\.\\d{2})?$', 'i'));
-        if (m1) {
-          const rawDate = m1[1];
-          let rawDesc = m1[2].trim();
-          const amt = parseFloat(m1[3].replace(/,/g, ''));
-          const flag = (m1[4] || '').toUpperCase();
-
-          rawDesc = rawDesc.replace(/\s+\d{1,3}$/, ''); // Remove trailing reward points digit
-
-          let isCr = (flag === 'CR' || flag === 'C') || /payment received|infinity payment|bbps|refund|cashback/i.test(rawDesc);
-          if (flag === 'DR' || flag === 'D') isCr = false;
-
-          if (amt > 0) {
-            parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
-          }
-          continue;
+        if (amt && amt > 0) {
+          parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, line));
         }
       }
 
-      // Fallback: CSV Header column mapping
+      // Pass 2: Unstructured Text Scanner (Safety Net for Non-Standard Statements & NetBanking Dumps)
       if (parsedRecords.length === 0) {
-        let headerIdx = -1;
-        let dateCol = -1, descCol = -1, debitCol = -1, creditCol = -1, amtCol = -1;
-
-        for (let i = 0; i < Math.min(10, lines.length); i++) {
-          const cols = lines[i].split(',').map(c => c.replace(/["']/g, '').trim().toLowerCase());
-          cols.forEach((col, idx) => {
-            if (/date/i.test(col) && dateCol === -1) dateCol = idx;
-            else if (/narration|description|particular|details|remarks|merchant/i.test(col) && descCol === -1) descCol = idx;
-            else if (/withdrawal|debit|dr/i.test(col) && debitCol === -1) debitCol = idx;
-            else if (/deposit|credit|cr/i.test(col) && creditCol === -1) creditCol = idx;
-            else if (/amount|amt/i.test(col) && amtCol === -1) amtCol = idx;
-          });
-
-          if (dateCol !== -1 && (debitCol !== -1 || amtCol !== -1 || descCol !== -1)) {
-            headerIdx = i;
-            break;
-          }
-        }
-
-        if (headerIdx !== -1) {
-          for (let i = headerIdx + 1; i < lines.length; i++) {
-            const row = lines[i].split(',').map(c => c.replace(/["']/g, '').trim());
-            if (row.length <= dateCol) continue;
-            const rawDate = row[dateCol];
-            if (!rawDate) continue;
-
-            const rawDesc = descCol !== -1 ? row[descCol] : 'Bank Transaction';
-            let amt = 0, isCr = false;
-
-            if (debitCol !== -1 && creditCol !== -1) {
-              const deb = parseFloat((row[debitCol] || '').replace(/,/g, ''));
-              const cred = parseFloat((row[creditCol] || '').replace(/,/g, ''));
-              if (!isNaN(deb) && deb > 0) { amt = deb; isCr = false; }
-              else if (!isNaN(cred) && cred > 0) { amt = cred; isCr = true; }
-            } else if (amtCol !== -1) {
-              const a = parseFloat((row[amtCol] || '').replace(/,/g, ''));
-              if (!isNaN(a) && Math.abs(a) > 0) { amt = Math.abs(a); isCr = false; }
-            }
-
-            if (amt > 0) {
-              parsedRecords.push(createRecord(rawDate, rawDesc, amt, isCr, lines[i]));
-            }
+        const fullText = rawLines.join('\n');
+        const unstructRegex = new RegExp('(' + DATE_REGEX_STR + ')[\\s\\S]{1,80}?(?:(?:Rs\\.?|INR|₹|\\$)\\s*)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\\.[0-9]{1,2})|[0-9]+(?:\\.[0-9]{1,2}))\\s*(CR|DR|Cr|Dr)?', 'gi');
+        let unstructMatch;
+        while ((unstructMatch = unstructRegex.exec(fullText)) !== null) {
+          const rDate = unstructMatch[1];
+          const rAmt = parseFloat(unstructMatch[2].replace(/,/g, ''));
+          const rFlag = (unstructMatch[3] || '').toUpperCase();
+          if (rAmt > 0) {
+            const isCr = (rFlag === 'CR' || rFlag === 'C');
+            parsedRecords.push(createRecord(rDate, 'Bank Transaction', rAmt, isCr, unstructMatch[0]));
           }
         }
       }
@@ -1555,7 +1591,10 @@ Example:
         showToast(`⚡ Successfully imported ${parsedRecords.length} transactions from ${accountBadge}!`);
         switchTab('expenses');
       } else {
-        showToast('No readable transactions detected in this statement.');
+        showToast('⚠️ No transactions detected. If this is a scanned/photo PDF, please paste text or export as CSV.');
+        // Automatically open paste box for convenience
+        const pasteSection = document.getElementById('statementPasteSection');
+        if (pasteSection) pasteSection.classList.remove('hidden');
       }
     }
 
@@ -1817,10 +1856,26 @@ Example:
     // --- AUTOMATIC URL INGESTION (SHORTCUTS INTEGRATION) ---
     function checkURLParameters() {
       try {
-        const params = new URLSearchParams(window.location.search);
-        let sms = params.get('sms') || params.get('text');
+        // Support both query (?sms=...) and hash (#sms=...)
+        let rawQuery = window.location.search;
+        if (!rawQuery && window.location.hash) {
+          rawQuery = '?' + window.location.hash.replace(/^#/, '');
+        }
+        if (!rawQuery) return;
+
+        const params = new URLSearchParams(rawQuery);
+        let sms = params.get('sms') || params.get('text') || params.get('body') || params.get('msg');
         if (sms) {
-          sms = decodeURIComponent(sms);
+          // Replace + with space (standard URL form encoding) before decoding
+          sms = decodeURIComponent(sms.replace(/\+/g, ' ')).trim();
+
+          // Check if user literally typed "[Shortcut Input]" without selecting the iOS variable
+          if (/^\[shortcut input\]$/i.test(sms) || sms === '[Shortcut Input]') {
+            showToast('⚠️ In Apple Shortcuts, tap the variable token "Shortcut Input" above the keyboard.');
+            switchTab('sms');
+            return;
+          }
+
           const res = parseBankSMSText(sms);
           if (res && res.amount && !isNaN(res.amount)) {
             const newRec = {
@@ -1842,13 +1897,13 @@ Example:
             window.history.replaceState({}, document.title, window.location.pathname);
             switchTab('expenses');
           } else {
-            // Switch to SMS tab and place raw text in input
+            // Switch to SMS tab and place raw text in input for 1-tap review
             switchTab('sms');
             setTimeout(() => {
               const input = document.getElementById('smsInput');
               if (input) input.value = sms;
             }, 150);
-            showToast('⚠️ Could not automatically detect amount. Please review message.');
+            showToast('⚠️ SMS received! Tap "Parse & Save to Mobile" to record.');
           }
         }
       } catch (e) {
