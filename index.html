@@ -201,52 +201,44 @@
       <!-- Modal Header -->
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2.5">
-          <span class="text-2xl">🚀</span>
+          <span class="text-2xl">⚡</span>
           <div>
-            <h3 class="text-base font-bold text-white">Apple Shortcuts Auto-Setup</h3>
-            <p class="text-[10px] text-emerald-400 font-medium">100% Pre-Built • Zero Human Construction Required</p>
+            <h3 class="text-base font-bold text-white">Apple Shortcuts Automation Setup</h3>
+            <p class="text-[10px] text-emerald-400 font-medium">Automatic Bank Recognition • 1-Tap Direct Launch</p>
           </div>
         </div>
         <button onclick="closeShortcutsModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <!-- Hero 1-Click Auto-Install Pre-Built Shortcut Button -->
-      <div class="bg-gradient-to-r from-emerald-950/80 via-teal-950/80 to-indigo-950/80 border border-emerald-500/50 p-4 rounded-2xl space-y-2.5 shadow-xl">
+      <!-- 1-Tap Hero Direct Launch Button -->
+      <div class="bg-gradient-to-r from-purple-950/80 via-indigo-950/80 to-blue-950/80 border border-purple-500/50 p-4 rounded-2xl space-y-2.5 shadow-xl">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-emerald-300">⚡ Instant 1-Click Installation</span>
-          <span class="text-[9px] bg-emerald-500/30 text-emerald-200 px-2 py-0.5 rounded-full font-bold">100% Pre-Built</span>
+          <span class="text-xs font-bold text-purple-200">🚀 Direct iPhone Integration</span>
+          <span class="text-[9px] bg-purple-500/30 text-purple-200 px-2 py-0.5 rounded-full font-bold">1-Tap Jump</span>
         </div>
         <p class="text-[11px] text-slate-200 leading-relaxed">
-          Tap below to install the pre-built Apple Shortcut. <strong>Everything is built automatically</strong> — all actions, URLs, and encoding are pre-assembled!
+          Tap below to copy your action URL and directly launch the Apple Shortcuts automation creator on your iPhone:
         </p>
-        <button onclick="installPrebuiltShortcut()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/30 active:scale-98 border border-emerald-400/40">
-          <span class="text-base">🚀</span>
-          <span>1-Click Auto-Install "Log Bank Expense"</span>
-        </button>
-        <div class="flex gap-2 pt-0.5">
-          <a href="Log-Bank-Expense.shortcut" download="Log-Bank-Expense.shortcut" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold transition flex items-center justify-center space-x-1">
-            <span>📥</span>
-            <span>Download File</span>
-          </a>
-          <button onclick="launchShortcutsAutoSetupDirect()" class="flex-1 py-2 bg-purple-900/50 hover:bg-purple-800/60 border border-purple-500/30 text-purple-200 rounded-lg text-[10px] font-bold transition flex items-center justify-center space-x-1">
-            <span>⚡</span>
-            <span id="launchPresetBtnText">Open Automation</span>
+        <div class="flex gap-2 pt-1">
+          <button onclick="launchShortcutsAutoSetupDirect()" class="flex-1 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center space-x-2 shadow-lg shadow-purple-600/40 active:scale-98">
+            <span class="text-sm">⚡</span>
+            <span id="launchPresetBtnText">Open Apple Shortcuts App</span>
           </button>
-          <button onclick="copySetupURL()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-lg text-[10px] font-bold transition flex items-center justify-center space-x-1">
-            <span>📋</span>
+          <button onclick="copySetupURL()" class="py-3 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1 active:scale-98">
+            <span id="copyUrlIcon">📋</span>
             <span>Copy URL</span>
           </button>
         </div>
       </div>
 
-      <!-- Zero-Click Auto-Log Feature Card -->
-      <div class="bg-gradient-to-r from-emerald-950/60 to-teal-950/60 border border-emerald-500/40 p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-md">
+      <!-- Zero-Click Auto-Log Feature Card (No Shortcuts Required!) -->
+      <div class="bg-gradient-to-r from-emerald-950/70 to-teal-950/70 border border-emerald-500/50 p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-lg">
         <div class="space-y-0.5">
           <div class="flex items-center space-x-1.5">
             <span class="text-sm">⚡</span>
-            <span class="text-xs font-bold text-white">Zero-Click Auto-Log from Clipboard</span>
+            <span class="text-xs font-bold text-white">EASIEST OPTION: Zero-Click Auto-Log</span>
           </div>
-          <p class="text-[10px] text-slate-300">Copy any bank SMS & switch here: automatically parses & saves with 0 human clicks!</p>
+          <p class="text-[10px] text-emerald-300">Copy any bank SMS &amp; open this app: automatically logs with 0 clicks! (No shortcuts needed)</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" id="modalAutoLogToggle" onchange="toggleAutoLogClipboard(this.checked)" class="sr-only peer">
@@ -271,26 +263,27 @@
       <!-- Step-by-Step Visual Automation Blueprint -->
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
         <div class="flex items-center justify-between border-b border-slate-900 pb-2">
-          <span class="font-bold text-slate-200 text-xs">📱 How the Automation Runs (1 Action):</span>
+          <span class="font-bold text-slate-200 text-xs">📱 10-Second Setup in Apple Shortcuts:</span>
           <span class="text-[10px] text-indigo-400 font-semibold">Shortcuts ➔ Automation ➔ + ➔ Message</span>
         </div>
 
         <div class="space-y-2 text-[11px]">
           <div class="flex items-start justify-between bg-slate-900/80 p-2 rounded-xl border border-slate-800">
             <div>
-              <span class="text-slate-400 block text-[10px] uppercase font-bold">1. Trigger (When I receive message)</span>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold">1. When I receive message</span>
               <span class="text-slate-200">Sender: <strong class="text-emerald-400">EMPTY</strong> • Message Contains: <strong id="blueprintKeyword" class="font-mono text-indigo-300 bg-indigo-950 px-1.5 py-0.5 rounded border border-indigo-500/30">Rs</strong></span>
             </div>
             <span class="text-[10px] text-purple-300 font-bold">Run Immediately</span>
           </div>
 
           <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1">
-            <span class="text-slate-400 block text-[10px] uppercase font-bold">2. Action (Pre-Built!)</span>
-            <div class="flex items-center space-x-2 text-white font-bold">
-              <span class="w-5 h-5 rounded-md bg-emerald-600 flex items-center justify-center text-[10px]">✓</span>
-              <span>Run Shortcut: <span class="text-emerald-400">Log Bank Expense</span></span>
+            <span class="text-slate-400 block text-[10px] uppercase font-bold">2. Do (Action)</span>
+            <p class="text-[10px] text-slate-300">Tap <strong>Add Action</strong> ➔ Search <strong>Open URLs</strong> ➔ Paste the copied link:</p>
+            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 font-mono text-[10px] text-blue-300 break-all select-all flex justify-between items-center gap-1.5 mt-1">
+              <span>https://dinakardharsiguntala-rgb.github.io/expense-tracker/?sms=[Shortcut Input]</span>
+              <button onclick="copySetupURL()" class="px-2 py-0.5 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[9px] rounded font-bold whitespace-nowrap">Copy</button>
             </div>
-            <p class="text-[10px] text-slate-400 mt-1">Done! Because the shortcut is pre-built, you don't need to build any actions or URLs.</p>
+            <p class="text-[9px] text-emerald-400 mt-1">⚡ Tip: In the link, tap the blue token <strong>[Shortcut Input]</strong> above the keyboard.</p>
           </div>
         </div>
       </div>
@@ -1448,22 +1441,22 @@
     function renderSMSSubTabContent() {
       return `
         <!-- iPhone Shortcuts Auto-Sync Card (Pre-Configured) -->
-        <div class="bg-gradient-to-br from-emerald-950/80 via-teal-950/80 to-indigo-950/80 border border-emerald-500/50 p-4 rounded-2xl space-y-3 shadow-xl">
+        <div class="bg-gradient-to-br from-indigo-950/80 via-purple-950/80 to-blue-950/80 border border-indigo-500/50 p-4 rounded-2xl space-y-3 shadow-xl">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
-              <span class="text-2xl">🚀</span>
+              <span class="text-2xl">⚡</span>
               <div>
-                <span class="text-xs font-black text-white">1-Click Auto-Install Shortcut</span>
-                <span class="block text-[10px] text-emerald-300">100% Pre-Built • No Human Building Required</span>
+                <span class="text-xs font-black text-white">Apple Shortcuts Auto-Sync</span>
+                <span class="block text-[10px] text-indigo-300">100% Automated • On-Device Private Sync</span>
               </div>
             </div>
-            <button onclick="installPrebuiltShortcut()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white rounded-xl text-xs font-black transition shadow-md shadow-emerald-600/30 flex items-center space-x-1.5 active:scale-95 border border-emerald-400/40">
+            <button onclick="launchShortcutsAutoSetupDirect()" class="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white rounded-xl text-xs font-black transition shadow-md shadow-indigo-600/30 flex items-center space-x-1.5 active:scale-95">
               <span>⚡</span>
-              <span>Install Shortcut</span>
+              <span>Open Shortcuts</span>
             </button>
           </div>
           <p class="text-[11px] text-slate-200 leading-relaxed">
-            All actions, parameters, and URLs are pre-built into the Apple Shortcut. Tap above to add it to your iPhone with 1 click.
+            Whenever your bank texts you, Apple Shortcuts triggers your private link and records the transaction into your mobile database.
           </p>
           <div class="grid grid-cols-3 gap-1.5 pt-0.5">
             <button onclick="openShortcutsModal()" class="py-2 bg-slate-900/80 hover:bg-slate-800 text-purple-300 border border-purple-500/30 rounded-xl text-[11px] font-semibold transition flex items-center justify-center space-x-1">
@@ -1892,33 +1885,7 @@ Example:
     }
 
     function installPrebuiltShortcut() {
-      const shortcutFileUrl = "https://dinakardharsiguntala-rgb.github.io/expense-tracker/Log-Bank-Expense.shortcut";
-      copySetupURL();
-
-      // Trigger automatic file download of the pre-built .shortcut
-      const dlLink = document.createElement('a');
-      dlLink.href = shortcutFileUrl;
-      dlLink.download = 'Log-Bank-Expense.shortcut';
-      document.body.appendChild(dlLink);
-      dlLink.click();
-      document.body.removeChild(dlLink);
-
-      // Deep link to Apple Shortcuts import
-      const importUri = `shortcuts://import-shortcut/?url=${encodeURIComponent(shortcutFileUrl)}&name=${encodeURIComponent('Log Bank Expense')}`;
-
-      showCenterAlert(
-        '🚀 Pre-Built Shortcut Ready!',
-        `Your pre-built <strong>Log Bank Expense</strong> shortcut is downloaded!<br><p class="text-[11px] text-slate-300 mt-2">Opening Apple Shortcuts now... Simply tap <strong class="text-blue-400">"Add Shortcut"</strong> and everything is built automatically!</p>`,
-        'success',
-        5
-      );
-
-      setTimeout(() => {
-        window.location.href = importUri;
-        setTimeout(() => {
-          window.location.href = 'shortcuts://';
-        }, 1200);
-      }, 500);
+      launchShortcutsAutoSetupDirect();
     }
 
     function selectBankPreset(presetKey) {
