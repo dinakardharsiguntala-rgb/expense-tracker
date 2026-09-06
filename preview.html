@@ -412,16 +412,26 @@
       return dateStr;
     }
 
-    const initialData = [
-      { id: '1', amount: 450.00, type: 'Expense', merchant: 'Starbucks Coffee', category: 'Food & Dining', bank: 'HDFC Bank', last4: '1234', mode: 'UPI', date: '2026-09-05', isAuto: true, raw: 'Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS COFFEE on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.' },
-      { id: '2', amount: 1299.00, type: 'Expense', merchant: 'Blinkit Grocery', category: 'Groceries', bank: 'SBI', last4: '9876', mode: 'UPI', date: '2026-09-05', isAuto: true, raw: 'Your A/C 9876 is debited by INR 1,299.00 on 05-SEP-26 to BLINKIT via UPI Ref 629482. SBI.' },
-      { id: '3', amount: 850.00, type: 'Expense', merchant: 'Zomato Dining', category: 'Food & Dining', bank: 'Axis Bank', last4: '3210', mode: 'UPI', date: '2026-08-25', isAuto: true, raw: 'INR 850.00 debited from Axis Bank A/c 3210 on 25-08-26 at ZOMATO.' },
-      { id: '4', amount: 2400.00, type: 'Expense', merchant: 'Electricity Bill', category: 'Utilities & Bills', bank: 'SBI', last4: '9876', mode: 'NetBanking', date: '2026-08-10', isAuto: true, raw: 'Txn of INR 2400.00 on 10-AUG-26 to BESCOM.' },
-      { id: '5', amount: 1500.00, type: 'Expense', merchant: 'Fuel Station', category: 'Transportation', bank: 'HDFC Bank', last4: '1234', mode: 'Card', date: '2026-07-20', isAuto: true, raw: 'Alert: Rs 1500.00 spent on Card 1234 at SHELL on 20-07-26.' },
-      { id: '6', amount: 75000.00, type: 'Income', merchant: 'Infosys Ltd (Salary)', category: 'Salary', bank: 'HDFC Bank', last4: '1234', mode: 'NetBanking', date: '2026-09-01', isAuto: true, raw: 'Salary of INR 75,000.00 credited to your Account **1234 on 01-SEP-26.' }
-    ];
+    // 100% PRIVATE MOBILE DATABASE (Stored exclusively in this phone's localStorage)
+    const initialData = [];
 
-    let transactions = JSON.parse(localStorage.getItem('expenses_pwa_records_v2')) || initialData;
+    let storedRecords = localStorage.getItem('expenses_pwa_records_v2');
+    let transactions = [];
+    if (storedRecords) {
+      try {
+        const parsed = JSON.parse(storedRecords);
+        // Purge legacy sample seeds (ids '1' through '6') if user had old dummy data
+        const legacyIds = new Set(['1', '2', '3', '4', '5', '6']);
+        if (Array.isArray(parsed) && parsed.length === 6 && parsed.every(t => legacyIds.has(t.id))) {
+          transactions = [];
+          localStorage.setItem('expenses_pwa_records_v2', JSON.stringify([]));
+        } else if (Array.isArray(parsed)) {
+          transactions = parsed;
+        }
+      } catch (e) {
+        transactions = [];
+      }
+    }
 
     function saveState() {
       localStorage.setItem('expenses_pwa_records_v2', JSON.stringify(transactions));
@@ -472,6 +482,15 @@
 
       container.innerHTML = `
         <div class="space-y-4">
+          <!-- On-Device Database Indicator -->
+          <div class="flex items-center justify-between px-1 text-[10px]">
+            <span class="flex items-center space-x-1.5 text-emerald-400 font-bold">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Mobile Database Active</span>
+            </span>
+            <span class="text-slate-400">100% On-Device • Zero Cloud Storage</span>
+          </div>
+
           <!-- Balance Card -->
           <div class="bg-gradient-to-br from-blue-900/60 to-indigo-950/70 border border-blue-500/30 p-5 rounded-3xl shadow-xl">
             <span class="text-xs text-blue-300 font-semibold tracking-wide">Net Monthly Savings</span>
@@ -523,9 +542,17 @@
               <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Recent Activity</h3>
               <button onclick="switchTab('expenses')" class="text-xs font-semibold text-blue-400 hover:text-blue-300">View All</button>
             </div>
-            <div class="space-y-2">
-              ${transactions.slice(0, 5).map(t => getTransactionRowHTML(t)).join('')}
-            </div>
+            ${transactions.length === 0 ? `
+              <div class="bg-slate-900/70 border border-slate-800 p-6 rounded-2xl text-center space-y-2">
+                <span class="text-3xl">📱</span>
+                <p class="text-xs font-bold text-slate-200">Your Phone Is Your Database</p>
+                <p class="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">No transactions recorded yet. Forward incoming bank SMS via Apple Shortcuts or tap "Parse Bank SMS" to start tracking.</p>
+              </div>
+            ` : `
+              <div class="space-y-2">
+                ${transactions.slice(0, 5).map(t => getTransactionRowHTML(t)).join('')}
+              </div>
+            `}
           </div>
         </div>
       `;
@@ -583,7 +610,11 @@
           <!-- Month-Wise Grouped Transactions -->
           <div class="space-y-5">
             ${transactions.length === 0 ? `
-              <div class="p-8 text-center text-slate-500 text-xs">No transactions recorded yet.</div>
+              <div class="bg-slate-900/70 border border-slate-800 p-8 rounded-2xl text-center space-y-2">
+                <span class="text-3xl">📱</span>
+                <p class="text-xs font-bold text-slate-200">No Transactions in Mobile Database</p>
+                <p class="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">All transactions recorded from your bank SMS or shortcuts are kept 100% on this mobile device.</p>
+              </div>
             ` : displayMonthKeys.map(mKey => {
               const txns = monthsMap[mKey] || [];
               const monthSpent = txns.filter(x => x.type === 'Expense').reduce((acc, x) => acc + x.amount, 0);
@@ -641,137 +672,61 @@
       `;
     }
 
-    // --- TAB 3: BANK SMS PARSER ---
+    // --- TAB 3: BANK SMS PARSER & IPHONE SHORTCUTS ---
     function renderSMS(container) {
       container.innerHTML = `
         <div class="space-y-4">
           <div>
-            <h2 class="text-lg font-extrabold text-white">Bank SMS Reader</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Parse past or new bank SMS from HDFC, SBI, ICICI, Axis, Chase, etc.</p>
+            <h2 class="text-lg font-extrabold text-white">Sync Bank SMS</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Auto-record expenses & P2P transfers directly to your mobile database</p>
           </div>
 
-          <!-- iPhone Privacy Notice & Explanation -->
-          <div class="bg-blue-950/40 border border-blue-500/30 p-3.5 rounded-2xl flex items-start space-x-3">
-            <span class="text-lg shrink-0">ℹ️</span>
-            <div class="text-xs text-slate-300 leading-relaxed">
-              <span class="font-bold text-blue-300">Why doesn't iPhone read existing SMS automatically?</span><br>
-              Apple's iOS security strictly blocks all apps from accessing your past SMS inbox.
-              To import past messages, select and copy them from the Messages app and paste them below. <strong>You can paste 1 or multiple messages at once!</strong>
+          <!-- Shortcuts Auto-Sync Guide Card (Highlighted) -->
+          <div class="bg-gradient-to-br from-indigo-950/70 to-purple-950/70 border border-indigo-500/40 p-4 rounded-2xl space-y-2.5 shadow-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-xl">🍎</span>
+                <span class="text-xs font-bold text-white">Real-Time iPhone SMS Automation</span>
+              </div>
+              <button onclick="openShortcutsModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition">
+                Setup Shortcut
+              </button>
             </div>
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+              Whenever a bank SMS arrives on your iPhone, Apple Shortcuts automatically opens your PWA link and saves the transaction <strong>directly to your mobile database</strong> with zero cloud servers!
+            </p>
           </div>
 
-          <!-- 1-Tap Paste Box -->
-          <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3">
+          <!-- Direct Paste Box -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
             <div class="flex justify-between items-center">
-              <label class="text-xs font-bold text-slate-300">Paste Bank SMS (Single or Multiple)</label>
+              <label class="text-xs font-bold text-slate-200">Paste Bank or UPI SMS</label>
               <button onclick="clearSMSInput()" class="text-[11px] text-slate-400 hover:text-white">Clear</button>
             </div>
 
-            <textarea id="smsInput" rows="5" placeholder="Paste one or multiple past bank SMS messages here...\n\nTip: You can copy several SMS alerts from your bank and paste them all together!" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
+            <textarea id="smsInput" rows="5" placeholder="Paste single or multiple bank SMS messages here...\n\nHandles:\n• Sent money (P2P UPI)\n• Received money (UPI / Refund)\n• Merchant purchases (Food, Groceries, Fuel, Shopping)\n• Salary & Account credits" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 font-mono resize-none"></textarea>
             
             <div class="flex gap-2">
               <button onclick="pasteFromClipboard()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
                 <span>📋</span>
-                <span>Paste from Clipboard</span>
+                <span>Paste Clipboard</span>
               </button>
               <button onclick="parseAndLogSMS()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-1.5">
                 <span>⚡</span>
-                <span>Parse & Import</span>
+                <span>Parse & Save to Mobile</span>
               </button>
             </div>
           </div>
 
-          <!-- 100% Dynamic Bank & Credit Card Statement Importer Card -->
-          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-xl">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-2xl">📂</span>
-              <div>
-                <h3 class="text-xs font-bold text-white">Dynamic Bank Statement Importer</h3>
-                <p class="text-[10px] text-indigo-300">100% On-Device & Private • All Banks & Cards</p>
-              </div>
-            </div>
-
-            <p class="text-[11px] text-slate-300 leading-relaxed">
-              Upload your actual statement file (<strong>.PDF</strong> or <strong>.CSV</strong>) or paste statement text. The app dynamically detects whether it is a <strong>Credit Card</strong> or <strong>Savings Account</strong>, categorizes each transaction, and syncs past months with zero cloud transfer.
-            </p>
-
-            <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
-
-            <div class="flex flex-col gap-2">
-              <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                <span>Upload Statement (.PDF or .CSV)</span>
-              </button>
-
-              <button onclick="toggleStatementPasteBox()" class="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-[11px] font-semibold transition flex items-center justify-center space-x-1.5 border border-slate-700">
-                <span>📝</span>
-                <span id="pasteToggleLabel">Or Paste Statement Text</span>
-              </button>
-            </div>
-
-            <!-- Optional Direct Statement Text Paste Area -->
-            <div id="statementPasteSection" class="hidden space-y-2 pt-1">
-              <textarea id="statementTextInput" rows="4" placeholder="Paste statement text or CSV rows here..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
-              <button onclick="parsePastedStatement()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
-                ⚡ Parse Pasted Statement
-              </button>
-            </div>
-          </div>
-
-          <!-- Shortcuts Auto-Sync Guide Card -->
-          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 p-4 rounded-2xl space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-indigo-300">🍎 Real-Time Auto SMS for Future Alerts</span>
-              <button onclick="openShortcutsModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition">
-                Setup Guide
-              </button>
-            </div>
-            <p class="text-[11px] text-slate-300 leading-relaxed">
-              For <strong>new incoming</strong> bank alerts, Apple Shortcuts automation can instantly forward them to this app the moment they arrive!
-            </p>
-          </div>
-
-          <!-- Sample Messages to Test -->
-          <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Try Sample Bank Alerts (1-Tap Test)</h3>
-            <div class="space-y-2">
-              <button onclick="loadSampleSMS(0)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-blue-400 font-bold uppercase">Merchant UPI (HDFC)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS using UPI...</p>
-              </button>
-              <button onclick="loadSampleSMS(1)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-rose-400 font-bold uppercase">Send Money to Person (P2P)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Sent Rs. 500.00 to RAHUL SHARMA via PhonePe UPI on 05-SEP-26...</p>
-              </button>
-              <button onclick="loadSampleSMS(2)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-emerald-400 font-bold uppercase">Received Money from Person (P2P)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Received INR 2,000.00 from PRIYA SINGH via GPay on 04-SEP-26...</p>
-              </button>
-              <button onclick="loadSampleSMS(3)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-purple-400 font-bold uppercase">Past Month (August)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Your A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI...</p>
-              </button>
-              <button onclick="loadSampleSMS(4)" class="w-full text-left bg-slate-900 border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                <span class="text-[10px] text-amber-400 font-bold uppercase">Bulk Multi-Month & P2P Test (4-in-1)</span>
-                <p class="text-[11px] text-slate-300 truncate mt-0.5">Loads 4 transactions (Merchants + P2P Send + P2P Receive) across Sep, Aug, Jul!</p>
-              </button>
-            </div>
+          <!-- Privacy & Database Notice -->
+          <div class="bg-slate-900/70 border border-slate-800/80 p-3.5 rounded-2xl flex items-center space-x-3 text-xs text-slate-400">
+            <span class="text-lg">🔒</span>
+            <span class="leading-relaxed">
+              <strong>100% Private On-Device:</strong> Your SMS messages are parsed locally on your phone using JavaScript regex. No data ever leaves your device.
+            </span>
           </div>
         </div>
       `;
-    }
-
-    const sampleAlerts = [
-      "Dear Customer, Rs.450.00 has been debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI. Avl Bal: Rs 15,240.50.",
-      "Sent Rs. 500.00 to RAHUL SHARMA via PhonePe UPI on 05-SEP-26. Bal: Rs 14,740.50.",
-      "Received INR 2,000.00 from PRIYA SINGH via GPay on 04-SEP-26. Bal: Rs 16,740.50.",
-      "Your A/C 9876 is debited by INR 1,299.00 on 18-AUG-26 to BLINKIT via UPI Ref 629482. Avl Bal INR 4,320.00 - SBI",
-      "Dear Customer, Rs.450.00 debited from A/c **1234 to STARBUCKS on 05-SEP-26 using UPI.\n\nSent Rs. 500.00 to RAHUL SHARMA via UPI on 05-SEP-26.\n\nReceived INR 2,000.00 from PRIYA SINGH on 04-SEP-26.\n\nINR 850.00 debited from Axis Bank A/c 3210 on 25-JUL-26 at ZOMATO."
-    ];
-
-    function loadSampleSMS(idx) {
-      document.getElementById('smsInput').value = sampleAlerts[idx];
-      showToast('Sample SMS Loaded! Tap "Parse & Import"');
     }
 
     function clearSMSInput() {
@@ -1277,20 +1232,20 @@
       // 2. Extract transaction amount (ignoring balance)
       let amount = null;
 
-      // Priority 1: Action word followed by amount (e.g. "debited by Rs. 450", "credited with INR 1,299")
-      const p1 = clean.match(/(?:debited|spent|paid|credited|transferred|withdrawn|deposited|sent|purchase\s+with|purchase\s+of)\s+(?:by|with|of|for)?\s*(?:(?:Rs\.?|INR|USD|\$)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR))/i);
+      // Priority 1: Action word followed by amount (e.g. "debited by Rs. 450", "credited with INR 1,299", "sent Rs 500")
+      const p1 = clean.match(/(?:debited|spent|paid|credited|transferred|withdrawn|deposited|sent|purchase\s+with|purchase\s+of)\s+(?:by|with|of|for)?\s*(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))/i);
       if (p1) {
         const val = p1[1] || p1[2];
         amount = parseFloat(val.replace(/,/g, ''));
       } else {
         // Priority 2: Amount preceding action word (e.g. "Rs. 450 debited", "INR 1,299.00 has been credited")
-        const p2 = clean.match(/(?:(?:Rs\.?|INR|USD|\$)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR))\s+(?:has\s+been\s+)?(?:debited|spent|paid|credited|transferred|deposited|sent)/i);
+        const p2 = clean.match(/(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))\s+(?:has\s+been\s+)?(?:debited|spent|paid|credited|transferred|deposited|sent)/i);
         if (p2) {
           const val = p2[1] || p2[2];
           amount = parseFloat(val.replace(/,/g, ''));
         } else {
-          // Priority 3: Any currency pattern not preceded by "bal" or "balance"
-          const curRegex = /(?:(?:Rs\.?|INR|USD|\$)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR))/gi;
+          // Priority 3: First valid currency pattern not preceded by balance
+          const curRegex = /(?:(?:Rs\.?|INR|USD|\$|₹)\s*(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s*(?:Rs\.?|INR|₹))/gi;
           let match;
           while ((match = curRegex.exec(clean)) !== null) {
             const val = match[1] || match[2];
@@ -1315,52 +1270,105 @@
       // 3. Merchant & P2P detection
       let merchant = 'Bank Transaction';
       let category = 'Other';
+      let mode = /upi/i.test(clean) ? 'UPI' : /card|pos/i.test(clean) ? 'Card' : 'NetBanking';
 
-      if (/starbucks|cafe|coffee|mcdonalds|kfc|pizza|burger|swiggy|zomato|dining|restaurant/i.test(clean)) {
-        merchant = 'Dining / Food';
+      // Priority A: Known Merchants (with strict word boundaries to avoid matching inside words like "via")
+      if (/\b(starbucks|cafe|coffee|mcdonalds|kfc|pizza|burger|swiggy|zomato|dining|restaurant)\b/i.test(clean)) {
+        merchant = /swiggy/i.test(clean) ? 'Swiggy Food' : /zomato/i.test(clean) ? 'Zomato Dining' : /starbucks/i.test(clean) ? 'Starbucks Coffee' : 'Dining / Food';
         category = 'Food & Dining';
-      } else if (/blinkit|zepto|bigbasket|grocery|supermarket|mart|dmart|instamart/i.test(clean)) {
-        merchant = 'Groceries / Mart';
+      } else if (/\b(blinkit|zepto|bigbasket|grocery|supermarket|mart|dmart|instamart)\b/i.test(clean)) {
+        merchant = /blinkit/i.test(clean) ? 'Blinkit Grocery' : 'Grocery Store';
         category = 'Groceries';
-      } else if (/uber|ola|rapido|fuel|petrol|shell|hpcl|bpcl|metro|irctc/i.test(clean)) {
-        merchant = 'Transport / Fuel';
+      } else if (/\b(uber|ola|rapido|fuel|petrol|shell|hpcl|bpcl|metro|irctc)\b/i.test(clean)) {
+        merchant = /fuel|petrol|shell|hpcl|bpcl/i.test(clean) ? 'Fuel Station' : 'Uber Ride';
         category = 'Transportation';
-      } else if (/amazon|flipkart|myntra|meesho|ajio|nykaa|zara|h&m|shopping/i.test(clean)) {
-        merchant = 'Online Shopping';
+      } else if (/\b(amazon|flipkart|myntra|meesho|ajio|nykaa|zara|h&m|shopping)\b/i.test(clean)) {
+        merchant = /amazon/i.test(clean) ? 'Amazon Shopping' : 'Online Shopping';
         category = 'Shopping';
-      } else if (/electricity|water|bill|bescom|airtel|jio|vi|recharge/i.test(clean)) {
-        merchant = 'Bills & Utilities';
+      } else if (/\b(electricity|water|bill|bescom|airtel|jio|broadband|fastag|recharge)\b/i.test(clean)) {
+        merchant = /bescom|electricity/i.test(clean) ? 'Electricity Bill' : 'Bills & Utilities';
         category = 'Utilities & Bills';
-      } else if (/pharmacy|apollo|pharmeasy|1mg|hospital|clinic/i.test(clean)) {
-        merchant = 'Healthcare';
-        category = 'Healthcare';
-      } else {
-        const p2p = extractP2PTransfer(clean, isCredit);
-        if (p2p) {
-          merchant = p2p.merchant;
-          category = p2p.category;
-        } else if (isCredit) {
-          merchant = 'Salary / Deposit';
-          category = 'Salary';
+      } else if (isCredit && /\b(salary|payroll)\b/i.test(clean)) {
+        merchant = 'Salary Credit';
+        category = 'Salary';
+      }
+
+      // Priority B: Person-to-Person (P2P) Send Money or Receive Money
+      if (merchant === 'Bank Transaction') {
+        const stopWords = new Set([
+          'upi', 'via', 'on', 'using', 'ref', 'a/c', 'account', 'for', 'at', 'bank',
+          'avl', 'bal', 'inr', 'rs', 'phonepe', 'gpay', 'paytm', 'customer', 'user',
+          'info', 'acct', 'xx', 'towards', 'transfer', 'trf', 'from', 'your', 'through',
+          'neft', 'imps', 'rtgs', 'no', 'linked'
+        ]);
+
+        function cleanName(raw) {
+          if (!raw) return null;
+          raw = raw.replace(/[/@_].*$/, ''); // strip VPA/email domain
+          const words = raw.trim().split(/\s+/);
+          const cleaned = [];
+          for (const w of words) {
+            const cw = w.replace(/[^a-zA-Z]/g, '');
+            if (stopWords.has(cw.toLowerCase())) break;
+            if (cw) cleaned.push(cw.charAt(0).toUpperCase() + cw.slice(1).toLowerCase());
+          }
+          if (cleaned.length > 0 && cleaned.length <= 3) {
+            return cleaned.join(' ');
+          }
+          return null;
+        }
+
+        // Pattern B1: UPI Info pattern (e.g. Info: UPI/RAHUL SHARMA/rahul@okaxis)
+        const upiMatch = clean.match(/\bUPI\/(?:[\w\d]+\/)?([A-Za-z\s]{2,25})[/@]/i);
+        if (upiMatch) {
+          const name = cleanName(upiMatch[1]);
+          if (name && !/customer|user|account|payment/i.test(name)) {
+            merchant = isCredit ? `Received from ${name}` : `Sent to ${name}`;
+            category = 'Personal Transfer';
+            mode = 'UPI';
+          }
+        }
+
+        // Pattern B2: Standard Send/Receive text
+        if (merchant === 'Bank Transaction') {
+          if (isCredit) {
+            const mRec = clean.match(/\b(?:received\s+from|from|credited\s+by|deposited\s+by|trf\s+from|transfer\s+from)\s+([A-Za-z\s]{2,30})/i);
+            if (mRec) {
+              const name = cleanName(mRec[1]);
+              if (name && !/customer|user|account|payment/i.test(name)) {
+                merchant = `Received from ${name}`;
+                category = 'Personal Transfer';
+              }
+            }
+          } else {
+            const mSend = clean.match(/\b(?:towards\s+transfer\s+to|transfer(?:red)?\s+to|trf\s+to|paid\s+to|sent\s+to|to|towards)\s+([A-Za-z\s]{2,25})/i);
+            if (mSend) {
+              const name = cleanName(mSend[1]);
+              if (name && !/customer|user|account|payment|your\s+bank/i.test(name)) {
+                merchant = `Sent to ${name}`;
+                category = 'Personal Transfer';
+              }
+            }
+          }
         }
       }
 
-      // 4. Bank name
+      if (merchant === 'Bank Transaction' && isCredit) {
+        merchant = 'Account Deposit';
+        category = 'Income';
+      }
+
+      // 4. Bank name (ignoring VPAs like @okaxis)
+      const cleanNoVpa = clean.replace(/@\w+/g, ' ');
       let bank = 'Bank';
-      if (/hdfc/i.test(clean)) bank = 'HDFC Bank';
-      else if (/sbi/i.test(clean)) bank = 'SBI';
-      else if (/icici/i.test(clean)) bank = 'ICICI Bank';
-      else if (/axis/i.test(clean)) bank = 'Axis Bank';
-      else if (/kotak/i.test(clean)) bank = 'Kotak Bank';
-      else if (/chase/i.test(clean)) bank = 'Chase';
+      if (/\bhdfc\b/i.test(cleanNoVpa)) bank = 'HDFC Bank';
+      else if (/\bsbi|state bank\b/i.test(cleanNoVpa)) bank = 'SBI';
+      else if (/\bicici\b/i.test(cleanNoVpa)) bank = 'ICICI Bank';
+      else if (/\baxis\b/i.test(cleanNoVpa)) bank = 'Axis Bank';
+      else if (/\bkotak\b/i.test(cleanNoVpa)) bank = 'Kotak Bank';
+      else if (/\bchase\b/i.test(cleanNoVpa)) bank = 'Chase';
 
-      // 5. Payment mode
-      let mode = 'UPI';
-      if (/upi/i.test(clean)) mode = 'UPI';
-      else if (/card|credit|debit/i.test(clean)) mode = 'Card';
-      else if (/netbanking|neft|rtgs|imps/i.test(clean)) mode = 'NetBanking';
-
-      // 6. Last 4 digits
+      // 5. Last 4 digits
       let last4 = '';
       const cardMatch = clean.match(/(?:card|a\/c|account|xx|\*\*)[^\d]*(\d{4})/i);
       if (cardMatch) last4 = cardMatch[1];
@@ -1372,7 +1380,7 @@
         type,
         merchant,
         category,
-        bank,
+        bank: last4 ? `${bank} (${last4})` : bank,
         last4,
         mode,
         date,
@@ -1477,7 +1485,7 @@
           const res = parseBankSMSText(sms);
           if (res && res.amount && !isNaN(res.amount)) {
             const newRec = {
-              id: Date.now().toString(),
+              id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
               amount: res.amount,
               type: res.type,
               merchant: res.merchant,
@@ -1491,9 +1499,17 @@
             };
             transactions.unshift(newRec);
             saveState();
-            showToast(`⚡ Auto-Recorded: ${currencySymbol}${res.amount.toFixed(2)} (${res.merchant})`);
+            showToast(`⚡ Saved to Mobile: ${currencySymbol}${res.amount.toFixed(2)} (${res.merchant})`);
             window.history.replaceState({}, document.title, window.location.pathname);
             switchTab('expenses');
+          } else {
+            // Switch to SMS tab and place raw text in input
+            switchTab('sms');
+            setTimeout(() => {
+              const input = document.getElementById('smsInput');
+              if (input) input.value = sms;
+            }, 150);
+            showToast('⚠️ Could not automatically detect amount. Please review message.');
           }
         }
       } catch (e) {
@@ -1658,6 +1674,42 @@
             </button>
           </div>
 
+          <!-- Dynamic Bank & Credit Card Statement Importer Card -->
+          <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/60 border border-indigo-500/40 p-4 rounded-2xl space-y-3 shadow-xl">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-2xl">📂</span>
+              <div>
+                <h3 class="text-xs font-bold text-white">Dynamic Bank Statement Importer</h3>
+                <p class="text-[10px] text-indigo-300">Upload PDF/CSV statements directly to mobile database</p>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+              Upload monthly statements (.PDF or .CSV) from any bank or credit card. Decrypted and parsed 100% on this mobile device.
+            </p>
+
+            <input type="file" id="bankStatementFile" accept=".csv,.txt,.tsv,.pdf" class="hidden" onchange="handleStatementFileUpload(event)">
+
+            <div class="flex flex-col gap-2">
+              <button onclick="document.getElementById('bankStatementFile').click()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 shadow-md shadow-indigo-600/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Upload Statement (.PDF or .CSV)</span>
+              </button>
+
+              <button onclick="toggleStatementPasteBox()" class="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-[11px] font-semibold transition flex items-center justify-center space-x-1.5 border border-slate-700">
+                <span>📝</span>
+                <span id="pasteToggleLabel">Or Paste Statement Text</span>
+              </button>
+            </div>
+
+            <div id="statementPasteSection" class="hidden space-y-2 pt-1">
+              <textarea id="statementTextInput" rows="4" placeholder="Paste statement text or CSV rows here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
+              <button onclick="parsePastedStatement()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
+                ⚡ Parse Statement into Mobile
+              </button>
+            </div>
+          </div>
+
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
             <h3 class="text-xs font-bold text-slate-300">Data Management</h3>
             <button onclick="exportData()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2">
@@ -1691,10 +1743,10 @@
     }
 
     function resetData() {
-      if (confirm('Reset transactions to default samples?')) {
-        transactions = [...initialData];
+      if (confirm('Are you sure you want to erase all transactions from your mobile database? This cannot be undone.')) {
+        transactions = [];
         saveState();
-        showToast('Data reset complete.');
+        showToast('Mobile database cleared.');
         switchTab('dashboard');
       }
     }
